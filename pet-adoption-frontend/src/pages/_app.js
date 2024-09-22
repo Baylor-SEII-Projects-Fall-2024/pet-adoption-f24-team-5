@@ -9,7 +9,7 @@ import { PetAdoptionThemeProvider } from '@/utils/theme';
 import { buildStore } from '@/utils/redux';
 
 import '@/styles/globals.css'
-import '@/styles/SearchEngine.css';
+import '@/styles/styled-button.css';
 
 // Initialize Redux
 let initialState = {};
