@@ -2,11 +2,10 @@ import React from 'react';
 import Head from 'next/head';
 import { AppBar, Button, Card, CardContent, Stack, Toolbar, Typography } from '@mui/material';
 import styles from '@/styles/Home.module.css';
+import { useRouter } from 'next/router';
 
 export default function HomePage() {
-    const onButtonPress = () => {
-        alert('You pressed a button!');
-    };
+    const router = useRouter();
 
     return (
         <>
@@ -19,8 +18,9 @@ export default function HomePage() {
                     <Typography variant="h6" sx={{ flexGrow: 1 }}>
                         Pet Adoption
                     </Typography>
-                    <Button color="inherit" onClick={onButtonPress}>Profile</Button>
-                    <Button color="inherit" onClick={onButtonPress}>TBH</Button>
+                    <Button color="inherit" onClick={() => router.push('/PostPet')}>Profile</Button>
+                    <Button color="inherit" onClick={() => router.push('/SearchEngine')}>Search Engine</Button>
+                    <Button color="inherit" onClick={() => router.push('/settings')}>Settings</Button>
                 </Toolbar>
             </AppBar>
 
