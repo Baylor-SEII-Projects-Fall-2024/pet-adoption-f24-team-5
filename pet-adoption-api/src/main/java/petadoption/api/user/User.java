@@ -2,10 +2,14 @@ package petadoption.api.user;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @Data
 @Entity
 @Table(name = User.TABLE_NAME)
+@Getter
+@Setter
 public class User {
     public static final String TABLE_NAME = "USERS";
 
@@ -26,4 +30,32 @@ public class User {
 
     @Column(name = "USER_TYPE")
     String userType;
+
+    @Column(name = "AGE")
+    int age;
+
+    @Column(name = "PHONE_NUMBER")
+    String phoneNumber;
+
+    public User() {
+
+    }
+
+    public User(String emailAddress, String password, UserType userType, int age, String phoneNumber) {
+        this.emailAddress = emailAddress;
+        this.password = password;
+        this.userType = String.valueOf(userType);
+        this.age = age;
+        this.phoneNumber = phoneNumber;
+    }
+    public User(Long id, String emailAddress, String password, UserType userType, int age, String phoneNumber) {
+        this.id = id;
+        this.emailAddress = emailAddress;
+        this.password = password;
+        this.userType = String.valueOf(userType);
+        this.age = age;
+        this.phoneNumber = phoneNumber;
+    }
+
+
 }
