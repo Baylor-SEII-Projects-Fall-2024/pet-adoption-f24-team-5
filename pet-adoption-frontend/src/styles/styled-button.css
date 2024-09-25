@@ -1,0 +1,25 @@
+.styled-button {
+    background-color: #4CAF50; /* Green background */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 10px;
+    cursor: pointer;
+    border-radius: 8px; /* Rounded corners */
+    transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transition */
+}
+
+.styled-button:hover {
+    background-color: #459049; /* Darker green on hover */
+    transform: scale(1.05); /* Slight zoom-in effect on hover */
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
