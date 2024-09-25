@@ -8,7 +8,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class LoginEndpoint {
     @GetMapping("/login")
-    public String ping() {
+    public String login() {
         return "login";
     }
+
 }
