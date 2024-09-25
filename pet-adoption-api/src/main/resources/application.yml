@@ -8,5 +8,6 @@ spring:
     driverClassName: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
+      #ddl-auto: create-drop
       ddl-auto: update
     show-sql: true
