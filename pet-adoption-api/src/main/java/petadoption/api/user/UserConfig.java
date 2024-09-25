@@ -35,7 +35,7 @@ public class UserConfig {
                     "254-556-7794"
             );
 
-            userRepository.saveAll(List.of(user1,user2, user3));
+            //userRepository.saveAll(List.of(user1,user2, user3));
         };
     }
 }

@@ -4,38 +4,69 @@ import axios from 'axios';
 
 const SearchEngine = () => {
     const [email, setEmail] = useState('');
+    const [id, setId] = useState('');
+    const [userType ,setUserType] = useState('');
+    const [age, setAge] = useState('');
+    const[phoneNumber, setPhoneNumber] = useState('');
     const [password, setPassword] = useState('');
-    const [submitted, setSubmitted] = useState(false); // New state to trigger useEffect
+
+
+    const [submitted, setSubmitted] = useState(false);
+
+
 
     useEffect(() => {
         if (submitted) {
-            const user = {
+            const loginRequest = {
                 email,
                 password
             };
 
+            const user = {
+                id,
+                email,
+                password,
+                userType,
+                age,
+                phoneNumber
+            };
+
+            console.log(loginRequest);
+
             axios
-                .post('http://localhost:8080/api/users/login', user)
+                .post('http://localhost:8080/api/users/login', loginRequest)
                 .then((res) => {
-                    alert(res.data.message);
-                    setEmail('');
-                    setPassword('');
+
+                    console.log(res.status);
+                    if(res.status !== 401){
+                        alert(
+                            "ID: " + res.data.id + '\n' +
+                            "Email Address: " + user.email  + '\n' +
+                            "UserType: "+ res.data.userType + '\n' +
+                            "Age: " + res.data.age + '\n' +
+                            "Phone number: "+ res.data.phoneNumber + '\n'
+                        )
+
+                        // Clear input fields by resetting state values
+                        setEmail('');
+                        setPassword('');
+                    }
                 })
                 .catch((err) => {
-                    console.error(err); // Log the error for debugging
-                    if (err.response) {
-                        alert(`Error: ${err.response.data.message || err.response.status}`);
-                    } else if (err.request) {
-                        alert('No response from the server. Please try again later.');
+                    // Handle the error when the status code is 401
+                    if (err.response && err.response.status === 401) {
+                        alert(err.response.data);
                     } else {
-                        alert('Error in setting up the request');
+                        console.error('An unexpected error occurred:', err);
+                        alert('An unexpected error occurred. Please try again later.');
                     }
                 })
                 .finally(() => {
                     setSubmitted(false); // Reset the submitted state after the request
                 });
+
         }
-    }, [submitted]); // Trigger useEffect when `submitted` changes
+    }, [submitted]);
 
     const handleSubmit = (event) => {
         event.preventDefault();

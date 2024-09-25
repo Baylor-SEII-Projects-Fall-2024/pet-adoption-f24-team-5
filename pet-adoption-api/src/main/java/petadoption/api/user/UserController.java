@@ -10,6 +10,7 @@ import java.util.List;
 
 @RequestMapping("/api/users")
 @RestController
+@CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
     @Autowired
     private final UserService userService;
@@ -25,6 +26,7 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+        System.out.println("Checking: " + request.getEmail() + " " + request.getPassword());
         try{
             User user = userService.loginUser(request.getEmail(), request.getPassword());
             return new ResponseEntity<>(user, HttpStatus.OK);
