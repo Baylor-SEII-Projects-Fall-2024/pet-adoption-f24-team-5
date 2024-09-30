@@ -10,7 +10,8 @@ import lombok.Setter;
 @Table(name = User.TABLE_NAME)
 @Getter
 @Setter
-public class User {
+@Inheritance(strategy = InheritanceType.JOINED)
+public abstract class User {
     public static final String TABLE_NAME = "USERS";
 
     @Id
@@ -20,22 +21,23 @@ public class User {
             sequenceName = TABLE_NAME + "_SEQUENCE"
     )
     @Column(name = "USER_ID")
-    Long id;
+    protected Long id;
 
     @Column(name = "EMAIL_ADDRESS")
-    String emailAddress;
+    protected  String emailAddress;
 
     @Column(name = "PASSWORD")
-    String password;
+    protected String password;
 
     @Column(name = "USER_TYPE")
-    String userType;
+    @Enumerated(EnumType.STRING)
+    protected UserType userType;
 
     @Column(name = "AGE")
-    int age;
+    protected int age;
 
     @Column(name = "PHONE_NUMBER")
-    String phoneNumber;
+    protected String phoneNumber;
 
     public User() {
 
@@ -44,7 +46,7 @@ public class User {
     public User(String emailAddress, String password, UserType userType, int age, String phoneNumber) {
         this.emailAddress = emailAddress;
         this.password = password;
-        this.userType = String.valueOf(userType);
+        this.userType = userType;
         this.age = age;
         this.phoneNumber = phoneNumber;
     }
@@ -52,7 +54,7 @@ public class User {
         this.id = id;
         this.emailAddress = emailAddress;
         this.password = password;
-        this.userType = String.valueOf(userType);
+        this.userType = userType;
         this.age = age;
         this.phoneNumber = phoneNumber;
     }

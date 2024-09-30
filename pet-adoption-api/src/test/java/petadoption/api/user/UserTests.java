@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import petadoption.api.user.Owner.Owner;
 
 import java.util.Optional;
 
@@ -19,8 +20,8 @@ public class UserTests {
 
     @Test
     void testUserCreate() {
-        User newUser = new User();
-        newUser.userType = "PETOWNER";
+        User newUser = new Owner();
+        newUser.userType = UserType.PetOwner;
         newUser.emailAddress = "example@example.com";
         newUser.password = "password";
 
