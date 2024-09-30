@@ -35,4 +35,20 @@ public class UserService {
         }
         return user.get();
     }
+
+    public Long registerUser(User account) throws IllegalArgumentException{
+        Optional<User> user = userRepository.findByEmailAddress(account.getEmailAddress());
+        if (user.isPresent()) {
+            throw new IllegalArgumentException("Email is already in use");
+        }
+        userRepository.save(account);
+        user = userRepository.findByEmailAddress(account.emailAddress);
+
+        if(user.isEmpty()){
+            throw new IllegalArgumentException("Error adding user");
+        }
+        return user.get().getId();
+    }
+
+
 }
