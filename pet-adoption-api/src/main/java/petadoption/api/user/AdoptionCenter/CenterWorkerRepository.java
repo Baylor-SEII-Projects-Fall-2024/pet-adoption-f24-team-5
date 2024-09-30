@@ -6,6 +6,6 @@ import petadoption.api.user.User;
 import petadoption.api.user.UserRepository;
 
 @Repository
-public interface CenterWorkerRepository extends UserRepository {
+public interface CenterWorkerRepository extends JpaRepository<CenterWorker, Long> {
 
 }

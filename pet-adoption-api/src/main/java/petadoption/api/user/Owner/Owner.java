@@ -10,23 +10,36 @@ import petadoption.api.user.UserType;
 @Getter
 @Setter
 @Entity
+@Table(name = User.TABLE_NAME)
 public class Owner extends User {
     public static final String TABLE_NAME = "OWNERS";
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "PREFERENCE_ID", unique = true, nullable = false)
-    private Preference preference;
+    @Id
+    @GeneratedValue(generator = TABLE_NAME + "_GENERATOR")
+    @SequenceGenerator(
+            name = TABLE_NAME + "_GENERATOR",
+            sequenceName = TABLE_NAME + "_SEQUENCE"
+    )
+    @Column(name = "OWNER_ID", unique = true, nullable = false)
+    private Long id;
+
+    @Column(name = "USER_ID", unique = true, nullable = false)
+    private Long userId;
+
+    @Column(name = "PREFERENCE_ID", unique = true)
+    private Long preferenceId;
 
     public Owner(){
         super();
     }
-    public Owner(String emailAddress, String password, UserType userType, int age, String phoneNumber, Preference preference) {
+
+    public Owner(String emailAddress, String password, UserType userType, int age, String phoneNumber, Long preferenceId) {
         super(emailAddress, password, userType, age, phoneNumber);
-        this.preference = preference;
+        this.preferenceId = preferenceId;
     }
 
-    public Owner(Long id, String emailAddress, String password, UserType userType, int age, String phoneNumber, Preference preference) {
+    public Owner(Long id, String emailAddress, String password, UserType userType, int age, String phoneNumber, Long preferenceId) {
         super(id, emailAddress, password, userType, age, phoneNumber);
-        this.preference = preference;
+        this.preferenceId = preferenceId;
     }
 }

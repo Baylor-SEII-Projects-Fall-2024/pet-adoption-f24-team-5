@@ -3,13 +3,15 @@ package petadoption.api.user;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import petadoption.api.user.AdoptionCenter.CenterWorkerRepository;
+import petadoption.api.user.Owner.OwnerRepository;
 
 import java.util.List;
 
 @Configuration
 public class UserConfig {
     @Bean
-    CommandLineRunner commandLineRunner(UserRepository userRepository) {
+    CommandLineRunner commandLineRunner(UserRepository userRepository, CenterWorkerRepository centerWorkerRepository, OwnerRepository ownerRepository) {
         return args -> {
             User user1 = new User(
                     "peter727@gmail.com",

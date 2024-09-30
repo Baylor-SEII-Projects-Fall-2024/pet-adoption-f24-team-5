@@ -10,8 +10,7 @@ import lombok.Setter;
 @Table(name = User.TABLE_NAME)
 @Getter
 @Setter
-@Inheritance(strategy = InheritanceType.JOINED)
-public abstract class User {
+public class User {
     public static final String TABLE_NAME = "USERS";
 
     @Id

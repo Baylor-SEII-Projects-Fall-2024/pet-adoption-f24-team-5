@@ -7,5 +7,5 @@ import petadoption.api.user.User;
 import petadoption.api.user.UserRepository;
 
 @Repository
-public interface OwnerRepository extends UserRepository {
+public interface OwnerRepository extends JpaRepository<Owner, Long> {
 }
