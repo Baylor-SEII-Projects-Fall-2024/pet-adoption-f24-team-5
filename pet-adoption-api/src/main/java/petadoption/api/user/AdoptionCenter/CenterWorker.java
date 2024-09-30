@@ -2,6 +2,7 @@ package petadoption.api.user.AdoptionCenter;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import petadoption.api.preferences.Preference;
@@ -9,42 +10,37 @@ import petadoption.api.user.User;
 import petadoption.api.user.UserType;
 
 
-@Data
-@Entity
-@Table(name = User.TABLE_NAME)
 @Getter
 @Setter
+@Entity
+@DiscriminatorValue("CENTERWORKER")
+@PrimaryKeyJoinColumn(name="USER_ID")
+@EqualsAndHashCode(callSuper=true)
 public class CenterWorker extends User{
-    public static final String TABLE_NAME = "CENTER_WORKERS";
 
-    @Id
-    @GeneratedValue(generator = TABLE_NAME + "_GENERATOR")
-    @SequenceGenerator(
-            name = TABLE_NAME + "_GENERATOR",
-            sequenceName = TABLE_NAME + "_SEQUENCE"
-    )
-    @Column(name = "Worker_ID", unique = true, nullable = false)
-    protected Long id;
 
-    @Column(name = "USER_ID", unique = true, nullable = false)
-    private Long userId;
-
-    @Column(name = "CENTER_ID")
+    @Column(name = "CENTER_ID", nullable = true)
     private Long centerID;
 
     public CenterWorker(){
         super();
+        centerID = -1L;
     }
 
-
-    public CenterWorker(String emailAddress, String password, UserType userType, int age, String phoneNumber, Long userId) {
+    public CenterWorker(String emailAddress, String password, UserType userType, int age, String phoneNumber) {
         super(emailAddress, password, userType, age, phoneNumber);
-        this.userId = userId;
+        centerID = -1L;
     }
 
-    public CenterWorker(Long id, String emailAddress, String password, UserType userType, int age, String phoneNumber, Long userId) {
+
+    public CenterWorker(String emailAddress, String password, UserType userType, int age, String phoneNumber, Long centerID) {
+        super(emailAddress, password, userType, age, phoneNumber);
+        this.centerID = centerID;
+    }
+
+    public CenterWorker(Long id, String emailAddress, String password, UserType userType, int age, String phoneNumber, Long centerID) {
         super(id, emailAddress, password, userType, age, phoneNumber);
-        this.userId = userId;
+        this.centerID = centerID;
     }
 
 

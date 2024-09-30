@@ -9,18 +9,14 @@ import petadoption.api.user.User;
 
 @Data
 @Entity
-@Table(name = User.TABLE_NAME)
+@Table(name = Preference.TABLE_NAME)
 @Getter
 @Setter
 public class Preference {
     public static final String TABLE_NAME = "PREFERENCES";
 
     @Id
-    @GeneratedValue(generator = TABLE_NAME + "_GENERATOR")
-    @SequenceGenerator(
-            name = TABLE_NAME + "_GENERATOR",
-            sequenceName = TABLE_NAME + "_SEQUENCE"
-    )
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "PREFERENCE_ID")
     private Long id;
 

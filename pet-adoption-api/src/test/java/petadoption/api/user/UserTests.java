@@ -21,7 +21,7 @@ public class UserTests {
     @Test
     void testUserCreate() {
         User newUser = new Owner();
-        newUser.userType = UserType.PetOwner;
+        newUser.userType = UserType.Owner;
         newUser.emailAddress = "example@example.com";
         newUser.password = "password";
 

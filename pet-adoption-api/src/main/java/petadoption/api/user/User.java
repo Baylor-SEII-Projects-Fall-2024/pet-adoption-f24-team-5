@@ -4,21 +4,18 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-
+@Getter
+@Setter
 @Data
 @Entity
 @Table(name = User.TABLE_NAME)
-@Getter
-@Setter
+@Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn(name = "USER_TYPE", discriminatorType = DiscriminatorType.STRING)
 public class User {
     public static final String TABLE_NAME = "USERS";
 
     @Id
-    @GeneratedValue(generator = TABLE_NAME + "_GENERATOR")
-    @SequenceGenerator(
-            name = TABLE_NAME + "_GENERATOR",
-            sequenceName = TABLE_NAME + "_SEQUENCE"
-    )
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "USER_ID")
     protected Long id;
 
@@ -28,7 +25,7 @@ public class User {
     @Column(name = "PASSWORD")
     protected String password;
 
-    @Column(name = "USER_TYPE")
+    @Column(name = "ACCOUNT_TYPE")
     @Enumerated(EnumType.STRING)
     protected UserType userType;
 

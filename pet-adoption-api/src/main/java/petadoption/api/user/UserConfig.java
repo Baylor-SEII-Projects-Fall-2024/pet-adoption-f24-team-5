@@ -1,43 +1,53 @@
 package petadoption.api.user;
 
+import jakarta.websocket.OnClose;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import petadoption.api.user.AdoptionCenter.CenterWorker;
 import petadoption.api.user.AdoptionCenter.CenterWorkerRepository;
+import petadoption.api.user.Owner.Owner;
 import petadoption.api.user.Owner.OwnerRepository;
+import petadoption.api.user.UserRepository;
 
 import java.util.List;
+
+import static petadoption.api.user.UserType.CenterOwner;
 
 @Configuration
 public class UserConfig {
     @Bean
-    CommandLineRunner commandLineRunner(UserRepository userRepository, CenterWorkerRepository centerWorkerRepository, OwnerRepository ownerRepository) {
+    CommandLineRunner commandLineRunner(CenterWorkerRepository centerWorkerRepository, OwnerRepository ownerRepository) {
         return args -> {
-            User user1 = new User(
+            CenterWorker user1 = new CenterWorker(
                     "peter727@gmail.com",
                     "password",
-                    UserType.ClinicOwner,
+                    CenterOwner,
                     20,
-                    "914-282-8870"
+                    "914-282-8870",
+                    1L
             );
 
-            User user2 = new User(
+            CenterWorker user2 = new CenterWorker(
                     "ben@gmail.com",
                     "password2",
-                    UserType.ClinicWorker,
+                    UserType.CenterWorker,
                     21,
-                    "631-889-5214"
+                    "631-889-5214",
+                    1L
             );
 
-            User user3 = new User(
+            Owner user3 = new Owner(
                     "Jackson@gmail.com",
                     "password3",
-                    UserType.PetOwner,
+                    UserType.Owner,
                     21,
                     "254-556-7794"
             );
 
-            userRepository.saveAll(List.of(user1,user2, user3));
+            centerWorkerRepository.saveAll(List.of(user1,user2));
+            ownerRepository.saveAll(List.of(user3));
+
         };
     }
 }

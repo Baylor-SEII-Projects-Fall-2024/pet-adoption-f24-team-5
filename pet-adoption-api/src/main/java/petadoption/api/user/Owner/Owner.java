@@ -1,6 +1,7 @@
 package petadoption.api.user.Owner;
 
 import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import petadoption.api.preferences.Preference;
@@ -10,36 +11,28 @@ import petadoption.api.user.UserType;
 @Getter
 @Setter
 @Entity
-@Table(name = User.TABLE_NAME)
+@DiscriminatorValue("OWNER")
+@PrimaryKeyJoinColumn(name="USER_ID")
+@EqualsAndHashCode(callSuper=true)
 public class Owner extends User {
-    public static final String TABLE_NAME = "OWNERS";
 
-    @Id
-    @GeneratedValue(generator = TABLE_NAME + "_GENERATOR")
-    @SequenceGenerator(
-            name = TABLE_NAME + "_GENERATOR",
-            sequenceName = TABLE_NAME + "_SEQUENCE"
-    )
-    @Column(name = "OWNER_ID", unique = true, nullable = false)
-    private Long id;
-
-    @Column(name = "USER_ID", unique = true, nullable = false)
-    private Long userId;
-
-    @Column(name = "PREFERENCE_ID", unique = true)
-    private Long preferenceId;
+    @OneToOne
+    @JoinColumn(name = "PREFERENCE_ID")
+    private Preference preference;
 
     public Owner(){
         super();
     }
-
-    public Owner(String emailAddress, String password, UserType userType, int age, String phoneNumber, Long preferenceId) {
+    public Owner(String emailAddress, String password, UserType userType, int age, String phoneNumber) {
         super(emailAddress, password, userType, age, phoneNumber);
-        this.preferenceId = preferenceId;
+    }
+    public Owner(String emailAddress, String password, UserType userType, int age, String phoneNumber, Preference preference) {
+        super(emailAddress, password, userType, age, phoneNumber);
+        this.preference = preference;
     }
 
-    public Owner(Long id, String emailAddress, String password, UserType userType, int age, String phoneNumber, Long preferenceId) {
+    public Owner(Long id, String emailAddress, String password, UserType userType, int age, String phoneNumber, Preference preference) {
         super(id, emailAddress, password, userType, age, phoneNumber);
-        this.preferenceId = preferenceId;
+        this.preference = preference;
     }
 }
