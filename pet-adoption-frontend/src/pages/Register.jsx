@@ -3,10 +3,14 @@ import { Button, Stack } from "@mui/material";
 import axios from 'axios';
 import { TextField } from '@mui/material';
 import { Link } from 'react-router-dom';
+import MenuItem from '@mui/material/MenuItem';
+import { Box, Typography } from '@mui/material';
+
 const Register = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [userType, setUserType] = useState('');
+    const [adoptionCenterName, setAdoptionCenterName] = useState('');
     const [age, setAge] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
     const [userName, setUserName] = useState('');
@@ -31,6 +35,7 @@ const Register = () => {
                 setEmail('');
                 setPassword('');
                 setUserType('');
+                setAdoptionCenterName('');
                 setAge('');
                 setPhoneNumber('');
                 setUserName('');
@@ -42,10 +47,24 @@ const Register = () => {
     };
 
     return (
-        <div>
-            <h1>Register</h1>
-            <form onSubmit={handleSubmit}>
+        <Box>
+            <Typography variant="h4" component="h1" gutterBottom>
+                Register
+            </Typography>
+            <Box component="form" onSubmit={handleSubmit}>
                 <Stack spacing={2}>
+                    <TextField
+                        select
+                        label="User Type"
+                        value={userType}
+                        onChange={(e) => setUserType(e.target.value)}
+                        required
+                        fullWidth
+                    >
+                        <MenuItem value="owner">Adoption Center Owner</MenuItem>
+                        <MenuItem value="employee">Adoption Center Employee</MenuItem>
+                        <MenuItem value="user">Pet Owner</MenuItem>
+                    </TextField>
                     <TextField
                         label="Email"
                         type="email"
@@ -71,14 +90,6 @@ const Register = () => {
                         fullWidth
                     />
                     <TextField
-                        label="User Type"
-                        type="text"
-                        value={userType}
-                        onChange={(e) => setUserType(e.target.value)}
-                        required
-                        fullWidth
-                    />
-                    <TextField
                         label="Phone Number"
                         type="tel"
                         value={phoneNumber}
@@ -86,11 +97,23 @@ const Register = () => {
                         required
                         fullWidth
                     />
+                    {userType === 'owner' && (
+                        <TextField
+                            label="Adoption Center Name"
+                            type="text"
+                            value={adoptionCenterName}
+                            onChange={(e) => setAdoptionCenterName(e.target.value)}
+                            required
+                            fullWidth
+                        />
+                    )}
                 </Stack>
-                <Button variant="contained" component={Link} to="/Login">Login</Button>
-                <Button type="submit" variant="contained">Register</Button>
-            </form>
-        </div>
+                <Stack direction="row" spacing={2} mt={2}>
+                    <Button variant="contained" component={Link} to="/Login">Login</Button>
+                    <Button type="submit" variant="contained">Register</Button>
+                </Stack>
+            </Box>
+        </Box>
     );
 };
 

@@ -49,7 +49,7 @@ export default function App() {
               <Route path="/Login" element={<Login />} />
               <Route path="/PostPet" element={<PostPet />} />
               <Route path="/SearchEngine" element={<SearchEngine />} />
-              <Route path="/settings" element={<Settings />} />
+              <Route path="/Settings" element={<Settings />} />
               <Route path="/LocalAdoptionCenter" element={<LocalAdoptionCenter />} />
               <Route path="*" element={<Navigate to="/Login" />} />
             </Routes>
