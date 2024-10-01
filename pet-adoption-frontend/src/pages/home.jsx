@@ -1,12 +1,10 @@
 import React from 'react';
 import Head from 'next/head';
 import { AppBar, Button, Card, CardContent, Stack, Toolbar, Typography } from '@mui/material';
+import { Link } from 'react-router-dom';
 import styles from '@/styles/Home.module.css';
-import { useRouter } from 'next/router';
 
 export default function HomePage() {
-    const router = useRouter();
-
     return (
         <>
             <Head>
@@ -18,9 +16,10 @@ export default function HomePage() {
                     <Typography variant="h6" sx={{ flexGrow: 1 }}>
                         Pet Adoption
                     </Typography>
-                    <Button color="inherit" onClick={() => router.push('/PostPet')}>Profile</Button>
-                    <Button color="inherit" onClick={() => router.push('/SearchEngine')}>Search Engine</Button>
-                    <Button color="inherit" onClick={() => router.push('/settings')}>Settings</Button>
+                    <Button color="inherit" component={Link} to="/PostPet">Profile</Button>
+                    <Button color="inherit" component={Link} to="/SearchEngine">Search Engine</Button>
+                    <Button color="inherit" component={Link} to="/settings">Settings</Button>
+                    <Button color="inherit" component={Link} to="/Login">Log Out</Button>
                 </Toolbar>
             </AppBar>
 
