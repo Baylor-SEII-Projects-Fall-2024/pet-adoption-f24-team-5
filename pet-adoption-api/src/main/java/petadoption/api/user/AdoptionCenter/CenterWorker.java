@@ -22,25 +22,33 @@ public class CenterWorker extends User{
     @Column(name = "CENTER_ID", nullable = true)
     private Long centerID;
 
+    @Column(name = "AGE")
+    private int age;
+
+
+
     public CenterWorker(){
         super();
         centerID = -1L;
     }
 
     public CenterWorker(String emailAddress, String password, UserType userType, int age, String phoneNumber) {
-        super(emailAddress, password, userType, age, phoneNumber);
+        super(emailAddress, password, userType, phoneNumber);
         centerID = -1L;
+        this.age = age;
     }
 
 
     public CenterWorker(String emailAddress, String password, UserType userType, int age, String phoneNumber, Long centerID) {
-        super(emailAddress, password, userType, age, phoneNumber);
+        super(emailAddress, password, userType, phoneNumber);
         this.centerID = centerID;
+        this.age = age;
     }
 
     public CenterWorker(Long id, String emailAddress, String password, UserType userType, int age, String phoneNumber, Long centerID) {
-        super(id, emailAddress, password, userType, age, phoneNumber);
+        super(id, emailAddress, password, userType, phoneNumber);
         this.centerID = centerID;
+        this.age = age;
     }
 
 

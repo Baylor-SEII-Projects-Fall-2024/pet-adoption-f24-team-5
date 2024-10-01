@@ -20,19 +20,25 @@ public class Owner extends User {
     @JoinColumn(name = "PREFERENCE_ID")
     private Preference preference;
 
+    @Column(name = "AGE")
+    private int age;
+
     public Owner(){
         super();
     }
     public Owner(String emailAddress, String password, UserType userType, int age, String phoneNumber) {
-        super(emailAddress, password, userType, age, phoneNumber);
+        super(emailAddress, password, userType, phoneNumber);
+        this.age=age;
     }
     public Owner(String emailAddress, String password, UserType userType, int age, String phoneNumber, Preference preference) {
-        super(emailAddress, password, userType, age, phoneNumber);
+        super(emailAddress, password, userType, phoneNumber);
         this.preference = preference;
+        this.age=age;
     }
 
     public Owner(Long id, String emailAddress, String password, UserType userType, int age, String phoneNumber, Preference preference) {
-        super(id, emailAddress, password, userType, age, phoneNumber);
+        super(id, emailAddress, password, userType, phoneNumber);
         this.preference = preference;
+        this.age=age;
     }
 }

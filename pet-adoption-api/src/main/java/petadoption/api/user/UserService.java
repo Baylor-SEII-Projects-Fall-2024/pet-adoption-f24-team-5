@@ -2,6 +2,8 @@ package petadoption.api.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import petadoption.api.user.AdoptionCenter.AdoptionCenter;
+import petadoption.api.user.AdoptionCenter.AdoptionCenterRepository;
 import petadoption.api.user.AdoptionCenter.CenterWorker;
 import petadoption.api.user.AdoptionCenter.CenterWorkerRepository;
 import petadoption.api.user.Owner.Owner;
@@ -19,6 +21,8 @@ public class UserService {
     private OwnerRepository ownerRepository;
     @Autowired
     private CenterWorkerRepository workerRepository;
+    @Autowired
+    private AdoptionCenterRepository adoptionCenterRepository;
 
     public Optional<User> findUser(Long userId) {
         return userRepository.findById(userId);
@@ -66,7 +70,23 @@ public class UserService {
             throw new IllegalArgumentException("Email is already in use");
         }
 
-        workerRepository.save((CenterWorker) account);
+        workerRepository.save( account);
+        user = userRepository.findByEmailAddress(account.emailAddress);
+
+        if(user.isEmpty()){
+            throw new IllegalArgumentException("Error adding user");
+        }
+        return user.get().getId();
+    }
+
+    public Long registerUser(AdoptionCenter account) throws IllegalArgumentException{
+        System.out.println("Inside registerUser for CenterWorker");
+        Optional<User> user = userRepository.findByEmailAddress(account.getEmailAddress());
+        if (user.isPresent()) {
+            throw new IllegalArgumentException("Email is already in use");
+        }
+
+        adoptionCenterRepository.save(account);
         user = userRepository.findByEmailAddress(account.emailAddress);
 
         if(user.isEmpty()){

@@ -4,6 +4,8 @@ import jakarta.websocket.OnClose;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import petadoption.api.user.AdoptionCenter.AdoptionCenter;
+import petadoption.api.user.AdoptionCenter.AdoptionCenterRepository;
 import petadoption.api.user.AdoptionCenter.CenterWorker;
 import petadoption.api.user.AdoptionCenter.CenterWorkerRepository;
 import petadoption.api.user.Owner.Owner;
@@ -17,12 +19,12 @@ import static petadoption.api.user.UserType.CenterOwner;
 @Configuration
 public class UserConfig {
     @Bean
-    CommandLineRunner commandLineRunner(CenterWorkerRepository centerWorkerRepository, OwnerRepository ownerRepository) {
+    CommandLineRunner commandLineRunner(CenterWorkerRepository centerWorkerRepository, OwnerRepository ownerRepository, AdoptionCenterRepository adoptionCenterRepository, UserRepository userRepository) {
         return args -> {
             CenterWorker user1 = new CenterWorker(
                     "peter727@gmail.com",
                     "password",
-                    CenterOwner,
+                    UserType.CenterWorker,
                     20,
                     "914-282-8870",
                     1L
@@ -45,8 +47,23 @@ public class UserConfig {
                     "254-556-7794"
             );
 
+            AdoptionCenter adoptionCenter1 = new AdoptionCenter(
+                    "Andrew@gmail.com",
+                    "password4",
+                    UserType.CenterOwner,
+                    "254-556-7794",
+                    "Peter's Adoption Clinic",
+                    "1608 James Avenue",
+                    "Waco",
+                    "Texas",
+                    "76706",
+                    128
+            );
+
             centerWorkerRepository.saveAll(List.of(user1,user2));
             ownerRepository.saveAll(List.of(user3));
+            adoptionCenterRepository.saveAll(List.of(adoptionCenter1));
+
 
         };
     }

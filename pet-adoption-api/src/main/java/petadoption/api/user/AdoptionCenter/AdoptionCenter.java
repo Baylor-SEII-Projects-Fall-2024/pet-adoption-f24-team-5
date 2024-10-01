@@ -1,24 +1,18 @@
 package petadoption.api.user.AdoptionCenter;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import petadoption.api.user.User;
+import petadoption.api.user.UserType;
 
 @Data
 @Entity
-@Table(name = AdoptionCenter.TABLE_NAME)
 @Getter
 @Setter
-public class AdoptionCenter {
-    public static final String TABLE_NAME = "ADOPTION_CENTERS";
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "CENTER_ID")
-    private Long id;
+@DiscriminatorValue("CENTEROWNER")
+@PrimaryKeyJoinColumn(name="USER_ID")
+@EqualsAndHashCode(callSuper=true)
+public class AdoptionCenter extends User {
 
     @Column(name = "CENTER_NAME")
     private String centerName;
@@ -41,7 +35,9 @@ public class AdoptionCenter {
     public AdoptionCenter() {
     }
 
-    public AdoptionCenter(String centerName, String centerAddress, String centerCity, String centerState, String centerZip, int numberOfPets) {
+    public AdoptionCenter(String emailAddress, String password, UserType userType, String phoneNumber,
+                          String centerName, String centerAddress, String centerCity, String centerState, String centerZip, int numberOfPets) {
+        super(emailAddress, password, userType, phoneNumber);
         this.centerName = centerName;
         this.centerAddress = centerAddress;
         this.centerCity = centerCity;
@@ -50,7 +46,9 @@ public class AdoptionCenter {
         this.numberOfPets = numberOfPets;
     }
 
-    public AdoptionCenter(Long id, String centerName, String centerAddress, String centerCity, String centerState, String centerZip, int numberOfPets) {
+    public AdoptionCenter(Long id, String emailAddress, String password, UserType userType, String phoneNumber,
+                          String centerName, String centerAddress, String centerCity, String centerState, String centerZip, int numberOfPets) {
+        super(id, emailAddress, password, userType, phoneNumber);
         this.id = id;
         this.centerName = centerName;
         this.centerAddress = centerAddress;

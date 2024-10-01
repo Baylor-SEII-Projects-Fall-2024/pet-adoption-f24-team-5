@@ -29,30 +29,27 @@ public class User {
     @Enumerated(EnumType.STRING)
     protected UserType userType;
 
-    @Column(name = "AGE")
-    protected int age;
-
     @Column(name = "PHONE_NUMBER")
-    protected String phoneNumber;
+    private String phoneNumber;
 
     public User() {
 
     }
 
-    public User(String emailAddress, String password, UserType userType, int age, String phoneNumber) {
+    public User(String emailAddress, String password, UserType userType, String phoneNumber) {
         this.emailAddress = emailAddress;
         this.password = password;
         this.userType = userType;
-        this.age = age;
         this.phoneNumber = phoneNumber;
+
     }
-    public User(Long id, String emailAddress, String password, UserType userType, int age, String phoneNumber) {
+    public User(Long id, String emailAddress, String password, UserType userType, String phoneNumber) {
         this.id = id;
         this.emailAddress = emailAddress;
         this.password = password;
         this.userType = userType;
-        this.age = age;
         this.phoneNumber = phoneNumber;
+
     }
 
 
