@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import petadoption.api.user.AdoptionCenter.CenterWorker;
+import petadoption.api.user.Owner.Owner;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -34,8 +36,18 @@ public class UserController {
         }
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody User account) {
+    @PostMapping("/register/owner")
+    public ResponseEntity<?> register(@RequestBody Owner account) {
+        try{
+            Long id = userService.registerUser(account);
+            return new ResponseEntity<>(id, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    @PostMapping("/register/centerworker")
+    public ResponseEntity<?> register(@RequestBody CenterWorker account) {
         try{
             Long id = userService.registerUser(account);
             return new ResponseEntity<>(id, HttpStatus.OK);
