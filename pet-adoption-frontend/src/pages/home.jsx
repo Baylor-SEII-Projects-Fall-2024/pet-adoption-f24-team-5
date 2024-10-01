@@ -1,21 +1,57 @@
 import React from 'react';
 import Head from 'next/head';
-import { AppBar, Box, Button, Card, CardContent, Stack, Toolbar, Typography } from '@mui/material';
+import { AppBar, Box, Button, Card, CardContent, Stack, Toolbar, Typography, Grid } from '@mui/material';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import styles from '@/styles/Home.module.css';
 
+
 const HomePage = () => {
-    const [events, setEvents] = useState(
-        [
-            { name: "Dog Pile", description: "This page will show all of the events and the main way you use the app and will show differently if you are a center or user" },
-            { name: "Cat Pile", description: "This page will show all of the events and the main way you use the app and will show differently if you are a center or user" },
-            { name: "Other Pile", description: "This page will show all of the events and the main way you use the app and will show differently if you are a center or user" }
-        ]);
+    const [events, setEvents] = useState([
+        { name: "Dog Pile", description: "This page will show all of the events and the main way you use the app and will show differently if you are a center or user" },
+        { name: "Cat Pile", description: "This page will show all of the events and the main way you use the app and will show differently if you are a center or user" },
+        { name: "Other Pile", description: "This page will show all of the events and the main way you use the app and will show differently if you are a center or user" },
+        { name: "Other Other Pile", description: "This page will show all of the events and the main way you use the app and will show differently if you are a center or user" },
+        { name: "Other Other Other Pile", description: "This page will show all of the events and the main way you use the app and will show differently if you are a center or user" },
+        { name: "Other Other Other Other Pile", description: "This page will show all of the events and the main way you use the app and will show differently if you are a center or user" },
+        { name: "Other Other Other Other Other Pile", description: "This page will show all of the events and the main way you use the app and will show differently if you are a center or user" },
+        { name: "Other Other Other Other Other Other Pile", description: "This page will show all of the events and the main way you use the app and will show differently if you are a center or user" },
+    ]);
+
+    const [pets, setPets] = useState([
+        { name: "Dog Pile", description: "This page will show all of the events and the main way you use the app and will show differently if you are a center or user" },
+        { name: "Cat Pile", description: "This page will show all of the events and the main way you use the app and will show differently if you are a center or user" },
+        { name: "Other Pile", description: "This page will show all of the events and the main way you use the app and will show differently if you are a center or user" },
+        { name: "Other Other Pile", description: "This page will show all of the events and the main way you use the app and will show differently if you are a center or user" },
+    ]);
+
+    const [isEventsCollapsed, setIsEventsCollapsed] = useState(false);
+
+    const handleCollapseToggle = () => {
+        setIsEventsCollapsed(!isEventsCollapsed);
+    };
+
+    const EventCard = ({ event }) => (
+        <Card sx={{ width: '100%', height: '20vh' }} elevation={4} key={event.name}>
+            <CardContent>
+                <Typography variant='h5' align='center'>{event.name}</Typography>
+                <Typography variant='body2' align='center'>{event.description}</Typography>
+            </CardContent>
+        </Card>
+    );
+
+    const PetCard = ({ pet }) => (
+        <Card sx={{ width: '48%' }} elevation={4} key={pet.name}>
+            <CardContent>
+                <Typography variant='h5' align='center'>{pet.name}</Typography>
+                <Typography variant='body2' align='center'>{pet.description}</Typography>
+            </CardContent>
+        </Card>
+    );
 
     return (
         <Box sx={{ height: '100vh', width: '100vw', display: 'flex', flexDirection: 'column' }}>
-            <AppBar position="static" sx={{ height: '8vh' }}>
+            <Box sx={{ height: '8vh', width: '100vw', backgroundColor: 'primary.main' }}>
                 <Toolbar>
                     <Typography variant="h6" sx={{ flexGrow: 1 }}>
                         Pet Adoption
@@ -25,31 +61,34 @@ const HomePage = () => {
                     <Button color="inherit" component={Link} to="/Settings">Settings</Button>
                     <Button color="inherit" component={Link} to="/Login">Log Out</Button>
                 </Toolbar>
-            </AppBar>
+            </Box>
             <Box sx={{ height: '92vh', display: 'flex', flexDirection: 'row' }}>
-                <Box sx={{ width: '30vw', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRight: '1px solid black' }}>
-                    <Stack sx={{ padding: 2 }} alignItems='center' gap={2}>
-                        {events.map((event) => (
-                            <Card sx={{ width: '100%' }} elevation={4} key={event.name}>
-                                <CardContent>
-                                    <Typography variant='h5' align='center'>{event.name}</Typography>
-                                    <Typography variant='body2' align='center'>{event.description}</Typography>
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </Stack>
-                </Box>
-                <Box sx={{ width: '70vw', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Stack sx={{ paddingTop: 4 }} alignItems='center' gap={2}>
-                        <Card sx={{ width: '100%' }} elevation={4}>
-                            <CardContent>
-                                <Typography variant='h3' align='center'>Dog Pile</Typography>
-                            </CardContent>
-                        </Card>
-                    </Stack>
+                {!isEventsCollapsed && (
+                    <Box sx={{ width: '25vw', display: 'flex', flexDirection: 'column', borderRight: '1px solid black', overflowY: 'auto', height: '100%' }}>
+                        <Button onClick={handleCollapseToggle} sx={{ position: 'absolute', left: '23vw' }}>
+                            {'<'}
+                        </Button>
+                        <Grid container spacing={2} padding={2}>
+                            {events.map((event) => (
+                                <Grid item xs={12} key={event.name}>
+                                    <EventCard event={event} />
+                                </Grid>
+                            ))}
+                        </Grid>
+                    </Box>
+                )}
+                {isEventsCollapsed && (
+                    <Button onClick={handleCollapseToggle} sx={{ position: 'absolute', left: '0' }}>
+                        {'>'}
+                    </Button>
+                )}
+                <Box sx={{ width: isEventsCollapsed ? '100vw' : '75vw', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 4, padding: 4 }}>
+                    {pets.map((pet) => (
+                        <PetCard pet={pet} key={pet.name} />
+                    ))}
                 </Box>
             </Box>
-        </Box>
+        </Box >
     );
 }
 
