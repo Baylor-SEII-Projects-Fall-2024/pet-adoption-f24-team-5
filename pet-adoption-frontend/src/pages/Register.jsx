@@ -11,39 +11,72 @@ const Register = () => {
     const [password, setPassword] = useState('');
     const [userType, setUserType] = useState('');
     const [adoptionCenterName, setAdoptionCenterName] = useState('');
+    const [city, setCity] = useState('');
+    const [address, setAddress] = useState('');
     const [age, setAge] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
-    const [userName, setUserName] = useState('');
+    const [state, setState] = useState('');
+    const [zipCode, setZipCode] = useState('');
+    const [centerPetCount, setCenterPetCount] = useState('');
+
 
 
     const handleSubmit = (event) => {
         event.preventDefault();
-
-        const registrationData = {
-            email,
-            password,
-            userType,
-            age,
-            phoneNumber,
-            userName
-        };
-
-        axios
-            .post('http://localhost:8080/api/users/register', registrationData)
-            .then((res) => {
-                alert('Registration successful! Your user ID is: ' + res.data);
-                setEmail('');
-                setPassword('');
-                setUserType('');
-                setAdoptionCenterName('');
-                setAge('');
-                setPhoneNumber('');
-                setUserName('');
-            })
-            .catch((err) => {
-                console.error('An error occurred during registration:', err);
-                alert('An error occurred during registration. Please try again later.');
-            });
+        if (userType === 'owner') {
+            const registrationData = {
+                email,
+                password,
+                userType,
+                phoneNumber,
+                adoptionCenterName,
+                address,
+                city,
+                state,
+                zipCode,
+                centerPetCount
+            };
+            axios
+                .post('http://localhost:8080/api/register/adoptioncenter', registrationData)
+                .then((res) => {
+                    alert('Registration successful! Your user ID is: ' + res.data);
+                    setEmail('');
+                    setPassword('');
+                    setUserType('');
+                    setAdoptionCenterName('');
+                    setCity('');
+                    setAddress('');
+                    setState('');
+                    setZipCode('');
+                    setCenterPetCount('');
+                })
+                .catch((err) => {
+                    console.error('An error occurred during registration:', err);
+                    alert('An error occurred during registration. Please try again later.');
+                });
+        } else {
+            const registrationData = {
+                email,
+                password,
+                userType,
+                phoneNumber,
+                age,
+            };
+            axios
+                .post('http://localhost:8080/api/users/register/owner', registrationData)
+                .then((res) => {
+                    alert('Registration successful! Your user ID is: ' + res.data);
+                    setEmail('');
+                    setPassword('');
+                    setUserType('');
+                    setAge('');
+                    setPhoneNumber('');
+                })
+                .catch((err) => {
+                    console.error('An error occurred during registration:', err);
+                    alert('An error occurred during registration. Please try again later.');
+                });
+        }
     };
 
     return (
@@ -61,8 +94,7 @@ const Register = () => {
                         required
                         fullWidth
                     >
-                        <MenuItem value="owner">Adoption Center Owner</MenuItem>
-                        <MenuItem value="employee">Adoption Center Employee</MenuItem>
+                        <MenuItem value="owner">Adoption Center</MenuItem>
                         <MenuItem value="user">Pet Owner</MenuItem>
                     </TextField>
                     <TextField
@@ -82,14 +114,6 @@ const Register = () => {
                         fullWidth
                     />
                     <TextField
-                        label="User Name"
-                        type="text"
-                        value={userName}
-                        onChange={(e) => setUserName(e.target.value)}
-                        required
-                        fullWidth
-                    />
-                    <TextField
                         label="Phone Number"
                         type="tel"
                         value={phoneNumber}
@@ -103,6 +127,66 @@ const Register = () => {
                             type="text"
                             value={adoptionCenterName}
                             onChange={(e) => setAdoptionCenterName(e.target.value)}
+                            required
+                            fullWidth
+                        />
+                    )}
+                    {userType === 'owner' && (
+                        <TextField
+                            label="Address"
+                            type="text"
+                            value={address}
+                            onChange={(e) => setAddress(e.target.value)}
+                            required
+                            fullWidth
+                        />
+                    )}
+                    {userType === 'owner' && (
+                        <TextField
+                            label="City"
+                            type="text"
+                            value={city}
+                            onChange={(e) => setCity(e.target.value)}
+                            required
+                            fullWidth
+                        />
+                    )}
+                    {userType === 'owner' && (
+                        <TextField
+                            label="State"
+                            type="text"
+                            value={state}
+                            onChange={(e) => setState(e.target.value)}
+                            required
+                            fullWidth
+                        />
+                    )}
+                    {userType === 'owner' && (
+                        <TextField
+                            label="Zip Code"
+                            type="text"
+                            value={zipCode}
+                            onChange={(e) => setZipCode(e.target.value)}
+                            required
+                            fullWidth
+                        />
+                    )}
+                    {userType === 'owner' && (
+                        <TextField
+                            label="Center Pet Count"
+                            type="number"
+                            value={centerPetCount}
+                            onChange={(e) => setCenterPetCount(e.target.value)}
+                            required
+                            fullWidth
+                        />
+                    )}
+                    {userType === 'user' && (
+                        <TextField
+                            label="Age"
+                            type="number"
+                            value={age}
+                            onChange={(e) => setAge(e.target.value)}
                             required
                             fullWidth
                         />
