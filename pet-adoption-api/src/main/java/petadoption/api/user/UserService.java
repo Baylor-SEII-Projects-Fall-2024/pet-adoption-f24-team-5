@@ -2,6 +2,12 @@ package petadoption.api.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import petadoption.api.user.AdoptionCenter.AdoptionCenter;
+import petadoption.api.user.AdoptionCenter.AdoptionCenterRepository;
+import petadoption.api.user.AdoptionCenter.CenterWorker;
+import petadoption.api.user.AdoptionCenter.CenterWorkerRepository;
+import petadoption.api.user.Owner.Owner;
+import petadoption.api.user.Owner.OwnerRepository;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -11,6 +17,12 @@ import java.util.Optional;
 public class UserService {
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private OwnerRepository ownerRepository;
+    @Autowired
+    private CenterWorkerRepository workerRepository;
+    @Autowired
+    private AdoptionCenterRepository adoptionCenterRepository;
 
     public Optional<User> findUser(Long userId) {
         return userRepository.findById(userId);
@@ -36,12 +48,45 @@ public class UserService {
         return user.get();
     }
 
-    public Long registerUser(User account) throws IllegalArgumentException{
+    public Long registerUser(Owner account) throws IllegalArgumentException{
+        System.out.println("Inside registerUser for owner");
         Optional<User> user = userRepository.findByEmailAddress(account.getEmailAddress());
         if (user.isPresent()) {
             throw new IllegalArgumentException("Email is already in use");
         }
-        userRepository.save(account);
+        ownerRepository.save((Owner) account);
+        user = userRepository.findByEmailAddress(account.emailAddress);
+
+        if(user.isEmpty()){
+            throw new IllegalArgumentException("Error adding user");
+        }
+        return user.get().getId();
+    }
+
+    public Long registerUser(CenterWorker account) throws IllegalArgumentException{
+        System.out.println("Inside registerUser for CenterWorker");
+        Optional<User> user = userRepository.findByEmailAddress(account.getEmailAddress());
+        if (user.isPresent()) {
+            throw new IllegalArgumentException("Email is already in use");
+        }
+
+        workerRepository.save( account);
+        user = userRepository.findByEmailAddress(account.emailAddress);
+
+        if(user.isEmpty()){
+            throw new IllegalArgumentException("Error adding user");
+        }
+        return user.get().getId();
+    }
+
+    public Long registerUser(AdoptionCenter account) throws IllegalArgumentException{
+        System.out.println("Inside registerUser for CenterWorker");
+        Optional<User> user = userRepository.findByEmailAddress(account.getEmailAddress());
+        if (user.isPresent()) {
+            throw new IllegalArgumentException("Email is already in use");
+        }
+
+        adoptionCenterRepository.save(account);
         user = userRepository.findByEmailAddress(account.emailAddress);
 
         if(user.isEmpty()){
