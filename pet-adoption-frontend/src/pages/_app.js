@@ -51,7 +51,7 @@ export default function App() {
               <Route path="/SearchEngine" element={<SearchEngine />} />
               <Route path="/Settings" element={<Settings />} />
               <Route path="/LocalAdoptionCenter" element={<LocalAdoptionCenter />} />
-              <Route path="*" element={<Navigate to="/Login" />} />
+              {/* <Route path="*" element={<Navigate to="/Login" />} /> */}
             </Routes>
           </BrowserRouter>
         </PetAdoptionThemeProvider>
