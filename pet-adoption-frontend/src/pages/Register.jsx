@@ -10,14 +10,14 @@ const Register = () => {
     const [emailAddress, setEmailAddress] = useState('');
     const [password, setPassword] = useState('');
     const [userType, setUserType] = useState('');
-    const [adoptionCenterName, setAdoptionCenterName] = useState('');
-    const [city, setCity] = useState('');
-    const [address, setAddress] = useState('');
+    const [centerName, setCenterName] = useState('');
+    const [centerCity, setCenterCity] = useState('');
+    const [centerAddress, setCenterAddress] = useState('');
     const [age, setAge] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
-    const [state, setState] = useState('');
-    const [zipCode, setZipCode] = useState('');
-    const [centerPetCount, setCenterPetCount] = useState('');
+    const [centerState, setCenterState] = useState('');
+    const [centerZip, setCenterZip] = useState('');
+    const [numberOfPets, setNumberOfPets] = useState('');
 
 
 
@@ -28,12 +28,12 @@ const Register = () => {
             password,
             userType: 'CenterOwner',
             phoneNumber,
-            adoptionCenterName,
-            address,
-            city,
-            state,
-            zipCode,
-            centerPetCount: parseInt(centerPetCount, 10),
+            centerName,
+            centerAddress,
+            centerCity,
+            centerState,
+            centerZip,
+            numberOfPets: parseInt(numberOfPets, 10),
         } : {
             emailAddress,
             password,
@@ -45,7 +45,7 @@ const Register = () => {
         console.log('Registration Data:', registrationData); // Log the payload
 
         const url = userType === 'owner'
-            ? 'http://localhost:8080/api/register/adoptioncenter'
+            ? 'http://localhost:8080/api/users/register/adoptioncenter'
             : 'http://localhost:8080/api/users/register/owner';
 
         axios
@@ -106,8 +106,8 @@ const Register = () => {
                         <TextField
                             label="Adoption Center Name"
                             type="text"
-                            value={adoptionCenterName}
-                            onChange={(e) => setAdoptionCenterName(e.target.value)}
+                            value={centerName}
+                            onChange={(e) => setCenterName(e.target.value)}
                             required
                             fullWidth
                         />
@@ -116,8 +116,8 @@ const Register = () => {
                         <TextField
                             label="Address"
                             type="text"
-                            value={address}
-                            onChange={(e) => setAddress(e.target.value)}
+                            value={centerAddress}
+                            onChange={(e) => setCenterAddress(e.target.value)}
                             required
                             fullWidth
                         />
@@ -126,8 +126,8 @@ const Register = () => {
                         <TextField
                             label="City"
                             type="text"
-                            value={city}
-                            onChange={(e) => setCity(e.target.value)}
+                            value={centerCity}
+                            onChange={(e) => setCenterCity(e.target.value)}
                             required
                             fullWidth
                         />
@@ -136,8 +136,8 @@ const Register = () => {
                         <TextField
                             label="State"
                             type="text"
-                            value={state}
-                            onChange={(e) => setState(e.target.value)}
+                            value={centerState}
+                            onChange={(e) => setCenterState(e.target.value)}
                             required
                             fullWidth
                         />
@@ -146,8 +146,8 @@ const Register = () => {
                         <TextField
                             label="Zip Code"
                             type="text"
-                            value={zipCode}
-                            onChange={(e) => setZipCode(e.target.value)}
+                            value={centerZip}
+                            onChange={(e) => setCenterZip(e.target.value)}
                             required
                             fullWidth
                         />
@@ -156,8 +156,8 @@ const Register = () => {
                         <TextField
                             label="Center Pet Count"
                             type="number"
-                            value={centerPetCount}
-                            onChange={(e) => setCenterPetCount(e.target.value)}
+                            value={numberOfPets}
+                            onChange={(e) => setNumberOfPets(e.target.value)}
                             required
                             fullWidth
                         />
