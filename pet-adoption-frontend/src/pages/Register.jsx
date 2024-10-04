@@ -7,7 +7,7 @@ import MenuItem from '@mui/material/MenuItem';
 import { Box, Typography } from '@mui/material';
 
 const Register = () => {
-    const [email, setEmail] = useState('');
+    const [emailAddress, setEmailAddress] = useState('');
     const [password, setPassword] = useState('');
     const [userType, setUserType] = useState('');
     const [adoptionCenterName, setAdoptionCenterName] = useState('');
@@ -23,60 +23,41 @@ const Register = () => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        if (userType === 'owner') {
-            const registrationData = {
-                email,
-                password,
-                userType,
-                phoneNumber,
-                adoptionCenterName,
-                address,
-                city,
-                state,
-                zipCode,
-                centerPetCount
-            };
-            axios
-                .post('http://localhost:8080/api/register/adoptioncenter', registrationData)
-                .then((res) => {
-                    alert('Registration successful! Your user ID is: ' + res.data);
-                    setEmail('');
-                    setPassword('');
-                    setUserType('');
-                    setAdoptionCenterName('');
-                    setCity('');
-                    setAddress('');
-                    setState('');
-                    setZipCode('');
-                    setCenterPetCount('');
-                })
-                .catch((err) => {
-                    console.error('An error occurred during registration:', err);
-                    alert('An error occurred during registration. Please try again later.');
-                });
-        } else {
-            const registrationData = {
-                email,
-                password,
-                userType,
-                phoneNumber,
-                age,
-            };
-            axios
-                .post('http://localhost:8080/api/users/register/owner', registrationData)
-                .then((res) => {
-                    alert('Registration successful! Your user ID is: ' + res.data);
-                    setEmail('');
-                    setPassword('');
-                    setUserType('');
-                    setAge('');
-                    setPhoneNumber('');
-                })
-                .catch((err) => {
-                    console.error('An error occurred during registration:', err);
-                    alert('An error occurred during registration. Please try again later.');
-                });
-        }
+        const registrationData = userType === 'owner' ? {
+            emailAddress,
+            password,
+            userType: 'CenterOwner',
+            phoneNumber,
+            adoptionCenterName,
+            address,
+            city,
+            state,
+            zipCode,
+            centerPetCount: parseInt(centerPetCount, 10),
+        } : {
+            emailAddress,
+            password,
+            userType: 'Owner',
+            age: parseInt(age, 10),
+            phoneNumber,
+        };
+
+        console.log('Registration Data:', registrationData); // Log the payload
+
+        const url = userType === 'owner'
+            ? 'http://localhost:8080/api/register/adoptioncenter'
+            : 'http://localhost:8080/api/users/register/owner';
+
+        axios
+            .post(url, registrationData)
+            .then((res) => {
+                alert('Registration successful! Your user ID is: ' + res.data);
+                // Reset form fields
+            })
+            .catch((err) => {
+                console.error('An error occurred during registration:', err);
+                alert('An error occurred during registration. Please try again later.');
+            });
     };
 
     return (
@@ -100,8 +81,8 @@ const Register = () => {
                     <TextField
                         label="Email"
                         type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        value={emailAddress}
+                        onChange={(e) => setEmailAddress(e.target.value)}
                         required
                         fullWidth
                     />
