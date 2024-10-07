@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequestMapping("/api/users")
 @RestController
@@ -21,6 +22,16 @@ public class EventController {
     @GetMapping
     public List<Event> getEvent() {
         return eventService.findAllEvents();
+    }
+    @GetMapping
+    public Optional<Event> findEvent(Long event_id) {return eventService.findEvent(event_id);}
+    @GetMapping
+    public Event saveEvent(Event event) {
+        return eventService.saveEvent(event);
+    }
+    @GetMapping
+    public void deleteEvent(Long event_id) {
+        eventService.deleteEvent(event_id);
     }
 
     @PostMapping("/create/event")
