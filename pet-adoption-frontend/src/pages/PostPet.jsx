@@ -59,7 +59,6 @@ const PostPet = () => {
                     <Stack spacing={2}>
                         <TextField
                             label="Species"
-                            type="species"
                             value={species}
                             onChange={(e) => setSpecies(e.target.value)}
                             required
@@ -67,7 +66,6 @@ const PostPet = () => {
                         />
                         <TextField
                             label="Pet Name"
-                            type="pet name"
                             value={petName}
                             onChange={(e) => setPetName(e.target.value)}
                             required
@@ -75,7 +73,6 @@ const PostPet = () => {
                         />
                         <TextField
                             label="Breed"
-                            type="breed"
                             value={breed}
                                 onChange={(e) => setBreed(e.target.value)}
                             required
@@ -83,7 +80,6 @@ const PostPet = () => {
                         />
                         <TextField
                             label="Pet Color"
-                            type="color"
                             value={petColor}
                             onChange={(e) => setPetColor(e.target.value)}
                             required
@@ -91,7 +87,7 @@ const PostPet = () => {
                         />
                         <TextField
                             label="Age"
-                            type="age"
+                            type="number"
                             value={age}
                             onChange={(e) => setAge(e.target.value)}
                             required
