@@ -2,16 +2,6 @@ package petadoption.api.Event;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import petadoption.api.user.AdoptionCenter.AdoptionCenter;
-import petadoption.api.user.AdoptionCenter.AdoptionCenterRepository;
-import petadoption.api.user.AdoptionCenter.CenterWorker;
-import petadoption.api.user.AdoptionCenter.CenterWorkerRepository;
-import petadoption.api.user.Owner.Owner;
-import petadoption.api.user.Owner.OwnerRepository;
-import petadoption.api.user.User;
-import petadoption.api.user.UserRepository;
-
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
