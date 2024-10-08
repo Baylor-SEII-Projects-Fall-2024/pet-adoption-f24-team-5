@@ -1,8 +1,6 @@
 import React from 'react'
 import {Card, CardContent, Typography, Box, Button, Toolbar, Stack, TextField} from "@mui/material";
 import {Link} from "react-router-dom";
-import MenuItem from "@mui/material/MenuItem";
-import * as pet from "next/dist/telemetry/ci-info";
 import axios from "axios";
 
 const PostPet = () => {
@@ -24,19 +22,12 @@ const PostPet = () => {
     );
     const [postNewPet, setPostNewPet] = React.useState(false);
 
+
     const handlePostNewPet = () => {
         setPostNewPet(!postNewPet);
     }
 
-    const PetCard = ({ pet }) => (
-        <Card sx={{ width: '48%' }} elevation={4} key={pet.name}>
-            <CardContent>
-                <Typography variant='h5' align='center'>{pet.name}</Typography>
-                <Typography variant='body1' align='center'>{pet.image}</Typography>
-                <Typography variant='body2' align='center'>{pet.description}</Typography>
-            </CardContent>
-        </Card>
-    );
+
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -62,8 +53,18 @@ const PostPet = () => {
             .catch((err) => {
                 console.error('An error occurred during registration:', err);
                 alert('An error occured saving pet. Please try again later.');
-            })
-    }
+            });
+    };
+
+    const PetCard = ({ pet }) => (
+        <Card sx={{ width: '48%' }} elevation={4} key={pet.name}>
+            <CardContent>
+                <Typography variant='h5' align='center'>{pet.name}</Typography>
+                <Typography variant='body1' align='center'>{pet.image}</Typography>
+                <Typography variant='body2' align='center'>{pet.description}</Typography>
+            </CardContent>
+        </Card>
+    );
 
     return (
         <Box sx={{height: '100vh', width: '100vw', display: 'flex', flexDirection: 'column'}}>
