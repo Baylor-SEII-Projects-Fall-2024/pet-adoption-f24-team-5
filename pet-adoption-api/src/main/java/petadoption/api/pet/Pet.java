@@ -25,7 +25,7 @@ public class Pet {
     protected User petOwner;
 
     @ManyToOne
-    @JoinColumn(name = "USER_ID")
+    @JoinColumn(name = "CENTER_ID")
     protected AdoptionCenter adoptionCenter;
 
     @Column(name = "SPECIES")
