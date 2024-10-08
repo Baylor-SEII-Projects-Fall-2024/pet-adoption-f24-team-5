@@ -1,9 +1,9 @@
 package petadoption.api.pet;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RequestMapping("/api/pets")
 @RestController
@@ -12,7 +12,12 @@ public class PetController {
     @Autowired
     private PetService petService;
 
-    //public PetController(PetService petService) { this.petService = petService; }
+    @GetMapping
+    public List<Pet> getPets() { return petService.getAllPets(); }
 
+    @PostMapping("/save/pet")
+    public void addPet(@RequestBody Pet pet) {
+        petService.savePet(pet);
+    }
 
 }
