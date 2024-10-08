@@ -18,23 +18,11 @@ public class EventController {
     public EventController(EventService eventService) {
         this.eventService = eventService;
     }
-
-    @GetMapping
-    public List<Event> getEvent() {
-        return eventService.findAllEvents();
-    }
-    @GetMapping
-    public Optional<Event> findEvent(Long event_id) {return eventService.findEvent(event_id);}
     @GetMapping
     public Event saveEvent(Event event) {
         return eventService.saveEvent(event);
     }
-    @GetMapping
-    public void deleteEvent(Long event_id) {
-        eventService.deleteEvent(event_id);
-    }
-
-    @PostMapping("/create/event")
+    @PostMapping("/create_event")
     public ResponseEntity<?> register(@RequestBody Event event) {
         try{
             Long id = eventService.createEvent(event);
