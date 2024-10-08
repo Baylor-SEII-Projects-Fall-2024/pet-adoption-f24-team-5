@@ -1,7 +1,19 @@
 import React, {useEffect} from 'react'
-import {Card, CardContent, Typography, Box, Button, Toolbar, Stack, TextField} from "@mui/material";
+import {
+    Card,
+    CardContent,
+    Typography,
+    Box,
+    Button,
+    Toolbar,
+    Stack,
+    TextField,
+    Select,
+    LinearProgress
+} from "@mui/material";
 import {Link} from "react-router-dom";
 import axios from "axios";
+import MenuItem from "@mui/material/MenuItem";
 
 const PostPet = () => {
     const [species, setSpecies] = React.useState('');
@@ -14,15 +26,18 @@ const PostPet = () => {
     const [image, setImage] = React.useState('');
     const [pets, setPets] = React.useState( [] );
     const [postNewPet, setPostNewPet] = React.useState(false);
+    const [uploadProgress, setUploadProgress] = React.useState(0);
 
 
     const handlePostNewPet = () => {
         setPostNewPet(!postNewPet);
     }
 
-    const url = "http://localhost:8080/api/pets";
 
     const getAllPets = () => {
+
+        const url = "http://localhost:8080/api/pets";
+
         axios.get(url)
             .then((res) => {
                 setPets(res.data);
@@ -35,6 +50,30 @@ const PostPet = () => {
         getAllPets();
     }, []);
 
+    const handleChangeSelection = (event) => {
+        setStatus(event.target.value);
+    }
+
+    const handleFileUpload = (event) => {
+        const file = event.target.files[0];
+        const formData = new FormData();
+        formData.append('file', file);
+
+        //resolve api here
+        axios.post('/upload', formData, {
+            onUploadProgress: (progressEvent) => {
+                const percentCompleted = Math.round((progressEvent.loaded * 100)/ progressEvent.total);
+                setUploadProgress(percentCompleted);
+            }
+        })
+            .then(res => {
+                console.log(res);
+            })
+            .catch(err => {
+                console.log(err);
+            });
+    };
+
     const resetFields = () => {
         setSpecies("");
         setPetName("");
@@ -43,6 +82,7 @@ const PostPet = () => {
         setAge("");
         setDescription("");
         setPetColor("");
+        setStatus(false);
     }
 
     const handleSubmit = (event) => {
@@ -54,7 +94,7 @@ const PostPet = () => {
             breed,
             petColor,
             age,
-            adoptionStatus: false,
+            adoptionStatus,
             description,
         };
 
@@ -78,6 +118,10 @@ const PostPet = () => {
         <Card sx={{ width: '48%' }} elevation={4} key={pet.petName}>
             <CardContent>
                 <Typography variant='h5' align='center'>{pet.petName}</Typography>
+                <Typography variant='body2' align='center'>{pet.species}</Typography>
+                <Typography variant='body2' align='center'>{pet.breed}</Typography>
+                <Typography variant='body2' align='center'>{pet.color}</Typography>
+                <Typography variant='body2' align='center'>{pet.age}</Typography>
                 <Typography variant='body2' align='center'>{pet.description}</Typography>
             </CardContent>
         </Card>
@@ -148,6 +192,22 @@ const PostPet = () => {
                             required
                             fullWidth
                         />
+                        <Select
+                            defaultValue="Up For Adoption"
+                            label="Adoption Status"
+                            value={adoptionStatus}
+                            onChange={handleChangeSelection}
+                            >
+                            <MenuItem value={'false'}>Up For Adoption</MenuItem>
+                            <MenuItem value={'true'}>Owned</MenuItem>
+                        </Select>
+                        <TextField type="file" />
+                        <LinearProgress variant="determinate" value={uploadProgress} />
+                        <Button variant="contained"
+                                color="primary"
+                                component="span"
+                                onClick={handleFileUpload}>Upload</Button>
+
                         <Button type="submit" variant="contained">Post</Button>
 
                     </Stack>
