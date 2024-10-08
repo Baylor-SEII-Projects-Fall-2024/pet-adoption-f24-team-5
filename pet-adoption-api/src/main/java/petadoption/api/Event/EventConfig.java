@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class EventConfig {
     @Bean
-    CommandLineRunner commandLineRunner(EventRepository eventRepository) {
+    CommandLineRunner eventCommandLineRunner(EventRepository eventRepository) {
         return args -> {};
     }
 }
