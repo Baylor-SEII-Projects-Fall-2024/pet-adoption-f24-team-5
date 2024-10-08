@@ -1,11 +1,12 @@
 import React from 'react'
 import {Card, CardContent, Typography, Box, Button, Toolbar, Stack, TextField} from "@mui/material";
 import {Link} from "react-router-dom";
-import MenuItem from "@mui/material/MenuItem";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const PostEvent = () => {
     const [center_id , setCenterID] = React.useState('');
-    const [event_date_time, setEventDateTime] = React.useState(new Date());
+    const [event_date , setEventDate] = React.useState(new Date());
     const [description, setDescription] = React.useState('');
     const [postEvent, setPostEvent] = React.useState(false);
     const [events, setEvents] = React.useState(
@@ -18,9 +19,9 @@ const PostEvent = () => {
         ]
     );
 
-    const handleCenterID = () => {setCenterID(null);}
-    const handleEventDateTime = () => {setEventDateTime(null);}
-    const handleDescription = () => {setDescription(null);}
+    const handleCenterID = () => {setCenterID(center_id);}
+    const handleEventDate = () =>{setEventDate(event_date);}
+    const handleDescription = () => {setDescription(description);}
     const handlePostEvent = () => {setPostEvent(!postEvent);}
 
     const EventCard = ({ event }) => (
@@ -37,7 +38,7 @@ const PostEvent = () => {
             <Box sx={{ height: '8vh', width: '100vw', backgroundColor: 'primary.main' }}>
                 <Toolbar>
                     <Typography variant="h6" sx={{ flexGrow: 1 }}>
-                        Post Pet
+                        Post Event
                     </Typography>
                     <Button color="inherit" component={Link} to="/PostPet">Profile</Button>
                     <Button color="inherit" component={Link} to="/SearchEngine">Search Engine</Button>
@@ -50,7 +51,7 @@ const PostEvent = () => {
 
             {postEvent && (
                 <Box component="form">
-                    <Button onClick={handlePostEvent} variant='contaiend'>Back to Events</Button>
+                    <Button onClick={handlePostEvent} variant='contained'>Back to Events</Button>
 
                     <Stack spacing={2}>
                         <TextField
@@ -60,12 +61,12 @@ const PostEvent = () => {
                             required
                             fullWidth
                         />
-                        <TextField
-                            label="Event Date and Time"
-                            value={event_date_time}
-                            onChange={(e) => setEventDateTime(e.target.value)}
-                            required
-                            fullWidth
+                        <DatePicker
+                            selected={event_date}
+                            onChange={(event_date) => setEventDate(event_date)}
+                            showTimeSelect
+                            dateFormat="Pp"
+                            customInput={<TextField label="Event Date" fullWidth />}
                         />
                         <TextField
                             label="Description"
@@ -80,9 +81,8 @@ const PostEvent = () => {
             )}
 
             {!postEvent && (
-
                 <Stack sx={{paddingTop:4}} alignItems='center' gap={5}>
-                    <Button onClick={handlePostEvent} color='inherit' variant='contaiend'>Post Event</Button>
+                    <Button onClick={handlePostEvent} color='inherit' variant='contained'>Post Event</Button>
 
                     {events.map((event) => (
                         <EventCard event={event} key={event.name} />
