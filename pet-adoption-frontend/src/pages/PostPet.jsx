@@ -2,6 +2,8 @@ import React from 'react'
 import {Card, CardContent, Typography, Box, Button, Toolbar, Stack, TextField} from "@mui/material";
 import {Link} from "react-router-dom";
 import MenuItem from "@mui/material/MenuItem";
+import * as pet from "next/dist/telemetry/ci-info";
+import axios from "axios";
 
 const PostPet = () => {
     const [species, setSpecies] = React.useState('');
@@ -36,6 +38,33 @@ const PostPet = () => {
         </Card>
     );
 
+    const handleSubmit = (event) => {
+        event.preventDefault();
+
+        const petData = {
+            species,
+            petName,
+            breed,
+            petColor,
+            age,
+            adoptionStatus: false,
+        };
+
+        console.log('Pet Data: ', petData);
+
+        const url = "http://localhost:8080/api/pets/save/pet";
+
+        axios
+            .post(url, petData)
+            .then((res) => {
+                alert('Pet Saved!');
+            })
+            .catch((err) => {
+                console.error('An error occurred during registration:', err);
+                alert('An error occured saving pet. Please try again later.');
+            })
+    }
+
     return (
         <Box sx={{height: '100vh', width: '100vw', display: 'flex', flexDirection: 'column'}}>
             <Box sx={{ height: '8vh', width: '100vw', backgroundColor: 'primary.main' }}>
@@ -53,7 +82,7 @@ const PostPet = () => {
 
 
             {postNewPet && (
-                <Box component="form">
+                <Box component="form" onSubmit={handleSubmit}>
                     <Button onClick={handlePostNewPet} variant='contaiend'>Back to Pets</Button>
 
                     <Stack spacing={2}>
