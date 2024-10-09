@@ -1,9 +1,16 @@
 import React, { useEffect } from 'react';
 import { Card, CardContent, Typography, Box, Button, Toolbar, Stack, TextField } from "@mui/material";
-import { Link } from "react-router-dom";
+import {Link, Route} from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import axios from "axios";
+import HomePage from "@/pages/home";
+import Register from "@/pages/Register";
+import Login from "@/pages/Login";
+import PostPet from "@/pages/PostPet";
+import SearchEngine from "@/pages/SearchEngine";
+import Settings from "@/pages/settings";
+import LocalAdoptionCenter from "@/pages/LocalAdoptionCenter";
 
 const CreateEvent = () => {
     const [event_id, setEventID] = React.useState(0);
@@ -22,19 +29,74 @@ const CreateEvent = () => {
             console.log("Fetched Events:", response.data);
 
             const now = new Date();
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
+            console.log("Current date and time:", now);
+
+            const parseEventDate = (dateString) => {
+                // Check for "dd/MM/yyyy" format
+                const dateParts = dateString.split('/');
+                if (dateParts.length === 3) {
+                    const day = parseInt(dateParts[0], 10);
+                    const month = parseInt(dateParts[1], 10) - 1; // Months are 0-indexed
+                    const year = parseInt(dateParts[2], 10);
+                    return new Date(year, month, day);
+                }
+                return new Date(dateString); // Default parsing for other formats
+            };
 
             const filteredEvents = response.data.filter((event) => {
-                const eventDate = new Date(event.event_date);
-                if (eventDate.toDateString() === today.toDateString()) {
-                    return eventDate > now; // Only include events after the current time
+                if (!event.event_date || !event.event_time) {
+                    console.warn("Skipping event due to missing date/time:", event);
+                    return false;
                 }
-                return eventDate > today; // Include future events
+
+                const eventDate = parseEventDate(event.event_date);
+                if (isNaN(eventDate.getTime())) {
+                    console.warn("Invalid event date format for:", event);
+                    return false;
+                }
+                console.log("Parsed event date:", eventDate);
+
+                // Parse time and handle AM/PM
+                const [time, period] = event.event_time.split(' ');
+                const [hour, minute] = time.split(':').map(Number);
+                const eventHour = period === 'PM' && hour !== 12 ? hour + 12 : hour;
+                const eventDateTime = new Date(eventDate);
+                eventDateTime.setHours(eventHour, minute);
+
+                if (isNaN(eventDateTime.getTime())) {
+                    console.warn("Invalid event time format for:", event);
+                    return false;
+                }
+                console.log(`Combined event DateTime for ${event.event_name}:`, eventDateTime);
+
+                return eventDate.toDateString() === now.toDateString()
+                    ? eventDateTime > now
+                    : eventDateTime > now;
             });
 
-            const sortedFilteredEvents = filteredEvents.sort((a, b) => new Date(a.event_date) - new Date(b.event_date));
+            console.log("Filtered Events:", filteredEvents);
+
+            const sortedFilteredEvents = filteredEvents.sort((a, b) => {
+                const aDate = parseEventDate(a.event_date);
+                const bDate = parseEventDate(b.event_date);
+
+                const [aTime, aPeriod] = a.event_time.split(' ');
+                const [aHour, aMinute] = aTime.split(':').map(Number);
+                const aFinalHour = aPeriod === 'PM' && aHour !== 12 ? aHour + 12 : aHour;
+                const aDateTime = new Date(aDate);
+                aDateTime.setHours(aFinalHour, aMinute);
+
+                const [bTime, bPeriod] = b.event_time.split(' ');
+                const [bHour, bMinute] = bTime.split(':').map(Number);
+                const bFinalHour = bPeriod === 'PM' && bHour !== 12 ? bHour + 12 : bHour;
+                const bDateTime = new Date(bDate);
+                bDateTime.setHours(bFinalHour, bMinute);
+
+                return aDateTime - bDateTime;
+            });
+
             setEvents(sortedFilteredEvents);
+            console.log("Sorted Events:", sortedFilteredEvents);
             setNoFutureEvents(sortedFilteredEvents.length === 0);
         } catch (error) {
             console.error("Error fetching events:", error);
@@ -57,8 +119,11 @@ const CreateEvent = () => {
     const handleSubmit = (event) => {
         event.preventDefault(); // Prevent default form submission
 
-        const event_date = event_fullDate.toISOString();
-        const event_time = event_fullDate.toLocaleTimeString('en-GB', { hour12: false });
+        const day = String(event_fullDate.getDate()).padStart(2, '0'); // Get day
+        const month = String(event_fullDate.getMonth() + 1).padStart(2, '0'); // Get month (0-based)
+        const year = event_fullDate.getFullYear(); // Get full year
+        const event_date = `${day}/${month}/${year}`; // Format to dd/MM/yyyy
+        const event_time = event_fullDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }); // Format to hh:mm AM/PM
         const parsedCenterID = parseInt(center_id, 10);
 
         if(event_name.length === 0) {
@@ -89,8 +154,8 @@ const CreateEvent = () => {
         const eventData = {
             center_id: parsedCenterID,
             event_name,
-            event_date,
-            event_time,
+            event_date, // Should be in dd/MM/yyyy format
+            event_time,  // Should be in hh:mm AM/PM format
             description,
         };
 
@@ -121,31 +186,37 @@ const CreateEvent = () => {
     }
 
     const EventCard = ({ event }) => {
+        // Ensure consistent parsing of dd/MM/yyyy format
+        const [day, month, year] = event.event_date.split('/');
+        const eventDate = new Date(year, month - 1, day); // Convert to JavaScript Date
+
         return (
             <Card
                 sx={{
                     width: '48%',
-                    backgroundColor: 'white', // Normal background color
-                    transition: 'border 0.3s', // Smooth transition for the border
+                    backgroundColor: 'white',
+                    transition: 'border 0.3s',
                     '&:hover': {
-                        border: '2px solid blue', // Border on hover
+                        border: '2px solid blue',
                     },
                 }}
                 elevation={4}
-                key={event.event_id} // Use event_id as key
+                key={event.event_id}
                 onClick={() => {
-                    setSelectedEvent(event); // Set selected event
-                    setEventName(event.event_name); // Populate form fields
-                    setCenterID(event.center_id); // Populate form fields
-                    setEventFullDate(new Date(event.event_date)); // Populate form fields
-                    setDescription(event.description); // Populate form fields
-                    setCreateEvent(true); // Switch to create/edit form
+                    setSelectedEvent(event);
+                    setEventName(event.event_name);
+                    setCenterID(event.center_id);
+                    setEventFullDate(eventDate);
+                    setDescription(event.description);
+                    setCreateEvent(true);
                 }}
             >
                 <CardContent>
                     <Typography variant='h5' align='center'>{event.event_name || "Unnamed Event"}</Typography>
                     <Typography variant='body1' align='center'>{event.description}</Typography>
-                    <Typography variant='body2' align='center'>{new Date(event.event_date).toLocaleString()}</Typography>
+                    <Typography variant='body2' align='center'>
+                        {`${day}/${month}/${year}`} at {event.event_time} {/* Corrected format */}
+                    </Typography>
                 </CardContent>
             </Card>
         );
@@ -158,7 +229,10 @@ const CreateEvent = () => {
                     <Typography variant="h6" sx={{ flexGrow: 1 }}>
                         Create Event
                     </Typography>
-                    <Button color="inherit" component={Link} to="/PostPet">Profile</Button>
+
+                    <Button color="inherit" component={Link} to="/">Home</Button>
+                    <Button color="inherit" component={Link} to="/PostPet">Post Pet</Button>
+                    <Button color="inherit" component={Link} to="/LocalAdoptionCenter">Local Adoption Center</Button>
                     <Button color="inherit" component={Link} to="/SearchEngine">Search Engine</Button>
                     <Button color="inherit" component={Link} to="/Settings">Settings</Button>
                     <Button color="inherit" component={Link} to="/Login">Log Out</Button>
@@ -200,7 +274,7 @@ const CreateEvent = () => {
                             required
                             fullWidth
                         />
-                        <Button type="submit" variant='contained'>{selectedEvent ? 'Update Event' : 'Post Event'}</Button> {/* Button text changes based on mode */}
+                        <Button type="submit" variant='contained'>{selectedEvent ? 'Update Event' : 'Post Event'}</Button>
                     </Stack>
                 </Box>
             )}
@@ -208,13 +282,14 @@ const CreateEvent = () => {
             {!createEvent && (
                 <Stack sx={{ paddingTop: 4 }} alignItems='center' gap={5}>
                     <Button onClick={handleCreateEvent} color='inherit' variant='contained'>Create Event</Button>
-
                     {noFutureEvents ? (
                         <Typography variant="h6" color="error">No future events</Typography>
                     ) : (
-                        events.map((event, index) => (
-                            <EventCard event={event} key={event.event_id || index} /> // Use event_id for keys
-                        ))
+                        <Stack spacing={2} direction='row' flexWrap='wrap' justifyContent='center'>
+                            {events.map(event => (
+                                <EventCard key={event.event_id} event={event} />
+                            ))}
+                        </Stack>
                     )}
                 </Stack>
             )}
