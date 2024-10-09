@@ -37,6 +37,8 @@ public class Event {
     @Column(name = "EVENT_TIME")
     protected Time event_time;
 
+    @Getter
+    @Setter
     @Column(name = "DESCRIPTION")
     protected String description;
 
@@ -58,4 +60,45 @@ public class Event {
         this.event_time = event_time;
         this.description = description;
     }
+
+    public Long getEventId() {
+        return event_id;
+    }
+
+    public void setEventId(Long event_id) {
+        this.event_id = event_id;
+    }
+
+    public Long getCenterId() {
+        return center_id;
+    }
+
+    public void setCenterId(Long center_id) {
+        this.center_id = center_id;
+    }
+
+    public String getEventName() {
+        return event_name;
+    }
+
+    public void setEventName(String event_name) {
+        this.event_name = event_name;
+    }
+
+    public Date getEventDate() {
+        return event_date;
+    }
+
+    public void setEventDate(Date event_date) {
+        this.event_date = event_date;
+    }
+
+    public Time getEventTime() {
+        return event_time;
+    }
+
+    public void setEventTime(Time event_time) {
+        this.event_time = event_time;
+    }
+
 }
