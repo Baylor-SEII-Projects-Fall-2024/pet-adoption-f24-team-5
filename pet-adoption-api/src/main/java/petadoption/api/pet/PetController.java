@@ -2,7 +2,9 @@ package petadoption.api.pet;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.util.List;
 
 @RequestMapping("/api/pets")
@@ -10,7 +12,9 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:3000")
 public class PetController {
     @Autowired
-    private PetService petService;
+    private final PetService petService;
+
+    PetController(PetService petService) { this.petService = petService; }
 
     @GetMapping
     public List<Pet> getPets() { return petService.getAllPets(); }
@@ -18,6 +22,11 @@ public class PetController {
     @PostMapping("/save/pet")
     public void addPet(@RequestBody Pet pet) {
         petService.savePet(pet);
+    }
+
+    @PostMapping("/uploadImage")
+    public String uploadImage(@RequestBody MultipartFile file) {
+        return "stubbed";
     }
 
 }

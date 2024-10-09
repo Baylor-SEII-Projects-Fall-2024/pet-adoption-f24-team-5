@@ -1,6 +1,7 @@
 package petadoption.api.pet;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,6 +12,7 @@ import petadoption.api.user.User;
 @Getter
 @Setter
 @Data
+@Builder
 @Table(name = Pet.TABLE_NAME)
 public class Pet {
     public static final String TABLE_NAME = "Pets";
