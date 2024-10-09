@@ -37,34 +37,5 @@ public class UserController {
         }
     }
 
-    @PostMapping("/register/owner")
-    public ResponseEntity<?> register(@RequestBody Owner account) {
-        try{
-            Long id = userService.registerUser(account);
-            return new ResponseEntity<>(id, HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
-        }
-    }
-
-    @PostMapping("/register/centerworker")
-    public ResponseEntity<?> register(@RequestBody CenterWorker account) {
-        try{
-            Long id = userService.registerUser(account);
-            return new ResponseEntity<>(id, HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
-        }
-    }
-
-    @PostMapping("/register/adoptioncenter")
-    public ResponseEntity<?> register(@RequestBody AdoptionCenter account) {
-        try{
-            Long id = userService.registerUser(account);
-            return new ResponseEntity<>(id, HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
-        }
-    }
 
 }
