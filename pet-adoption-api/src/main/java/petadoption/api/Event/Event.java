@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.sql.Time;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -26,8 +25,11 @@ public class Event {
     @Column(name = "EVENT_ID")
     protected Long event_id;
 
-    @Column(name = "Center_ID")
+    @Column(name = "CENTER_ID")
     protected Long center_id;
+
+    @Column(name = "EVENT_NAME")
+    protected String event_name;
 
     @Column(name = "EVENT_DATE")
     protected Date event_date;
@@ -40,24 +42,20 @@ public class Event {
 
     public Event() {}
 
-    public Event(Long center_id, Date event_date, Time event_time, String description) {
+    public Event(Long center_id, String event_name, Date event_date, Time event_time, String description) {
         this.center_id = center_id;
+        this.event_name = event_name;
         this.event_date = event_date;
         this.event_time = event_time;
         this.description = description;
 
     }
-    public Event(Long event_id, Long center_id, Date event_date, Time event_time, String description) {
+    public Event(Long event_id, Long center_id, String event_name, Date event_date, Time event_time, String description) {
         this.event_id = event_id;
         this.center_id = center_id;
+        this.event_name = event_name;
         this.event_date = event_date;
         this.event_time = event_time;
-        this.description = description;
-    }
-    public Event(String center_id, String event_date, String event_time, String description) throws Exception {
-        this.center_id = Long.parseLong(center_id);
-        this.event_date = dateFormat.parse(event_date);
-        this.event_time = new java.sql.Time(timeFormat.parse(event_time).getTime());
         this.description = description;
     }
 }
