@@ -19,24 +19,6 @@ export default function HomePage() {
   const [phoneNumberLabel, setPhoneNumberLabel] = useState('');
   const [invalidPhoneNumber, setInvalidPhoneNumber] = useState(false);
 
-  // Uncomment and use when ready
-  /*useEffect(() => {
-    const fetchUsername = async () => {
-      try {
-        const response = await fetch('/api/user');
-        const data = await response.json();
-        if (data && data.username) {
-          setUsername(data.username);
-        }
-      } catch (error) {
-        console.error('Error fetching username:', error);
-      }
-    };
-
-    fetchUsername();
-  }, []);*/
-
-
 useEffect(() => {
   console.log('User id: ' + localStorage.getItem('currentId'));
   setUserId(localStorage.getItem('currentId'));
