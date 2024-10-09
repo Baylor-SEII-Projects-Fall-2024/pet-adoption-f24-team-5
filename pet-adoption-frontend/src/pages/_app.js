@@ -26,6 +26,8 @@ import PostPet from './PostPet';
 import SearchEngine from './SearchEngine';
 import Settings from './settings';
 import LocalAdoptionCenter from './LocalAdoptionCenter';
+import PostEvent from "@/pages/CreateEvent";
+import CreateEvent from "@/pages/CreateEvent";
 
 // Initialize Redux
 let initialState = {};
@@ -50,6 +52,7 @@ export default function App() {
               <Route path="/PostPet" element={<PostPet />} />
               <Route path="/SearchEngine" element={<SearchEngine />} />
               <Route path="/Settings" element={<Settings />} />
+              <Route path="/CreateEvent" element={<CreateEvent />} />
               <Route path="/LocalAdoptionCenter" element={<LocalAdoptionCenter />} />
               {/* <Route path="*" element={<Navigate to="/Login" />} /> */}
             </Routes>
