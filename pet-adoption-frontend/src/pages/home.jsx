@@ -73,6 +73,7 @@ const HomePage = () => {
                         {emailAddress}
                     </Typography>
                     <Button color="inherit" component={Link} to="/PostPet">Profile</Button>
+                    <Button color="inherit" component={Link} to="/CreateEvent">Create Event</Button>
                     <Button color="inherit" component={Link} to="/SearchEngine">Search Engine</Button>
                     <Button color="inherit" component={Link} to="/Settings">Settings</Button>
                     <Button color="inherit" component={Link} to="/Login">Log Out</Button>
