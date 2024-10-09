@@ -19,18 +19,24 @@ public class EventController {
         this.eventService = eventService;
     }
     @GetMapping
-    public Event saveEvent(Event event) {
-        return eventService.saveEvent(event);
+    public List<Event> getEvents() {
+        return eventService.getEvent();
     }
     @PostMapping("/create_event")
     public ResponseEntity<?> register(@RequestBody Event event) {
+        System.out.println("a");
         try{
+            System.out.println("b");
             Long id = eventService.createEvent(event);
+            System.out.println("e");
             return new ResponseEntity<>(id, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
+            System.out.println("f");
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
     }
+
+
 
 }
 

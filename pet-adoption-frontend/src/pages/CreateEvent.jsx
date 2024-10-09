@@ -3,12 +3,14 @@ import {Card, CardContent, Typography, Box, Button, Toolbar, Stack, TextField} f
 import {Link} from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import axios from "axios";
 
-const PostEvent = () => {
+
+const CreateEvent = () => {
     const [center_id , setCenterID] = React.useState('');
-    const [event_date , setEventDate] = React.useState(new Date());
+    const [event_fullDate , setEventFullDate] = React.useState(new Date());
     const [description, setDescription] = React.useState('');
-    const [postEvent, setPostEvent] = React.useState(false);
+    const [createEvent, setCreateEvent] = React.useState(false);
     const [events, setEvents] = React.useState(
         [
             {name: "Event name 1", description: "description of event"},
@@ -19,10 +21,35 @@ const PostEvent = () => {
         ]
     );
 
-    const handleCenterID = () => {setCenterID(center_id);}
-    const handleEventDate = () =>{setEventDate(event_date);}
-    const handleDescription = () => {setDescription(description);}
-    const handlePostEvent = () => {setPostEvent(!postEvent);}
+    const handleSubmit = (event) => {
+        const event_date = event_fullDate.toISOString();
+        const event_time = event_fullDate.toLocaleTimeString('en-GB', { hour12: false });
+        const parsedCenterID = parseInt(center_id, 10);
+        if (isNaN(parsedCenterID)) {
+            alert("Center ID must be a number");
+            return;
+        }
+        event.preventDefault();
+
+        const eventData = {
+            center_id: parsedCenterID,
+            event_date,
+            event_time,
+            description
+        }
+        console.log('Event Data', eventData);
+        const url = 'http://localhost:8080/api/events/create_event';
+        axios.post(url, eventData)
+            .then((res) => {
+            alert('Event created. Event ID is: ' + res.data);
+        })
+            .catch((error) => {
+                console.error('Error: could not register event: ', error);
+                alert('Error: could not register event');
+                alert(error);
+            });
+    };
+    const handleCreateEvent = () => {setCreateEvent(!createEvent);}
 
     const EventCard = ({ event }) => (
         <Card sx={{ width: '48%' }} elevation={4} key={event.name}>
@@ -38,7 +65,7 @@ const PostEvent = () => {
             <Box sx={{ height: '8vh', width: '100vw', backgroundColor: 'primary.main' }}>
                 <Toolbar>
                     <Typography variant="h6" sx={{ flexGrow: 1 }}>
-                        Post Event
+                        Create Event
                     </Typography>
                     <Button color="inherit" component={Link} to="/PostPet">Profile</Button>
                     <Button color="inherit" component={Link} to="/SearchEngine">Search Engine</Button>
@@ -49,9 +76,9 @@ const PostEvent = () => {
 
 
 
-            {postEvent && (
+            {createEvent && (
                 <Box component="form">
-                    <Button onClick={handlePostEvent} variant='contained'>Back to Events</Button>
+                    <Button onClick={handleCreateEvent} variant='contained'>Back to Events</Button>
 
                     <Stack spacing={2}>
                         <TextField
@@ -62,8 +89,8 @@ const PostEvent = () => {
                             fullWidth
                         />
                         <DatePicker
-                            selected={event_date}
-                            onChange={(event_date) => setEventDate(event_date)}
+                            selected={event_fullDate}
+                            onChange={(date) => setEventFullDate(date)}
                             showTimeSelect
                             dateFormat="Pp"
                             customInput={<TextField label="Event Date" fullWidth />}
@@ -75,14 +102,14 @@ const PostEvent = () => {
                             required
                             fullWidth
                         />
-                        <Button type="submit" variant="contained">Post</Button>
+                        <Button onClick={(event) => handleSubmit(event)} variant='contained'>Post Event</Button>
                     </Stack>
                 </Box>
             )}
 
-            {!postEvent && (
+            {!createEvent && (
                 <Stack sx={{paddingTop:4}} alignItems='center' gap={5}>
-                    <Button onClick={handlePostEvent} color='inherit' variant='contained'>Post Event</Button>
+                    <Button onClick={handleCreateEvent} color='inherit' variant='contained'>Create Event</Button>
 
                     {events.map((event) => (
                         <EventCard event={event} key={event.name} />
@@ -93,4 +120,4 @@ const PostEvent = () => {
     );
 };
 
-export default PostEvent
+export default CreateEvent
