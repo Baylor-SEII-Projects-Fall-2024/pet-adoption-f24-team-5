@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.sql.Time;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Getter
@@ -16,6 +18,8 @@ import java.util.Date;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Event {
     public static final String TABLE_NAME = "EVENTS";
+    public static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+    public static final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -48,6 +52,12 @@ public class Event {
         this.center_id = center_id;
         this.event_date = event_date;
         this.event_time = event_time;
+        this.description = description;
+    }
+    public Event(String center_id, String event_date, String event_time, String description) throws Exception {
+        this.center_id = Long.parseLong(center_id);
+        this.event_date = dateFormat.parse(event_date);
+        this.event_time = new java.sql.Time(timeFormat.parse(event_time).getTime());
         this.description = description;
     }
 }

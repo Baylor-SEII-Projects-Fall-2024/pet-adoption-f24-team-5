@@ -13,8 +13,14 @@ public class EventService {
         return eventRepository.save(event);
     }
     public Long createEvent(Event event) throws IllegalArgumentException{
+        System.out.println("c");
         eventRepository.save(event);
+        System.out.println("d");
         return event.getEvent_id();
+    }
+
+    List<Event> getEvent(){
+        return eventRepository.findAll();
     }
 }
 
