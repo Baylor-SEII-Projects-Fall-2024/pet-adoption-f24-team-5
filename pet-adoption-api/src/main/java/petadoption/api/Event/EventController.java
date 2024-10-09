@@ -22,6 +22,10 @@ public class EventController {
     public List<Event> getEvents() {
         return eventService.getEvent();
     }
+    @PutMapping("/update_event/{id}")
+    public ResponseEntity<?> updateEvent(@PathVariable Long id, @RequestBody Event updatedEvent) {
+        return eventService.updateEvent(id, updatedEvent);
+    }
     @PostMapping("/create_event")
     public ResponseEntity<?> register(@RequestBody Event event) {
         try{
