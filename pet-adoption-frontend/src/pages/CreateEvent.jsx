@@ -4,13 +4,6 @@ import {Link, Route} from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import axios from "axios";
-import HomePage from "@/pages/home";
-import Register from "@/pages/Register";
-import Login from "@/pages/Login";
-import PostPet from "@/pages/PostPet";
-import SearchEngine from "@/pages/SearchEngine";
-import Settings from "@/pages/settings";
-import LocalAdoptionCenter from "@/pages/LocalAdoptionCenter";
 
 const CreateEvent = () => {
     const [event_id, setEventID] = React.useState(0);
