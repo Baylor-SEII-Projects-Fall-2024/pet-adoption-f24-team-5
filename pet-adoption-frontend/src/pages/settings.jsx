@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
 import { Button, Card, CardContent, Stack, TextField, Typography, Paper } from '@mui/material';
 import styles from '@/styles/Home.module.css';
+import axios from 'axios';
 
 export default function HomePage() {
+  const [userId, setUserId] = useState('');
   const [username, setUsername] = useState('');
   const [firstName, setFirstName] = useState('');
   const [firstNameLabel, setFirstNameLabel] = useState('');
@@ -34,7 +36,20 @@ export default function HomePage() {
     fetchUsername();
   }, []);*/
 
+
+useEffect(() => {
+  console.log('User id: ' + localStorage.getItem('currentId'));
+  setUserId(localStorage.getItem('currentId'));
+  if (userId){
+    console.log("userId: " + userId);
+  }
+  else{
+    console.log("No user id");
+  }
+}, []);
+
   const handleFirstNameChange = () => {
+    console.log("In function: " + userId);
     setFirstName(firstNameLabel);
   };
 
@@ -46,6 +61,7 @@ export default function HomePage() {
     setPassword(passwordLabel);
     setOldPassword(passwordLabel);
     setOldPasswordLabel("");
+    handleUserUpdate();
   };
 
   const handlePhoneNumberChange = () => {
@@ -56,6 +72,42 @@ export default function HomePage() {
       setInvalidPhoneNumber(false);
     }
     setPhoneNumber(phoneNumberLabel);
+    handleUserUpdate();
+  };
+
+  const handleUserUpdate = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/api/users/${userId}');
+    if (!response.ok){
+      throw new Error("Failed to fetch user data");
+    }
+
+    const currentUser = await response.json();
+    const updatedUser = {
+      ...currentUser,
+      password: password,
+      phoneNumber: phoneNumber,
+    };
+
+    const updatedResponse = await fetch ('/api/users', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updatedUser),
+    });
+
+    if (!updatedResponse.ok){
+      throw new Error("Failed to update user data");
+    }
+    }
+    catch (error){
+      console.error('Failed to update user', error);
+    }
+  };
+
+  const fetchUserData = () => {
+
   };
 
   return (
@@ -122,6 +174,7 @@ export default function HomePage() {
                 label="Old Password"
                 align='center'
                 value={oldPasswordLabel}
+                onChange={(e) => setOldPasswordLabel(e.target.value)}
                 InputProps={{ style: { height: '40px', width: '420px' } }}
               />
             </Stack>
