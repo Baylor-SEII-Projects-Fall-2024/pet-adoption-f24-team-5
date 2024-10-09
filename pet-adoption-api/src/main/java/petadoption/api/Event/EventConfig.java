@@ -17,6 +17,7 @@ public class EventConfig {
         return args -> {
             Event event1 = new Event(
                     1L,
+                    "Cool event name",
                     new Date(),
                     new Time(1,1,1),
                     "This is the description"
