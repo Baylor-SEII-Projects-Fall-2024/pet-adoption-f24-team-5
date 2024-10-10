@@ -1,35 +1,31 @@
 import React, { useState } from 'react';
 import { Button, Stack } from "@mui/material";
-import { Link } from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import axios from 'axios';
 import { TextField } from '@mui/material';
+import Home from './home';
 
 const Login = () => {
-    const [email, setEmail] = useState('');
+    const [emailAddress, setEmailAddress] = useState('');
     const [password, setPassword] = useState('');
+    const navigate = useNavigate();
 
     const handleSubmit = (event) => {
         event.preventDefault();
         const loginRequest = {
-            email,
+            emailAddress,
             password
         };
 
         axios
-            .post('http://localhost:8080/api/users/login', loginRequest)
+            .post('http://localhost:8080/api/auth/authenticate', loginRequest)
             .then((res) => {
 
                 if (res.status !== 401) {
-                    alert(
-                        "ID: " + res.data.id + '\n' +
-                        "Email Address: " + res.data.email + '\n' +
-                        "UserType: " + res.data.userType + '\n' +
-                        "Age: " + res.data.age + '\n' +
-                        "Phone number: " + res.data.phoneNumber + '\n'
-                    );
-
-                    setEmail('');
+                    localStorage.setItem('token', res.data.token);
+                    setEmailAddress('');
                     setPassword('');
+                    navigate('/');
                 }
             })
             .catch((err) => {
@@ -51,8 +47,8 @@ const Login = () => {
                     <TextField
                         label="Email"
                         type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        value={emailAddress}
+                        onChange={(e) => setEmailAddress(e.target.value)}
                         required
                         fullWidth
                     />
