@@ -1,10 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { AppBar, Box, Button, Card, CardContent, Stack, Toolbar, Typography, Grid } from '@mui/material';
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 import styles from '@/styles/Home.module.css';
-
 
 const HomePage = () => {
     const [events, setEvents] = useState([
@@ -26,6 +25,20 @@ const HomePage = () => {
     ]);
 
     const [isEventsCollapsed, setIsEventsCollapsed] = useState(false);
+    const [emailAddress, setEmailAddress] = useState('');
+
+    useEffect(() => {
+        const fetchEmailAddress = async () => {
+            try {
+                const response = await axios.get('http://localhost:8080/users/1/emailAddress'); // Use the new endpoint
+                setEmailAddress(response.data);
+            } catch (error) {
+                console.error('Error fetching email address:', error);
+            }
+        };
+
+        fetchEmailAddress();
+    }, []);
 
     const handleCollapseToggle = () => {
         setIsEventsCollapsed(!isEventsCollapsed);
@@ -56,7 +69,11 @@ const HomePage = () => {
                     <Typography variant="h6" sx={{ flexGrow: 1 }}>
                         Pet Adoption
                     </Typography>
+                    <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'center' }}>
+                        {emailAddress}
+                    </Typography>
                     <Button color="inherit" component={Link} to="/PostPet">Profile</Button>
+                    <Button color="inherit" component={Link} to="/CreateEvent">Create Event</Button>
                     <Button color="inherit" component={Link} to="/SearchEngine">Search Engine</Button>
                     <Button color="inherit" component={Link} to="/Settings">Settings</Button>
                     <Button color="inherit" component={Link} to="/Login">Log Out</Button>

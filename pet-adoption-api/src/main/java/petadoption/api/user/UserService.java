@@ -40,6 +40,12 @@ public class UserService {
         return userRepository.findAll();
     }
 
+    // In UserService.java
+    public List<AdoptionCenter> findAllAdoptionCenters() {
+        return userRepository.findAllAdoptionCenters();
+    }
+
+
     public User loginUser(String email, String password) throws IllegalArgumentException {
         Optional<User> user = userRepository.findByEmailAddressAndPassword(email, password);
         if (user.isEmpty()) {
