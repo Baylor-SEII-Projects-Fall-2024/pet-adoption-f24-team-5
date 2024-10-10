@@ -1,5 +1,4 @@
 package petadoption.api.pet;
-
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
@@ -52,7 +51,7 @@ public class Pet {
     @Column(name = "IMAGE_DATA", length = 1000)
     private byte[] imageData;
 
-    public Pet() { /*DEFAULT BRUTHA*/ }
+    public Pet() { /*DEFAULT BRUTHA */}
 
     public Pet(String species, String petName, String breed, String color, Integer age, Boolean adoptionStatus, String description) {
         this.species = species;
