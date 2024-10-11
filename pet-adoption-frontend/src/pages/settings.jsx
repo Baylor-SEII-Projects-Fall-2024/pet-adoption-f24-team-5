@@ -44,7 +44,7 @@ useEffect(() => {
   };
 
   const handlePhoneNumberChange = () => {
-    if (phoneNumberLabel.length < 9){
+    if (phoneNumberLabel.length < 10){
       setInvalidPhoneNumber(true);
     }
     else{
