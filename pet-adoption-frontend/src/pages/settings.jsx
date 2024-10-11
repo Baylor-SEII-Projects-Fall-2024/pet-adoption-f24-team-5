@@ -20,23 +20,20 @@ export default function HomePage() {
   const [invalidPhoneNumber, setInvalidPhoneNumber] = useState(false);
 
 useEffect(() => {
-  console.log('User id: ' + localStorage.getItem('currentId'));
-  setUserId(localStorage.getItem('currentId'));
-  if (userId){
-    console.log("userId: " + userId);
-  }
-  else{
-    console.log("No user id");
+  const storedUserId = Number(localStorage.getItem('currentId'));
+  if (storedUserId) {
+    setUserId(storedUserId);
   }
 }, []);
 
   const handleFirstNameChange = () => {
-    console.log("In function: " + userId);
     setFirstName(firstNameLabel);
+    handleUserUpdate();
   };
 
   const handleLastNameChange = () => {
     setLastName(lastNameLabel);
+    handleUserUpdate();
   }
 
   const handlePasswordChange = () => {
@@ -47,7 +44,7 @@ useEffect(() => {
   };
 
   const handlePhoneNumberChange = () => {
-    if (!phoneNumberLabel.length < 9){
+    if (phoneNumberLabel.length < 9){
       setInvalidPhoneNumber(true);
     }
     else{
@@ -59,19 +56,19 @@ useEffect(() => {
 
   const handleUserUpdate = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/users/${userId}');
-    if (!response.ok){
-      throw new Error("Failed to fetch user data");
-    }
+      const response = await fetch(`http://localhost:8080/users/${userId}`);
+      if (!response.ok){
+        throw new Error("Failed to fetch user data");
+      }
 
-    const currentUser = await response.json();
-    const updatedUser = {
-      ...currentUser,
-      password: password,
-      phoneNumber: phoneNumber,
-    };
+      const currentUser = await response.json();
+      const updatedUser = {
+        ...currentUser,
+        password: password,
+        phoneNumber: phoneNumber,
+      };
 
-    const updatedResponse = await fetch ('/api/users', {
+      const updatedResponse = await fetch (`http://localhost:8080/users`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -86,10 +83,6 @@ useEffect(() => {
     catch (error){
       console.error('Failed to update user', error);
     }
-  };
-
-  const fetchUserData = () => {
-
   };
 
   return (
