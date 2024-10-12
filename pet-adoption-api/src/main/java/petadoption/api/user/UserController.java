@@ -13,7 +13,7 @@ import java.util.List;
 
 @RequestMapping("/api/users")
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://34.173.164.84:3000")
 public class UserController {
     @Autowired
     private final UserService userService;
@@ -77,6 +77,12 @@ public class UserController {
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
+    }
+
+    @PostMapping("/initialize")
+    public List<User> initialize() {
+        userService.initialize();
+        return userService.findAllUsers();
     }
 
 }

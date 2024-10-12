@@ -112,4 +112,60 @@ public class UserService {
     }
 
 
+    public void initialize() {
+        // Check if the email address exists before inserting
+
+        if (userRepository.findByEmailAddress("peter727@gmail.com").isEmpty()) {
+            CenterWorker user1 = new CenterWorker(
+                    "peter727@gmail.com",
+                    "password",
+                    UserType.CenterWorker,
+                    20,
+                    "914-282-8870",
+                    1L
+            );
+            workerRepository.save(user1);
+        }
+
+        if (userRepository.findByEmailAddress("ben@gmail.com").isEmpty()) {
+            CenterWorker user2 = new CenterWorker(
+                    "ben@gmail.com",
+                    "password2",
+                    UserType.CenterWorker,
+                    21,
+                    "631-889-5214",
+                    1L
+            );
+            workerRepository.save(user2);
+        }
+
+        if (userRepository.findByEmailAddress("Jackson@gmail.com").isEmpty()) {
+            Owner user3 = new Owner(
+                    "Jackson@gmail.com",
+                    "password3",
+                    UserType.Owner,
+                    21,
+                    "254-556-7794"
+            );
+            ownerRepository.save(user3);
+        }
+
+        if (userRepository.findByEmailAddress("Andrew@gmail.com").isEmpty()) {
+            AdoptionCenter adoptionCenter1 = new AdoptionCenter(
+                    "Andrew@gmail.com",
+                    "password4",
+                    UserType.CenterOwner,
+                    "254-556-7794",
+                    "Peter's Adoption Clinic",
+                    "1608 James Avenue",
+                    "Waco",
+                    "Texas",
+                    "76706",
+                    128
+            );
+            adoptionCenterRepository.save(adoptionCenter1);
+        }
+
+        System.out.println("Database seeding complete.");
+    }
 }
