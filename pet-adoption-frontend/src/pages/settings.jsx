@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Head from 'next/head';
 import { Button, Card, CardContent, Stack, TextField, Typography, Paper } from '@mui/material';
 import styles from '@/styles/Home.module.css';
-import axios from 'axios';
 
 export default function HomePage() {
   const [userId, setUserId] = useState('');
@@ -15,16 +14,39 @@ export default function HomePage() {
   const [passwordLabel, setPasswordLabel] = useState('');
   const [oldPassword, setOldPassword] = useState('');
   const [oldPasswordLabel, setOldPasswordLabel] = useState('');
+  const [invalidPassword, setInvalidPassword] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [phoneNumberLabel, setPhoneNumberLabel] = useState('');
   const [invalidPhoneNumber, setInvalidPhoneNumber] = useState(false);
 
-useEffect(() => {
-  const storedUserId = Number(localStorage.getItem('currentId'));
-  if (storedUserId) {
-    setUserId(storedUserId);
-  }
-}, []);
+  //Can add ability to change age
+
+  const updatedValuesRef = useRef({});
+
+  useEffect(() => {
+    const storedUserId = Number(localStorage.getItem('currentId'));
+    if (storedUserId) {
+      setUserId(storedUserId);
+      fetchUserInfo(storedUserId);
+    }
+  }, []);
+
+  const fetchUserInfo = async (id) => {
+    try {
+      const response = await fetch(`http://localhost:8080/users/${id}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch user info');
+      }
+
+      const userInfo = await response.json();
+      setFirstNameLabel(userInfo.firstName);
+      setLastNameLabel(userInfo.lastName);
+      setPhoneNumberLabel(userInfo.phoneNumber);
+      setOldPassword(userInfo.password);
+    } catch (error) {
+      console.error('Error fetching user info:', error);
+    }
+  };
 
   const handleFirstNameChange = () => {
     setFirstName(firstNameLabel);
@@ -37,21 +59,31 @@ useEffect(() => {
   }
 
   const handlePasswordChange = () => {
-    setPassword(passwordLabel);
-    setOldPassword(passwordLabel);
-    setOldPasswordLabel("");
-    handleUserUpdate();
+    console.log("Old: " + oldPasswordLabel);
+    console.log("New: " + passwordLabel);
+    if (oldPassword == oldPasswordLabel){
+      setPassword(passwordLabel);
+      setOldPassword(passwordLabel);
+      updatedValuesRef.current.password = passwordLabel;
+      setOldPasswordLabel("");
+      handleUserUpdate();
+    }
+    else{
+      setInvalidPassword(true);
+    }
   };
 
   const handlePhoneNumberChange = () => {
-    if (phoneNumberLabel.length < 10){
+    const isValidPhone = /^[0-9]{10}$/.test(phoneNumberLabel);
+    if (!isValidPhone){
       setInvalidPhoneNumber(true);
     }
     else{
       setInvalidPhoneNumber(false);
+      updatedValuesRef.current.phoneNumber = phoneNumberLabel;
+      setPhoneNumber(phoneNumberLabel);
+      handleUserUpdate();
     }
-    setPhoneNumber(phoneNumberLabel);
-    handleUserUpdate();
   };
 
   const handleUserUpdate = async () => {
@@ -64,8 +96,8 @@ useEffect(() => {
       const currentUser = await response.json();
       const updatedUser = {
         ...currentUser,
-        password: password,
-        phoneNumber: phoneNumber,
+        password: updatedValuesRef.current.password || password,
+        phoneNumber: updatedValuesRef.current.phoneNumber || phoneNumber,
       };
 
       const updatedResponse = await fetch (`http://localhost:8080/users`, {
@@ -164,6 +196,11 @@ useEffect(() => {
               />
             </Stack>
             <Button onClick={handlePasswordChange}>Confirm</Button>
+            {invalidPassword && (
+              <Typography color="error" variant = "body2" sx={{ marginTop: 1}}>
+                Please enter a valid password.
+              </Typography>
+            )}
           </Paper>
           <Stack direction="row"></Stack>
         </Stack>
