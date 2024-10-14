@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
 import { Button, Stack } from "@mui/material";
-import {Link, useNavigate} from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { TextField } from '@mui/material';
+import { useDispatch } from 'react-redux'; // Import useDispatch
+import { setToken } from '../utils/userSlice'; // Import setToken action
 import Home from './home';
 
 const Login = () => {
     const [emailAddress, setEmailAddress] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
+    const dispatch = useDispatch(); // Initialize dispatch
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -20,9 +23,9 @@ const Login = () => {
         axios
             .post('http://localhost:8080/api/auth/authenticate', loginRequest)
             .then((res) => {
-
                 if (res.status !== 401) {
                     localStorage.setItem('token', res.data.token);
+                    dispatch(setToken(res.data.token)); // Dispatch setToken action
                     setEmailAddress('');
                     setPassword('');
                     navigate('/');
