@@ -20,7 +20,7 @@ const PostPet = () => {
         setPostNewPet(!postNewPet);
     }
 
-    const url = "http://localhost:8080/api/pets";
+    const url = process.env.REACT_APP_BACKEND_URL + "/pets";
 
     const getAllPets = () => {
         axios.get(url)
@@ -60,7 +60,7 @@ const PostPet = () => {
 
         console.log('Pet Data: ', petData);
 
-        const url = "http://localhost:8080/api/pets/save/pet";
+        const url = process.env.REACT_APP_BACKEND_URL + "/pets/save/pet";
 
         axios
             .post(url, petData)

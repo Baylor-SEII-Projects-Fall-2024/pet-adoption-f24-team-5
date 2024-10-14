@@ -7,7 +7,7 @@ import { TextField } from '@mui/material';
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-
+    const REACT_APP_BACKEND_URL='http://34.27.150.181/api'
     const handleSubmit = (event) => {
         event.preventDefault();
         const loginRequest = {
@@ -16,7 +16,7 @@ const Login = () => {
         };
 
         axios
-            .post('http://localhost:8080/api/users/login', loginRequest)
+                .post(REACT_APP_BACKEND_URL + '/users/login', loginRequest)
             .then((res) => {
 
                 if (res.status !== 401) {

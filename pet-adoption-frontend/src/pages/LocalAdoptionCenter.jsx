@@ -6,11 +6,11 @@ import axios from 'axios';
 export default function AdoptionCenterPage() {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
-
+    const REACT_APP_BACKEND_URL='http://34.27.150.181/api'
     useEffect(() => {
         const fetchAdoptionCenters = async () => {
             try {
-                const response = await axios.get('http://localhost:8080/api/users/adoptioncenters');
+                const response = await axios.get(REACT_APP_BACKEND_URL + '/users/adoptioncenters');
                 setData(response.data);  // Store fetched data in state
             } catch (error) {
                 console.error('Error fetching adoption centers:', error);

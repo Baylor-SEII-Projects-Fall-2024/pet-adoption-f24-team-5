@@ -18,7 +18,7 @@ export default function HomePage() {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [phoneNumberLabel, setPhoneNumberLabel] = useState('');
   const [invalidPhoneNumber, setInvalidPhoneNumber] = useState(false);
-
+  const REACT_APP_BACKEND_URL='http://34.27.150.181/api'
 useEffect(() => {
   const storedUserId = Number(localStorage.getItem('currentId'));
   if (storedUserId) {
@@ -56,7 +56,7 @@ useEffect(() => {
 
   const handleUserUpdate = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/users/${userId}`);
+      const response = await fetch(REACT_APP_BACKEND_URL + `/users/${userId}`);
       if (!response.ok){
         throw new Error("Failed to fetch user data");
       }
@@ -68,7 +68,7 @@ useEffect(() => {
         phoneNumber: phoneNumber,
       };
 
-      const updatedResponse = await fetch (`http://localhost:8080/users`, {
+      const updatedResponse = await fetch (REACT_APP_BACKEND_URL + `/users`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

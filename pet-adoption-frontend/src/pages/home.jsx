@@ -27,10 +27,12 @@ const HomePage = () => {
     const [isEventsCollapsed, setIsEventsCollapsed] = useState(false);
     const [emailAddress, setEmailAddress] = useState('');
 
+    const REACT_APP_BACKEND_URL='http://34.27.150.181/api'
+
     useEffect(() => {
         const fetchEmailAddress = async () => {
             try {
-                const response = await axios.get('http://localhost:8080/users/1/emailAddress'); // Use the new endpoint
+                const response = await axios.get(REACT_APP_BACKEND_URL + '/users/1/emailAddress'); // Use the new endpoint
                 setEmailAddress(response.data);
             } catch (error) {
                 console.error('Error fetching email address:', error);

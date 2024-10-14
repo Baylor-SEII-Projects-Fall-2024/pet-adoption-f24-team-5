@@ -15,10 +15,10 @@ const CreateEvent = () => {
     const [events, setEvents] = React.useState([]);
     const [noFutureEvents, setNoFutureEvents] = React.useState(false);
     const [selectedEvent, setSelectedEvent] = React.useState(null);
-
+    const REACT_APP_BACKEND_URL='http://34.27.150.181/api'
     const fetchEvents = async () => {
         try {
-            const response = await axios.get('http://localhost:8080/api/events');
+                const response = await axios.get(REACT_APP_BACKEND_URL + '/events');
             console.log("Fetched Events:", response.data);
 
             const now = new Date();
@@ -155,8 +155,8 @@ const CreateEvent = () => {
         console.log('Event Data', eventData);
 
         const url = selectedEvent
-            ? `http://localhost:8080/api/events/update_event/${selectedEvent.event_id}` // Update URL
-            : 'http://localhost:8080/api/events/create_event'; // Create URL
+            ? REACT_APP_BACKEND_URL + `/events/update_event/${selectedEvent.event_id}` // Update URL
+            : REACT_APP_BACKEND_URL + '/events/create_event'; // Create URL
 
         const axiosMethod = selectedEvent ? axios.put : axios.post; // Decide on method
 
