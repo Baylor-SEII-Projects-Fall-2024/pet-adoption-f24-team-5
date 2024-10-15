@@ -1,5 +1,4 @@
 package petadoption.api.pet;
-
 import jakarta.persistence.*;
 import lombok.*;
 import petadoption.api.user.AdoptionCenter.AdoptionCenter;
@@ -9,7 +8,6 @@ import petadoption.api.user.User;
 @Getter
 @Setter
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = Pet.TABLE_NAME)
@@ -52,6 +50,7 @@ public class Pet {
 
     @Column(name = "IMAGE_NAME", length = 1000)
     private String imageName;
+
 
     public Pet(String species, String petName, String breed, String color, Integer age, Boolean adoptionStatus, String description) {
         this.species = species;

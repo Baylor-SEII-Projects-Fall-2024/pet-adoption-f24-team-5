@@ -27,6 +27,18 @@ public class UserController {
         return userService.findAllUsers();
     }
 
+    // In UserController.java
+    @GetMapping("/adoptioncenters")
+    public ResponseEntity<List<AdoptionCenter>> getAdoptionCenters() {
+        try {
+            List<AdoptionCenter> centers = userService.findAllAdoptionCenters();
+            return new ResponseEntity<>(centers, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try{

@@ -28,7 +28,7 @@ public class ImageController {
     @GetMapping
     public byte[] getImage(@RequestBody String fileName) throws IOException {
 
-        MultipartFile image = imageService.getImage(UPLOAD_DIRECTORY, fileName);
+        return imageService.getImage(UPLOAD_DIRECTORY, fileName);
     }
 
 }

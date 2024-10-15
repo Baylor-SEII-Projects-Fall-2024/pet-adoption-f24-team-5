@@ -1,5 +1,6 @@
 package petadoption.api.user;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import petadoption.api.user.AdoptionCenter.AdoptionCenter;
@@ -28,8 +29,17 @@ public class UserService {
         return userRepository.findById(userId);
     }
 
-    public User saveUser(User user) {
-        return userRepository.save(user);
+    public User saveUser(User user) {return userRepository.save(user);}
+
+    public User updateUser(User user) {
+        User existingUser = userRepository.findById(user.getId())
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + user.getId()));
+
+        existingUser.setEmailAddress(user.getEmailAddress());
+        existingUser.setPassword(user.getPassword());
+        existingUser.setUserType(user.getUserType());
+        existingUser.setPhoneNumber(user.getPhoneNumber());
+        return userRepository.save(existingUser);
     }
 
     public void deleteUser(Long userId) {
@@ -39,6 +49,12 @@ public class UserService {
     public List<User> findAllUsers() {
         return userRepository.findAll();
     }
+
+    // In UserService.java
+    public List<AdoptionCenter> findAllAdoptionCenters() {
+        return userRepository.findAllAdoptionCenters();
+    }
+
 
     public User loginUser(String email, String password) throws IllegalArgumentException {
         Optional<User> user = userRepository.findByEmailAddressAndPassword(email, password);

@@ -28,6 +28,9 @@ const Login = () => {
                         "Phone number: " + res.data.phoneNumber + '\n'
                     );
 
+                    const userId = res.data.id;
+                    localStorage.setItem('currentId', userId);
+
                     setEmail('');
                     setPassword('');
                 }
