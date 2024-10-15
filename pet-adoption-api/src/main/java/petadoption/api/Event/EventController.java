@@ -23,11 +23,15 @@ public class EventController {
     }
     @GetMapping
     public List<Event> getEvents() {
-        return eventService.getEvent();
+           return eventService.findAllEvents();
     }
     @PutMapping("/update_event/{id}")
     public ResponseEntity<?> updateEvent(@PathVariable Long id, @RequestBody Event updatedEvent) {
         return eventService.updateEvent(id, updatedEvent);
+    }
+    @DeleteMapping("/delete_event/{id}")
+    public void deleteEvent(@PathVariable Long id) {
+        eventService.deleteEvent(id);
     }
     @PostMapping("/create_event")
     public ResponseEntity<?> register(@RequestBody Event event) {
@@ -38,9 +42,8 @@ public class EventController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
     }
-
-    @PostMapping("initialize_events")
-    public ResponseEntity<?> initialize() {
+    @PostMapping("/initialize_events")
+    public ResponseEntity<List<Long>> initialize() {
         try{
             List<Long> ids = new ArrayList<>();
             List<Event> events;
@@ -50,16 +53,16 @@ public class EventController {
             Event event1 = new Event(
                     1L,
                     "Cool event name",
-                    java.sql.Date.valueOf(localDate), // Store date as java.sql.Date
-                    Time.valueOf(localTime).toLocalTime(),
+                    localDate,
+                    localTime,
                     "This is the description"
             );
             localTime = LocalTime.of(20, 30); // Use a LocalTime for the event time
             Event event2 = new Event(
                     1L,
                     "Cooler event name",
-                    java.sql.Date.valueOf(localDate), // Store date as java.sql.Date
-                    Time.valueOf(localTime).toLocalTime(),
+                    localDate,
+                    localTime,
                     "This is the description but longer"
             );
 
@@ -70,7 +73,7 @@ public class EventController {
 
             return new ResponseEntity<>(ids, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
