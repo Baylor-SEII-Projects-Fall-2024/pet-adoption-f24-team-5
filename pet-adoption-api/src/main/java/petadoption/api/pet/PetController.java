@@ -24,9 +24,6 @@ public class PetController {
         petService.savePet(pet);
     }
 
-    @PostMapping("/uploadImage")
-    public String uploadImage(@RequestBody MultipartFile file) {
-        return "stubbed";
-    }
+
 
 }
