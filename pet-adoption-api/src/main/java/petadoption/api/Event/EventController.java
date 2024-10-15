@@ -42,8 +42,8 @@ public class EventController {
     @PostMapping("initialize_events")
     public ResponseEntity<?> initialize() {
         try{
-            List<Long> ids = new ArrayList<Long>();
-            List<Event> events = new ArrayList<Event>();
+            List<Long> ids = new ArrayList<>();
+            List<Event> events;
 
             LocalDate localDate = LocalDate.now();
             LocalTime localTime = LocalTime.of(19, 30); // Use a LocalTime for the event time
