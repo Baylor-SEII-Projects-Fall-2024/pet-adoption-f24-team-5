@@ -24,6 +24,7 @@ import PostPet from './PostPet';
 import SearchEngine from './SearchEngine';
 import Settings from './settings';
 import LocalAdoptionCenter from './LocalAdoptionCenter';
+import CreateEvent from "@/pages/CreateEvent";
 
 // Initialize Redux
 const reduxStore = buildStore({});
@@ -39,6 +40,7 @@ function AppRoutes() {
           <Route path="/Register" element={<Register />} />
           <Route path="/Login" element={<Login />} />
           <Route path="/PostPet" element={<PostPet />} />
+          <Route path="/CreateEvent" element={<CreateEvent />} />
           <Route path="/SearchEngine" element={<SearchEngine />} />
           <Route path="/Settings" element={<Settings />} />
           <Route path="/LocalAdoptionCenter" element={<LocalAdoptionCenter />} />
