@@ -3,17 +3,12 @@ package petadoption.api.Event;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.sql.Date;
 import java.time.format.DateTimeFormatter;
 
-@Getter
-@Setter
 @Data
 @Entity
 @Table(name = Event.TABLE_NAME)
@@ -24,7 +19,7 @@ public class Event {
     public static final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "EVENT_ID")
     protected Long event_id;
 
@@ -36,20 +31,18 @@ public class Event {
 
     @Column(name = "EVENT_DATE")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
-    protected Date event_date;
+    protected LocalDate event_date;
 
     @Column(name = "EVENT_TIME")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "hh:mm a")
     protected LocalTime event_time;
 
-    @Getter
-    @Setter
     @Column(name = "DESCRIPTION")
     protected String description;
 
     public Event() {}
 
-    public Event(Long center_id, String event_name, Date event_date, LocalTime event_time, String description) {
+    public Event(Long center_id, String event_name, LocalDate event_date, LocalTime event_time, String description) {
         this.center_id = center_id;
         this.event_name = event_name;
         this.event_date = event_date;
@@ -57,19 +50,12 @@ public class Event {
         this.description = description;
 
     }
-    public Event(Long center_id, String event_name, String event_dateString, String event_timeString, String description) {
-        this.center_id = center_id;
-        this.event_name = event_name;
-        this.event_date = Date.valueOf(LocalDate.parse(event_dateString, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-        this.event_time = LocalTime.parse(event_timeString, DateTimeFormatter.ofPattern("hh:mm a"));
-        this.description = description;
-    }
-    public Event(Long event_id, Long center_id, String event_name, String event_dateString, String event_timeString, String description) {
+    public Event(Long event_id, Long center_id, String event_name, LocalDate event_date, LocalTime event_time, String description) {
         this.event_id = event_id;
         this.center_id = center_id;
         this.event_name = event_name;
-        this.event_date = Date.valueOf(LocalDate.parse(event_dateString, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-        this.event_time = LocalTime.parse(event_timeString, DateTimeFormatter.ofPattern("hh:mm a"));
+        this.event_date = event_date;
+        this.event_time = event_time;
         this.description = description;
     }
 
@@ -97,11 +83,11 @@ public class Event {
         this.event_name = event_name;
     }
 
-    public Date getEventDate() {
+    public LocalDate getEventDate() {
         return event_date;
     }
 
-    public void setEventDate(Date event_date) {
+    public void setEventDate(LocalDate event_date) {
         this.event_date = event_date;
     }
 
