@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Head from 'next/head';
-import { Button, Card, CardContent, Stack, TextField, Typography, Paper } from '@mui/material';
+import { Button, Card, CardContent, Stack, TextField, Typography, Paper, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import styles from '@/styles/Home.module.css';
 
 export default function HomePage() {
@@ -18,8 +18,8 @@ export default function HomePage() {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [phoneNumberLabel, setPhoneNumberLabel] = useState('');
   const [invalidPhoneNumber, setInvalidPhoneNumber] = useState(false);
-
-  //Can add ability to change age
+  const [userType, setUserType] = useState('');
+  const [userAge, setUserAge] = useState('');
 
   const updatedValuesRef = useRef({});
 
@@ -43,6 +43,12 @@ export default function HomePage() {
       setLastNameLabel(userInfo.lastName);
       setPhoneNumberLabel(userInfo.phoneNumber);
       setOldPassword(userInfo.password);
+      setUserType(userInfo.userType);
+      if (userInfo.userType != "CenterOwner"){
+        setUserAge(userInfo.userAge);
+      }
+      console.log("ID: " + id);
+      console.log(userInfo.emailAddress);
     } catch (error) {
       console.error('Error fetching user info:', error);
     }
@@ -59,8 +65,6 @@ export default function HomePage() {
   }
 
   const handlePasswordChange = () => {
-    console.log("Old: " + oldPasswordLabel);
-    console.log("New: " + passwordLabel);
     if (oldPassword == oldPasswordLabel){
       setPassword(passwordLabel);
       setOldPassword(passwordLabel);
@@ -86,6 +90,12 @@ export default function HomePage() {
     }
   };
 
+  const handleAgeChange = (event) => {
+    setUserAge(event.target.value);
+    updatedValuesRef.current.userAge = event.target.value;
+    handleUserUpdate();
+  };
+
   const handleUserUpdate = async () => {
     try {
       const response = await fetch(`http://localhost:8080/users/${userId}`);
@@ -99,6 +109,10 @@ export default function HomePage() {
         password: updatedValuesRef.current.password || password,
         phoneNumber: updatedValuesRef.current.phoneNumber || phoneNumber,
       };
+
+      if (updatedUser.userType != "CenterOwner"){
+        updatedUser.userAge = updatedValuesRef.current.userAge || userAge;
+      }
 
       const updatedResponse = await fetch (`http://localhost:8080/users`, {
       method: 'PUT',
@@ -202,7 +216,25 @@ export default function HomePage() {
               </Typography>
             )}
           </Paper>
-          <Stack direction="row"></Stack>
+          {userType != "CenterOwner" && (<Paper sx={{ width: 600 }} elevation={4}>
+            <Stack direction = "row">
+              <FormControl fullWidth>
+                <InputLabel id="Age">Age</InputLabel>
+                <Select
+                  labelId="Age"
+                  value={userAge}
+                  onChange={handleAgeChange}
+                  displayEmpty
+                >
+                  {[...Array(100).keys()].map((num) => (
+                    <MenuItem key={num + 1} value={num + 1}>
+                      {num + 1}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Stack>
+          </Paper>)}
         </Stack>
       </main>
     </>
