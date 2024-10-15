@@ -1,8 +1,10 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { thunk } from 'redux-thunk';
+import userReducer from './userSlice';
 
 const reducers = combineReducers({
-    // Add your reducers here
+    user: userReducer,
+    // Add other reducers here
 });
 
 export const buildStore = (initialState) => {
@@ -12,6 +14,6 @@ export const buildStore = (initialState) => {
         middleware: (getDefaultMiddleware) => {
             return getDefaultMiddleware().concat(thunk);
         },
-        devTools: process.env.NODE_ENV !== 'production'
+        devTools: process.env.NODE_ENV !== 'production',
     });
 };

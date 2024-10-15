@@ -4,6 +4,7 @@ import jakarta.websocket.OnClose;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import petadoption.api.auth.AuthenticationController;
 import petadoption.api.user.AdoptionCenter.AdoptionCenter;
 import petadoption.api.user.AdoptionCenter.AdoptionCenterRepository;
 import petadoption.api.user.AdoptionCenter.CenterWorker;
@@ -19,7 +20,7 @@ import static petadoption.api.user.UserType.CenterOwner;
 @Configuration
 public class UserConfig {
     @Bean
-    CommandLineRunner commandLineRunner(CenterWorkerRepository centerWorkerRepository, OwnerRepository ownerRepository, AdoptionCenterRepository adoptionCenterRepository, UserRepository userRepository) {
+    CommandLineRunner commandLineRunner(AuthenticationController authenticationController, CenterWorkerRepository centerWorkerRepository, OwnerRepository ownerRepository, AdoptionCenterRepository adoptionCenterRepository, UserRepository userRepository) {
         return args -> {
             CenterWorker user1 = new CenterWorker(
                     "peter727@gmail.com",
@@ -60,9 +61,11 @@ public class UserConfig {
                     128
             );
 
-            centerWorkerRepository.saveAll(List.of(user1,user2));
-            ownerRepository.saveAll(List.of(user3));
-            adoptionCenterRepository.saveAll(List.of(adoptionCenter1));
+            authenticationController.register(user1);
+            authenticationController.register(user2);
+            authenticationController.register(user3);
+            authenticationController.register(adoptionCenter1);
+
 
 
         };
