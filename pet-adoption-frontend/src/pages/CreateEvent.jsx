@@ -4,12 +4,12 @@ import { Link } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import axios from "axios";
-import {setToken} from "@/utils/userSlice";
 
 const CreateEvent = () => {
     const [event_name, setEventName] = React.useState('');
     const [center_id, setCenterID] = React.useState('');
     const [event_date, setEventDate] = React.useState(new Date()); // LocalDate as Date object for ease
+    const [event_time , setEventTime] = React.useState('');
     const [description, setDescription] = React.useState('');
     const [createEvent, setCreateEvent] = React.useState(false);
     const [events, setEvents] = React.useState([]);
@@ -100,27 +100,27 @@ const CreateEvent = () => {
         event.preventDefault();
 
         const formattedDate = formatDate(event_date); // Format event_date as dd/MM/yyyy
-        const eventTime = event_date.toLocaleTimeString('en-US', {
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: true,
-        }); // Format time as hh:mm AM/PM
-
         const parsedCenterID = parseInt(center_id, 10);
+
 
         // Validate required fields
         if (!event_name || isNaN(parsedCenterID) || !description) {
             alert("Please fill out all fields correctly.");
             return;
         }
-
+        setEventTime(event_date.toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true,
+        }))
         const eventData = {
             center_id: parsedCenterID,
             event_name,
             event_date: formattedDate, // Send formatted date
-            event_time: eventTime,      // Send formatted time
+            event_time,
             description,
         };
+
 
         console.log('Event Data', eventData);
 
@@ -157,7 +157,9 @@ const CreateEvent = () => {
         return (
             <Card
                 sx={{
-                    width: '48%',
+                    flexBasis: '45%', // Takes about half the row space
+                    flexGrow: 1,
+                    maxWidth: '600px', // Controls maximum card width
                     backgroundColor: 'white',
                     transition: 'border 0.3s',
                     '&:hover': {
@@ -170,7 +172,8 @@ const CreateEvent = () => {
                     setSelectedEvent(event);
                     setEventName(event.event_name);
                     setCenterID(event.center_id);
-                    setEventDate(eventDate);
+                    setEventDate(event.event_date);
+                    setEventTime(event.event_time);
                     setDescription(event.description);
                     setCreateEvent(true);
                 }}
@@ -178,9 +181,8 @@ const CreateEvent = () => {
                 <CardContent>
                     <Typography variant='h5' align='center'>{event.event_name || "Unnamed Event"}</Typography>
                     <Typography variant='body1' align='center'>{event.description}</Typography>
-                    <Typography variant='body2' align='center'>
-                        {`${day}/${month}/${year}`}
-                    </Typography>
+                    <Typography variant='body2' align='center'>{`${day}/${month}/${year}`}</Typography>
+                    <Typography variant='body2' align='center' color="textSecondary"> {`Time: ${event.event_time || "N/A"}`}</Typography>
                 </CardContent>
             </Card>
         );
@@ -235,7 +237,7 @@ const CreateEvent = () => {
             )}
 
             {!createEvent && (
-                <Stack sx={{ paddingTop: 4 }} alignItems='center' gap={5}>
+                <Stack sx={{ paddingTop: 4, maxWidth: '1200px', margin: '0 auto' }} alignItems='center' gap={5}>
                     <Button onClick={handleCreateEvent} color='inherit' variant='contained'>Create Event</Button>
                     {noFutureEvents ? (
                         <Typography variant="h6" color="error">No future events</Typography>
