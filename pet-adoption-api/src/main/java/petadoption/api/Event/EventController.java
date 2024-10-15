@@ -41,8 +41,6 @@ public class EventController {
 
     @PostMapping("initialize_events")
     public ResponseEntity<?> initialize() {
-
-        //eventRepository.saveAll(List.of(event1));
         try{
             List<Long> ids = new ArrayList<Long>();
             List<Event> events = new ArrayList<Event>();
@@ -69,6 +67,7 @@ public class EventController {
             for(Event e : events) {
                 ids.add(eventService.createEvent(e));
             }
+
             return new ResponseEntity<>(ids, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
