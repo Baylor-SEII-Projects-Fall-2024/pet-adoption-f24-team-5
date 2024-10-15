@@ -22,6 +22,8 @@ public class UserConfig {
     CommandLineRunner commandLineRunner(UserService userService) {
         return args -> {
 
+            userService.initialize();
+
 
         };
     }
