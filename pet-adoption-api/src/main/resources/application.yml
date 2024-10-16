@@ -6,7 +6,12 @@ spring:
     username: root
     password: password
     driverClassName: com.mysql.cj.jdbc.Driver
+  servlet:
+    multipart:
+      enabled: true
   jpa:
     hibernate:
       ddl-auto: create-drop
     show-sql: true
+
+  
