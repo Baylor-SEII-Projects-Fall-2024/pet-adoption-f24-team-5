@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { TextField, Button, LinearProgress } from '@mui/material';
 import axios from 'axios';
+import {API_URL} from "@/constants";
 
 const ImageUploadComponent = ({ onImageUpload }) => {
     const [selectedFile, setSelectedFile] = useState(null);
@@ -23,7 +24,7 @@ const ImageUploadComponent = ({ onImageUpload }) => {
         const formData = new FormData();
         formData.append('file', selectedFile);
 
-        axios.post('http://localhost:8080/api/images/upload',
+        axios.post(`${API_URL}/api/images/upload`,
             formData, {
                 headers: {
                     Authorization: `Bearer ${token}`, // Pass token in the header

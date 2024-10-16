@@ -13,7 +13,6 @@ import petadoption.api.user.User;
 @RestController
 @RequestMapping("api/auth")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "localhost:3000")
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;

@@ -6,6 +6,7 @@ import { TextField } from '@mui/material';
 import { useDispatch } from 'react-redux'; // Import useDispatch
 import { setToken } from '../utils/userSlice'; // Import setToken action
 import Home from './home';
+import {API_URL} from "@/constants";
 
 const Login = () => {
     const [emailAddress, setEmailAddress] = useState('');
@@ -21,7 +22,7 @@ const Login = () => {
         };
 
         axios
-            .post('http://localhost:8080/api/auth/authenticate', loginRequest)
+            .post(`${API_URL}/api/auth/authenticate`, loginRequest)
             .then((res) => {
                 if (res.status !== 401) {
                     localStorage.setItem('token', res.data.token);

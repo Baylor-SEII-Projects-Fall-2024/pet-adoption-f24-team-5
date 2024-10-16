@@ -67,8 +67,6 @@ public class UserConfig {
             authenticationController.register(adoptionCenter1);
 
 
-            userService.initialize();
-
 
         };
     }

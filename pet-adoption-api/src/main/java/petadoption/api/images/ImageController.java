@@ -9,7 +9,6 @@ import java.io.IOException;
 
 @RequestMapping("api/images")
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
 public class ImageController {
 
     public static final String UPLOAD_DIRECTORY = "src/main/resources/images/";

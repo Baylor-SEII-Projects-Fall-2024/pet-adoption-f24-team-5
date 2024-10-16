@@ -4,6 +4,7 @@ import { AppBar, Box, Button, Card, CardContent, Stack, Toolbar, Typography, Gri
 import { Link, useNavigate } from 'react-router-dom'; // Use useNavigate for redirection
 import axios from 'axios';
 import styles from '@/styles/Home.module.css';
+import {API_URL, FRONTEND_URL} from "@/constants";
 
 function getSubjectFromToken(token) {
     try {
@@ -50,13 +51,6 @@ const HomePage = () => {
     useEffect(() => {
         const fetchEmailAddress = async () => {
             try {
-                /*const response = await axios.get('http://localhost:8080/users/1/emailAddress', {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        'Content-Type': 'application/json',
-                    },
-                });*/
-
                 setEmailAddress(getSubjectFromToken(token));
             } catch (error) {
                 console.error('Error fetching email address:', error);
