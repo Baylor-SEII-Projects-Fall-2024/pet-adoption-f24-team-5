@@ -56,7 +56,7 @@ const PostPet = () => {
                 Authorization: `Bearer ${token}`, // Pass token in the header
                 'Content-Type': 'application/json'
             }
-            })
+        })
             .then((res) => {
                 setPets(res.data);
                 console.log(res.data);
@@ -164,7 +164,7 @@ const PostPet = () => {
                         <TextField
                             label="Breed"
                             value={breed}
-                                onChange={(e) => setBreed(e.target.value)}
+                            onChange={(e) => setBreed(e.target.value)}
                             required
                             fullWidth
                         />
@@ -196,17 +196,17 @@ const PostPet = () => {
                             label="Adoption Status"
                             value={adoptionStatus}
                             onChange={handleChangeSelection}
-                            >
+                        >
                             <MenuItem value={'false'}>Up For Adoption</MenuItem>
                             <MenuItem value={'true'}>Owned</MenuItem>
                         </Select>
                         <ImageUploadComponent onImageUpload={handleImageUpload}/>
                         <Button type="submit" variant="contained">Post</Button>
                     </Stack>
-                    </Box>
-                )}
+                </Box>
+            )}
 
-                {!postNewPet && (
+            {!postNewPet && (
 
                     <Stack sx={{paddingTop:4}} alignItems='center' gap={5}>
                         <Button onClick={handlePostNewPet} color='inherit' variant='contaiend'>Post Pet</Button>

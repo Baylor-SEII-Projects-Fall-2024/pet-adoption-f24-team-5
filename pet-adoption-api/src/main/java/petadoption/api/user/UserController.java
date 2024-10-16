@@ -13,7 +13,7 @@ import java.util.List;
 
 @RequestMapping("/api/users")
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "localhost:3000")
 public class UserController {
     @Autowired
     private final UserService userService;
@@ -24,6 +24,7 @@ public class UserController {
 
     @GetMapping
     public List<User> getUser() {
+        System.out.println("Inside Get users");
         return userService.findAllUsers();
     }
 
@@ -48,6 +49,14 @@ public class UserController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
     }
+
+
+    @PostMapping("/initialize")
+    public List<User> initialize() {
+        userService.initialize();
+        return userService.findAllUsers();
+    }
+
 
 
 }
