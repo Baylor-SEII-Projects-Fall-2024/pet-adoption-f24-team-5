@@ -4,12 +4,14 @@ import { Card, CardContent, Stack, Typography } from '@mui/material';
 import AdoptionCenterCard from '../components/AdoptionCenterCard';
 import axios from 'axios';
 import { getSubjectFromToken } from '../utils/tokenUtils'; // Import the function
+import {API_URL, FRONTEND_URL} from "@/constants";
 
 export default function AdoptionCenterPage() {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [userEmail, setUserEmail] = useState(null); // State to store the user email
     const token = localStorage.getItem('token');
+
 
     useEffect(() => {
         // Extract user email (subject) from the token
@@ -23,7 +25,7 @@ export default function AdoptionCenterPage() {
         // Fetch adoption centers
         const fetchAdoptionCenters = async () => {
             try {
-                const response = await axios.get('http://localhost:8080/api/users/adoptioncenters', {
+                const response = await axios.get(`${API_URL}/api/users/adoptioncenters`, {
                     headers: {
                         Authorization: `Bearer ${token}`, // Pass token in the header
                         'Content-Type': 'application/json',

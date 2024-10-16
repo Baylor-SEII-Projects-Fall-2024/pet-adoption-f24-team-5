@@ -16,6 +16,7 @@ import MenuItem from "@mui/material/MenuItem";
 import axios from 'axios';
 import PetCard from "@/components/PetCard";
 import ImageUploadComponent from "@/components/ImageUploadComponent";
+import {API_URL} from "@/constants";
 
 const PostPet = () => {
     const [species, setSpecies] = React.useState('');
@@ -42,6 +43,7 @@ const PostPet = () => {
         handlePostNewPet();
     }
 
+
     const handlePostNewPet = () => {
         setPostNewPet(!postNewPet);
     }
@@ -49,7 +51,7 @@ const PostPet = () => {
 
     const getAllPets = () => {
 
-        const url = "http://localhost:8080/api/pets";
+        const url = `${API_URL}/api/pets`;
 
         axios.get(url, {
             headers: {
@@ -106,7 +108,7 @@ const PostPet = () => {
 
         console.log('Pet Data: ', petData);
 
-        const url = "http://localhost:8080/api/pets/save/pet";
+        const url = `${API_URL}/api/pets/save/pet`;
 
         axios
             .post(url, petData, {

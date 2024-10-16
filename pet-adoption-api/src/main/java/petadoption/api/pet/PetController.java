@@ -9,7 +9,6 @@ import java.util.List;
 
 @RequestMapping("/api/pets")
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
 public class PetController {
     @Autowired
     private final PetService petService;

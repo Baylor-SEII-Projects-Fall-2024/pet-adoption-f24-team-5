@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { AppBar, Box, Button, Card, CardContent, Stack, Toolbar, Typography, Grid, CardMedia } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom'; // Use useNavigate for redirection
 import axios from 'axios';
+import {API_URL} from "@/constants";
 
 function getSubjectFromToken(token) {
     try {
@@ -46,7 +47,7 @@ const HomePage = () => {
     useEffect(() => {
         const fetchEvents = async () => {
             try {
-                const response = await axios.get('http://localhost:8080/api/events', {
+                const response = await axios.get(`${API_URL}/api/events`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                         'Content-Type': 'application/json',
