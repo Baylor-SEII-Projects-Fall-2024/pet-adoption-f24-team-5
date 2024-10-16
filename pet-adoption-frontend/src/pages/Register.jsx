@@ -18,6 +18,7 @@ const Register = () => {
     const [centerState, setCenterState] = useState('');
     const [centerZip, setCenterZip] = useState('');
     const [numberOfPets, setNumberOfPets] = useState('');
+    const token = localStorage.getItem('token');
 
 
 
