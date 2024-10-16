@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+    import React, { useState } from 'react';
 import { Button, Stack } from "@mui/material";
 import axios from 'axios';
 import { TextField } from '@mui/material';
@@ -46,8 +46,9 @@ const Register = () => {
         };
 
         const url = userType === 'owner'
-            ? 'http://localhost:8080/api/auth/register/owner'
-            : 'http://localhost:8080/api/auth/register/center-worker';
+            ? 'http://localhost:8080/api/auth/register/adoption-center'
+            : 'http://localhost:8080/api/auth/register/owner';
+
 
         axios
             .post( url, registrationData)

@@ -30,6 +30,7 @@ export default function AdoptionCenterPage() {
                     },
                 });
                 setData(response.data); // Store fetched data in state
+                console.log(data);
             } catch (error) {
                 console.error('Error fetching adoption centers:', error);
             } finally {
