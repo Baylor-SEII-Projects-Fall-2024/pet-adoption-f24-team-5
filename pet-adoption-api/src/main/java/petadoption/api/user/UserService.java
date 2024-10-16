@@ -57,7 +57,7 @@ public class UserService {
         return ownerRepository.save(existingUser);
     }
 
-    public ResponseEntity<AdoptionCenter> updateUser(Long id, AdoptionCenter user) {
+    public ResponseEntity<User> updateUser(Long id, User user) {
         //AdoptionCenter existingUser = adoptionCenterRepository.findById(user.getId())
         //        .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + user.getId()));
         return userRepository.findById(id)
@@ -67,7 +67,7 @@ public class UserService {
                     event.setPhoneNumber(user.getPhoneNumber());
 
                     // Save updated event
-                    AdoptionCenter savedUser = userRepository.save(user);
+                    User savedUser = userRepository.save(event);
                     return ResponseEntity.ok(savedUser);
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());

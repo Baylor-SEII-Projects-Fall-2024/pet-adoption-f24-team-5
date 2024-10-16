@@ -74,9 +74,16 @@ public class UserController {
         return ResponseEntity.ok(userService.updateUser(user));
     }*/
     @PutMapping("/updateAdoptionCenter/{id}")
-    public ResponseEntity<?> updateUserAdoptionCenter(@RequestBody AdoptionCenter user, @PathVariable Long id) {
+    public ResponseEntity<?> updateUserAdoptionCenter(@RequestBody User user, @PathVariable Long id) {
+        System.out.println(user);
         return userService.updateUser(id, user);
     }
+
+    //THIS IS THE ONE
+    /*@PutMapping("/updateAdoptionCenter/{id}")
+    public String updateAdoptionCenter(@PathVariable int id, @RequestBody User adoptionCenter) {
+        return adoptionCenter.getPassword();
+    }*/
 
     /*@PutMapping("/update/AdoptionCenter")
     public ResponseEntity<?> getUser(@RequestParam("id") Long id) {
