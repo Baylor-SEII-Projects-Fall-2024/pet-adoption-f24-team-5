@@ -30,7 +30,17 @@ const PostPet = () => {
     const [postNewPet, setPostNewPet] = React.useState(false);
     const token = localStorage.getItem('token');
 
-
+    const handleCardClick = (pet) => {
+        setSpecies(pet.species);
+        setPetName(pet.petName);
+        setBreed(pet.breed);
+        setPetColor(pet.petColor);
+        setAge(pet.age);
+        setStatus(pet.adoptionStatus);
+        setDescription(pet.description);
+        setImageName(pet.imageName);
+        handlePostNewPet();
+    }
 
     const handlePostNewPet = () => {
         setPostNewPet(!postNewPet);
@@ -201,7 +211,7 @@ const PostPet = () => {
                     <Stack sx={{paddingTop:4}} alignItems='center' gap={5}>
                         <Button onClick={handlePostNewPet} color='inherit' variant='contaiend'>Post Pet</Button>
                         {pets.map((pet) => (
-                            <PetCard pet={pet} key={pet.petName} />
+                            <PetCard pet={pet} key={pet.petName} onClick={() => handleCardClick(pet)}/>
                         ))}
                     </Stack>)
                 }

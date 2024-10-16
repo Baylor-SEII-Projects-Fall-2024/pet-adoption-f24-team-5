@@ -3,7 +3,7 @@ import { Card, CardContent, Typography } from '@mui/material';
 import axios from 'axios';
 import {fetchImage} from "@/utils/fetchImage";
 
-const PetCard = ({ pet }) => {
+const PetCard = ({ pet, onClick }) => {
     const [imageSrc, setImageSrc] = useState('');
 
     useEffect(() => {
@@ -17,7 +17,13 @@ const PetCard = ({ pet }) => {
 
 
     return (
-        <Card sx={{ width: '48%' }} elevation={4} key={pet.petName}>
+        <Card onClick={onClick}
+              sx={{ width: '48%',
+                    backgroundColor: 'white',
+                    transition: 'border 0.3s',
+                    '&:hover': {
+                    border: '2px solid blue',
+                    },}} elevation={4} key={pet.petName}>
             <CardContent>
                 {imageSrc ? (
                     <img
