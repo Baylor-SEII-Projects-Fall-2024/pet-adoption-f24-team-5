@@ -1,32 +1,44 @@
 import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
 import { Card, CardContent, Stack, Typography } from '@mui/material';
+import AdoptionCenterCard from '../components/AdoptionCenterCard';
 import axios from 'axios';
+import { getSubjectFromToken } from '../utils/tokenUtils'; // Import the function
 
 export default function AdoptionCenterPage() {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [userEmail, setUserEmail] = useState(null); // State to store the user email
     const token = localStorage.getItem('token');
 
     useEffect(() => {
+        // Extract user email (subject) from the token
+        if (token) {
+            const subject = getSubjectFromToken(token); // Use the provided function
+            if (subject) {
+                setUserEmail(subject); // Store the user email (subject)
+            }
+        }
+
+        // Fetch adoption centers
         const fetchAdoptionCenters = async () => {
             try {
                 const response = await axios.get('http://localhost:8080/api/users/adoptioncenters', {
                     headers: {
                         Authorization: `Bearer ${token}`, // Pass token in the header
-                        'Content-Type': 'application/json'
-                    }
+                        'Content-Type': 'application/json',
+                    },
                 });
-                setData(response.data);  // Store fetched data in state
+                setData(response.data); // Store fetched data in state
             } catch (error) {
                 console.error('Error fetching adoption centers:', error);
             } finally {
-                setLoading(false);  // Stop loading once data is fetched or an error occurs
+                setLoading(false); // Stop loading once data is fetched or an error occurs
             }
         };
 
-        fetchAdoptionCenters();  // Fetch data on mount
-    }, []);
+        fetchAdoptionCenters(); // Fetch data on mount
+    }, [token]);
 
     if (loading) {
         return <Typography>Loading adoption centers...</Typography>;
@@ -43,39 +55,24 @@ export default function AdoptionCenterPage() {
                     sx={{
                         paddingTop: 4,
                         alignItems: 'center',
-                        overflow: 'hidden',  // Prevents scroll bars
+                        overflow: 'hidden', // Prevents scroll bars
                     }}
                 >
+                    {/* Display user email if available */}
+                    {userEmail && (
+                        <Typography variant="h6" align="center">
+                            Welcome, {userEmail}!
+                        </Typography>
+                    )}
+
                     <Stack
                         direction="row"
                         gap={2}
-                        flexWrap="wrap"  // Ensure the cards wrap instead of causing overflow
+                        flexWrap="wrap" // Ensure the cards wrap instead of causing overflow
                         justifyContent="center"
                     >
                         {data && data.map((center) => (
-                            <Card
-                                key={center.id}  // Ensure a unique key is provided
-                                sx={{
-                                    width: 300,
-                                    backgroundColor: '#3f51b5',
-                                    color: '#fff',
-                                    transition: '0.3s',
-                                    '&:hover': {
-                                        boxShadow: 8,  // Increase shadow on hover
-                                        transform: 'scale(1.05)',  // Slightly scale the card on hover
-                                    }
-                                }}
-                                elevation={4}
-                            >
-                                <CardContent>
-                                    <Typography variant="h5" align="center">
-                                        {center.centerName}  {/* Display center name */}
-                                    </Typography>
-                                    <Typography variant="body2" align="center">
-                                        {center.centerCity}, {center.centerState}  {/* Display city and state */}
-                                    </Typography>
-                                </CardContent>
-                            </Card>
+                            <AdoptionCenterCard key={center.id} center={center} />
                         ))}
                     </Stack>
                 </Stack>
