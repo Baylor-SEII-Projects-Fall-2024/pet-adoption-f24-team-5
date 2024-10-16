@@ -14,6 +14,7 @@ const PostPet = () => {
     const [image, setImage] = React.useState('');
     const [pets, setPets] = React.useState( [] );
     const [postNewPet, setPostNewPet] = React.useState(false);
+    const token = localStorage.getItem('token');
 
 
     const handlePostNewPet = () => {
@@ -23,7 +24,12 @@ const PostPet = () => {
     const url = process.env.REACT_APP_BACKEND_URL + "/pets";
 
     const getAllPets = () => {
-        axios.get(url)
+        axios.get(url,{
+            headers: {
+                Authorization: `Bearer ${token}`, // Pass token in the header
+                'Content-Type': 'application/json'
+            }
+        })
             .then((res) => {
                 setPets(res.data);
                 console.log(res.data);
@@ -63,7 +69,12 @@ const PostPet = () => {
         const url = process.env.REACT_APP_BACKEND_URL + "/pets/save/pet";
 
         axios
-            .post(url, petData)
+            .post(url, petData,{
+                headers: {
+                    Authorization: `Bearer ${token}`, // Pass token in the header
+                    'Content-Type': 'application/json'
+                }
+            })
             .then((res) => {
                 alert('Pet Saved!');
                 resetFields();

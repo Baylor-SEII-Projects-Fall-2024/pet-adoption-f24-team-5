@@ -11,12 +11,11 @@ import java.util.List;
 public class EventService {
     @Autowired
     private EventRepository eventRepository;
-    public Event saveEvent(Event event) {
-        return eventRepository.save(event);
-    }
     public Long createEvent(Event event) throws IllegalArgumentException{
-        eventRepository.save(event);
-        return event.getEvent_id();
+        return eventRepository.save(event).event_id;
+    }
+    public void deleteEvent(Long id) {
+        eventRepository.deleteById(id);
     }
     public ResponseEntity<Event> updateEvent(Long id, Event updatedEvent) {
         // Find the existing event by ID
@@ -36,9 +35,7 @@ public class EventService {
                 .orElseGet(() -> ResponseEntity.notFound().build()); // Return 404 if not found
     }
     public List<Event> findAllEvents() {
-        return eventRepository.findAll(Sort.by(Sort.Direction.ASC, "event_date"));
-    }
-    List<Event> getEvent(){
+        //return eventRepository.findAll(Sort.by(Sort.Direction.ASC, "event_date"));
         return eventRepository.findAll();
     }
 }

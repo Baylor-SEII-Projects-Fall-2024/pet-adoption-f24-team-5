@@ -1,38 +1,34 @@
 import React, { useState } from 'react';
 import { Button, Stack } from "@mui/material";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { TextField } from '@mui/material';
+import { useDispatch } from 'react-redux'; // Import useDispatch
+import { setToken } from '../utils/userSlice'; // Import setToken action
+import Home from './home';
 
 const Login = () => {
-    const [email, setEmail] = useState('');
+    const [emailAddress, setEmailAddress] = useState('');
     const [password, setPassword] = useState('');
-    const REACT_APP_BACKEND_URL='http://34.27.150.181/api'
+    const navigate = useNavigate();
+    const dispatch = useDispatch(); // Initialize dispatch
+
     const handleSubmit = (event) => {
         event.preventDefault();
         const loginRequest = {
-            email,
+            emailAddress,
             password
         };
 
         axios
-                .post(REACT_APP_BACKEND_URL + '/users/login', loginRequest)
+            .post('http://localhost:8080/api/auth/authenticate', loginRequest)
             .then((res) => {
-
                 if (res.status !== 401) {
-                    alert(
-                        "ID: " + res.data.id + '\n' +
-                        "Email Address: " + res.data.email + '\n' +
-                        "UserType: " + res.data.userType + '\n' +
-                        "Age: " + res.data.age + '\n' +
-                        "Phone number: " + res.data.phoneNumber + '\n'
-                    );
-
-                    const userId = res.data.id;
-                    localStorage.setItem('currentId', userId);
-
-                    setEmail('');
+                    localStorage.setItem('token', res.data.token);
+                    dispatch(setToken(res.data.token)); // Dispatch setToken action
+                    setEmailAddress('');
                     setPassword('');
+                    navigate('/');
                 }
             })
             .catch((err) => {
@@ -54,8 +50,8 @@ const Login = () => {
                     <TextField
                         label="Email"
                         type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        value={emailAddress}
+                        onChange={(e) => setEmailAddress(e.target.value)}
                         required
                         fullWidth
                     />

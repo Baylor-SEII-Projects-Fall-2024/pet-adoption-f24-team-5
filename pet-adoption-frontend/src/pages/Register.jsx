@@ -18,7 +18,8 @@ const Register = () => {
     const [centerState, setCenterState] = useState('');
     const [centerZip, setCenterZip] = useState('');
     const [numberOfPets, setNumberOfPets] = useState('');
-    const REACT_APP_BACKEND_URL='http://34.27.150.181/api'
+    const token = localStorage.getItem('token');
+
 
 
     const handleSubmit = (event) => {
@@ -45,8 +46,8 @@ const Register = () => {
         console.log('Registration Data:', registrationData); // Log the payload
 
         const url = userType === 'owner'
-            ? REACT_APP_BACKEND_URL + '/users/register/adoptioncenter'
-            : REACT_APP_BACKEND_URL + '/users/register/owner';
+            ? 'http://localhost:8080/api/users/register/adoptioncenter'
+            : 'http://localhost:8080/api/users/register/owner';
 
         axios
             .post(url, registrationData)

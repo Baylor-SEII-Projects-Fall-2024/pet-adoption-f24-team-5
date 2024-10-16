@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Head from 'next/head';
-import { Button, Card, CardContent, Stack, TextField, Typography, Paper } from '@mui/material';
+import { Button, Card, CardContent, Stack, TextField, Typography, Paper, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import styles from '@/styles/Home.module.css';
-import axios from 'axios';
 
 export default function HomePage() {
   const [userId, setUserId] = useState('');
@@ -15,16 +14,45 @@ export default function HomePage() {
   const [passwordLabel, setPasswordLabel] = useState('');
   const [oldPassword, setOldPassword] = useState('');
   const [oldPasswordLabel, setOldPasswordLabel] = useState('');
+  const [invalidPassword, setInvalidPassword] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [phoneNumberLabel, setPhoneNumberLabel] = useState('');
   const [invalidPhoneNumber, setInvalidPhoneNumber] = useState(false);
-  const REACT_APP_BACKEND_URL='http://34.27.150.181/api'
-useEffect(() => {
-  const storedUserId = Number(localStorage.getItem('currentId'));
-  if (storedUserId) {
-    setUserId(storedUserId);
-  }
-}, []);
+  const [userType, setUserType] = useState('');
+  const [userAge, setUserAge] = useState('');
+
+  const updatedValuesRef = useRef({});
+
+  useEffect(() => {
+    const storedUserId = Number(localStorage.getItem('currentId'));
+    if (storedUserId) {
+      setUserId(storedUserId);
+      fetchUserInfo(storedUserId);
+    }
+  }, []);
+
+  const fetchUserInfo = async (id) => {
+    try {
+      const response = await fetch(`http://localhost:8080/users/${id}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch user info');
+      }
+
+      const userInfo = await response.json();
+      setFirstNameLabel(userInfo.firstName);
+      setLastNameLabel(userInfo.lastName);
+      setPhoneNumberLabel(userInfo.phoneNumber);
+      setOldPassword(userInfo.password);
+      setUserType(userInfo.userType);
+      if (userInfo.userType != "CenterOwner"){
+        setUserAge(userInfo.userAge);
+      }
+      console.log("ID: " + id);
+      console.log(userInfo.emailAddress);
+    } catch (error) {
+      console.error('Error fetching user info:', error);
+    }
+  };
 
   const handleFirstNameChange = () => {
     setFirstName(firstNameLabel);
@@ -37,26 +65,40 @@ useEffect(() => {
   }
 
   const handlePasswordChange = () => {
-    setPassword(passwordLabel);
-    setOldPassword(passwordLabel);
-    setOldPasswordLabel("");
-    handleUserUpdate();
+    if (oldPassword == oldPasswordLabel){
+      setPassword(passwordLabel);
+      setOldPassword(passwordLabel);
+      updatedValuesRef.current.password = passwordLabel;
+      setOldPasswordLabel("");
+      handleUserUpdate();
+    }
+    else{
+      setInvalidPassword(true);
+    }
   };
 
   const handlePhoneNumberChange = () => {
-    if (phoneNumberLabel.length < 10){
+    const isValidPhone = /^[0-9]{10}$/.test(phoneNumberLabel);
+    if (!isValidPhone){
       setInvalidPhoneNumber(true);
     }
     else{
       setInvalidPhoneNumber(false);
+      updatedValuesRef.current.phoneNumber = phoneNumberLabel;
+      setPhoneNumber(phoneNumberLabel);
+      handleUserUpdate();
     }
-    setPhoneNumber(phoneNumberLabel);
+  };
+
+  const handleAgeChange = (event) => {
+    setUserAge(event.target.value);
+    updatedValuesRef.current.userAge = event.target.value;
     handleUserUpdate();
   };
 
   const handleUserUpdate = async () => {
     try {
-      const response = await fetch(REACT_APP_BACKEND_URL + `/users/${userId}`);
+      const response = await fetch(`http://localhost:8080/users/${userId}`);
       if (!response.ok){
         throw new Error("Failed to fetch user data");
       }
@@ -64,11 +106,15 @@ useEffect(() => {
       const currentUser = await response.json();
       const updatedUser = {
         ...currentUser,
-        password: password,
-        phoneNumber: phoneNumber,
+        password: updatedValuesRef.current.password || password,
+        phoneNumber: updatedValuesRef.current.phoneNumber || phoneNumber,
       };
 
-      const updatedResponse = await fetch (REACT_APP_BACKEND_URL + `/users`, {
+      if (updatedUser.userType != "CenterOwner"){
+        updatedUser.userAge = updatedValuesRef.current.userAge || userAge;
+      }
+
+      const updatedResponse = await fetch (`http://localhost:8080/users`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -164,8 +210,31 @@ useEffect(() => {
               />
             </Stack>
             <Button onClick={handlePasswordChange}>Confirm</Button>
+            {invalidPassword && (
+              <Typography color="error" variant = "body2" sx={{ marginTop: 1}}>
+                Please enter a valid password.
+              </Typography>
+            )}
           </Paper>
-          <Stack direction="row"></Stack>
+          {userType != "CenterOwner" && (<Paper sx={{ width: 600 }} elevation={4}>
+            <Stack direction = "row">
+              <FormControl fullWidth>
+                <InputLabel id="Age">Age</InputLabel>
+                <Select
+                  labelId="Age"
+                  value={userAge}
+                  onChange={handleAgeChange}
+                  displayEmpty
+                >
+                  {[...Array(100).keys()].map((num) => (
+                    <MenuItem key={num + 1} value={num + 1}>
+                      {num + 1}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Stack>
+          </Paper>)}
         </Stack>
       </main>
     </>
