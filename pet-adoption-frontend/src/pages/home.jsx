@@ -1,9 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { AppBar, Box, Button, Card, CardContent, Stack, Toolbar, Typography, Grid } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // Use useNavigate for redirection
 import axios from 'axios';
 import styles from '@/styles/Home.module.css';
+
+function getSubjectFromToken(token) {
+    try {
+        const base64Url = token.split('.')[1]; // Get the payload part of the token
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/'); // Handle URL-safe base64
+        const jsonPayload = decodeURIComponent(
+            atob(base64)
+                .split('')
+                .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+                .join('')
+        );
+
+        const payload = JSON.parse(jsonPayload);
+        return payload.sub; // Return the subject
+    } catch (error) {
+        console.error('Invalid token:', error);
+        return null;
+    }
+}
 
 const HomePage = () => {
     const [events, setEvents] = useState([
@@ -23,17 +42,22 @@ const HomePage = () => {
         { name: "Other Pile", description: "This page will show all of the events and the main way you use the app and will show differently if you are a center or user" },
         { name: "Other Other Pile", description: "This page will show all of the events and the main way you use the app and will show differently if you are a center or user" },
     ]);
-
     const [isEventsCollapsed, setIsEventsCollapsed] = useState(false);
     const [emailAddress, setEmailAddress] = useState('');
-
-    const REACT_APP_BACKEND_URL='http://34.27.150.181/api'
+    const token = localStorage.getItem('token');
+    const navigate = useNavigate(); // Hook for navigation
 
     useEffect(() => {
         const fetchEmailAddress = async () => {
             try {
-                const response = await axios.get(REACT_APP_BACKEND_URL + '/users/1/emailAddress'); // Use the new endpoint
-                setEmailAddress(response.data);
+                /*const response = await axios.get('http://localhost:8080/users/1/emailAddress', {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                });*/
+
+                setEmailAddress(getSubjectFromToken(token));
             } catch (error) {
                 console.error('Error fetching email address:', error);
             }
@@ -44,6 +68,11 @@ const HomePage = () => {
 
     const handleCollapseToggle = () => {
         setIsEventsCollapsed(!isEventsCollapsed);
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem('token'); // Remove token from local storage
+        navigate('/Login'); // Redirect to login page
     };
 
     const EventCard = ({ event }) => (
@@ -78,7 +107,7 @@ const HomePage = () => {
                     <Button color="inherit" component={Link} to="/CreateEvent">Create Event</Button>
                     <Button color="inherit" component={Link} to="/SearchEngine">Search Engine</Button>
                     <Button color="inherit" component={Link} to="/Settings">Settings</Button>
-                    <Button color="inherit" component={Link} to="/Login">Log Out</Button>
+                    <Button color="inherit" onClick={handleLogout}>Log Out</Button>
                 </Toolbar>
             </Box>
             <Box sx={{ height: '92vh', display: 'flex', flexDirection: 'row' }}>
@@ -107,8 +136,8 @@ const HomePage = () => {
                     ))}
                 </Box>
             </Box>
-        </Box >
+        </Box>
     );
-}
+};
 
 export default HomePage;

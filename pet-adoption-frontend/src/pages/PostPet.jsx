@@ -1,7 +1,21 @@
 import React, {useEffect} from 'react'
-import {Card, CardContent, Typography, Box, Button, Toolbar, Stack, TextField} from "@mui/material";
+import {
+    Card,
+    CardContent,
+    Typography,
+    Box,
+    Button,
+    Toolbar,
+    Stack,
+    TextField,
+    Select,
+    LinearProgress
+} from "@mui/material";
 import {Link} from "react-router-dom";
-import axios from "axios";
+import MenuItem from "@mui/material/MenuItem";
+import axios from 'axios';
+import PetCard from "@/components/PetCard";
+import ImageUploadComponent from "@/components/ImageUploadComponent";
 
 const PostPet = () => {
     const [species, setSpecies] = React.useState('');
@@ -11,19 +25,28 @@ const PostPet = () => {
     const [age, setAge] = React.useState('');
     const [description, setDescription] = React.useState('');
     const [adoptionStatus, setStatus] = React.useState(false);
-    const [image, setImage] = React.useState('');
+    const [imageName, setImageName] = React.useState('');
     const [pets, setPets] = React.useState( [] );
     const [postNewPet, setPostNewPet] = React.useState(false);
+    const token = localStorage.getItem('token');
+
 
 
     const handlePostNewPet = () => {
         setPostNewPet(!postNewPet);
     }
 
-    const url = process.env.REACT_APP_BACKEND_URL + "/pets";
 
     const getAllPets = () => {
-        axios.get(url)
+
+        const url = "http://localhost:8080/api/pets";
+
+        axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${token}`, // Pass token in the header
+                'Content-Type': 'application/json'
+            }
+        })
             .then((res) => {
                 setPets(res.data);
                 console.log(res.data);
@@ -33,7 +56,17 @@ const PostPet = () => {
 
     useEffect(() => {
         getAllPets();
-    }, []);
+    }, [postNewPet]);
+
+
+    const handleChangeSelection = (event) => {
+        setStatus(event.target.value);
+    }
+
+    const handleImageUpload = (name) => {
+        console.log("Uploaded image name:", name);
+        setImageName(name);
+    };
 
     const resetFields = () => {
         setSpecies("");
@@ -43,6 +76,8 @@ const PostPet = () => {
         setAge("");
         setDescription("");
         setPetColor("");
+        setStatus(false);
+        setImageName('');
     }
 
     const handleSubmit = (event) => {
@@ -54,38 +89,36 @@ const PostPet = () => {
             breed,
             petColor,
             age,
-            adoptionStatus: false,
+            adoptionStatus,
             description,
+            imageName,
         };
 
         console.log('Pet Data: ', petData);
 
-        const url = process.env.REACT_APP_BACKEND_URL + "/pets/save/pet";
+        const url = "http://localhost:8080/api/pets/save/pet";
 
         axios
-            .post(url, petData)
+            .post(url, petData, {
+                headers: {
+                    Authorization: `Bearer ${token}`, // Pass token in the header
+                    'Content-Type': 'application/json'
+                }
+            })
             .then((res) => {
                 alert('Pet Saved!');
                 resetFields();
             })
             .catch((err) => {
                 console.error('An error occurred during registration:', err);
-                alert('An error occured saving pet. Please try again later.');
+                alert('An error occurred saving pet. Please try again later.');
             });
     };
 
-    const PetCard = ({ pet }) => (
-        <Card sx={{ width: '48%' }} elevation={4} key={pet.petName}>
-            <CardContent>
-                <Typography variant='h5' align='center'>{pet.petName}</Typography>
-                <Typography variant='body2' align='center'>{pet.description}</Typography>
-            </CardContent>
-        </Card>
-    );
 
     return (
         <Box sx={{height: '100vh', width: '100vw', display: 'flex', flexDirection: 'column'}}>
-            <Box sx={{ height: '8vh', width: '100vw', backgroundColor: 'primary.main' }}>
+            <Box sx={{height: '8vh', width: '100vw', backgroundColor: 'primary.main'}}>
                 <Toolbar>
                     <Typography variant="h6" sx={{ flexGrow: 1 }}>
                         Post Pet
@@ -121,7 +154,7 @@ const PostPet = () => {
                         <TextField
                             label="Breed"
                             value={breed}
-                                onChange={(e) => setBreed(e.target.value)}
+                            onChange={(e) => setBreed(e.target.value)}
                             required
                             fullWidth
                         />
@@ -148,22 +181,30 @@ const PostPet = () => {
                             required
                             fullWidth
                         />
+                        <Select
+                            defaultValue="Up For Adoption"
+                            label="Adoption Status"
+                            value={adoptionStatus}
+                            onChange={handleChangeSelection}
+                        >
+                            <MenuItem value={'false'}>Up For Adoption</MenuItem>
+                            <MenuItem value={'true'}>Owned</MenuItem>
+                        </Select>
+                        <ImageUploadComponent onImageUpload={handleImageUpload}/>
                         <Button type="submit" variant="contained">Post</Button>
-
                     </Stack>
-                    </Box>
-                )}
+                </Box>
+            )}
 
-                {!postNewPet && (
+            {!postNewPet && (
 
-                    <Stack sx={{paddingTop:4}} alignItems='center' gap={5}>
-                        <Button onClick={handlePostNewPet} color='inherit' variant='contaiend'>Post Pet</Button>
-
-                        {pets.map((pet) => (
-                            <PetCard pet={pet} key={pet.petName} />
-                        ))}
-                    </Stack>)
-                }
+                <Stack sx={{paddingTop:4}} alignItems='center' gap={5}>
+                    <Button onClick={handlePostNewPet} color='inherit' variant='contaiend'>Post Pet</Button>
+                    {pets.map((pet) => (
+                        <PetCard pet={pet} key={pet.petName} />
+                    ))}
+                </Stack>)
+            }
 
 
         </Box>

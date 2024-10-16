@@ -13,7 +13,7 @@ import java.util.List;
 
 @RequestMapping("/api/users")
 @RestController
-@CrossOrigin(origins = "http://34.173.164.84:3000")
+@CrossOrigin(origins = "localhost:3000")
 public class UserController {
     @Autowired
     private final UserService userService;
@@ -24,6 +24,7 @@ public class UserController {
 
     @GetMapping
     public List<User> getUser() {
+        System.out.println("Inside Get users");
         return userService.findAllUsers();
     }
 
@@ -49,40 +50,13 @@ public class UserController {
         }
     }
 
-    @PostMapping("/register/owner")
-    public ResponseEntity<?> register(@RequestBody Owner account) {
-        try{
-            Long id = userService.registerUser(account);
-            return new ResponseEntity<>(id, HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
-        }
-    }
-
-    @PostMapping("/register/centerworker")
-    public ResponseEntity<?> register(@RequestBody CenterWorker account) {
-        try{
-            Long id = userService.registerUser(account);
-            return new ResponseEntity<>(id, HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
-        }
-    }
-
-    @PostMapping("/register/adoptioncenter")
-    public ResponseEntity<?> register(@RequestBody AdoptionCenter account) {
-        try{
-            Long id = userService.registerUser(account);
-            return new ResponseEntity<>(id, HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
-        }
-    }
 
     @PostMapping("/initialize")
     public List<User> initialize() {
         userService.initialize();
         return userService.findAllUsers();
     }
+
+
 
 }
