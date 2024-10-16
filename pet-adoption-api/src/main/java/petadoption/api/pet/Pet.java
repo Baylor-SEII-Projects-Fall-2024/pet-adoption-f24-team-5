@@ -1,8 +1,6 @@
 package petadoption.api.pet;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import petadoption.api.user.AdoptionCenter.AdoptionCenter;
 import petadoption.api.user.User;
 
@@ -10,8 +8,10 @@ import petadoption.api.user.User;
 @Getter
 @Setter
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = Pet.TABLE_NAME)
-public class Pet {
+public class Pet  {
     public static final String TABLE_NAME = "Pets";
 
     @Id
@@ -48,10 +48,9 @@ public class Pet {
     @Column(name = "DESCRIPTION")
     protected String description;
 
-    @Column(name = "IMAGE_DATA", length = 1000)
-    private byte[] imageData;
+    @Column(name = "IMAGE_NAME", length = 1000)
+    private String imageName;
 
-    public Pet() { /*DEFAULT BRUTHA */}
 
     public Pet(String species, String petName, String breed, String color, Integer age, Boolean adoptionStatus, String description) {
         this.species = species;
@@ -63,9 +62,7 @@ public class Pet {
         this.description = description;
     }
 
-    public Pet(User owner, AdoptionCenter adoption, String species, String petName, String breed, String color, Integer age, Boolean adoptionStatus, String description, byte[] imageData) {
-        this.petOwner = owner;
-        this.adoptionCenter = adoption;
+    public Pet(String species, String petName, String breed, String color, Integer age, Boolean adoptionStatus, String description, String imageName) {
         this.species = species;
         this.petName = petName;
         this.breed = breed;
@@ -73,7 +70,11 @@ public class Pet {
         this.age = age;
         this.adoptionStatus = adoptionStatus;
         this.description = description;
-        this.imageData = imageData;
+        this.imageName = imageName;
+    }
+
+    public Pet(String imageName) {
+        this.imageName = imageName;
     }
 
 
