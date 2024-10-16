@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import Head from 'next/head';
 import { Button, Card, CardContent, Stack, TextField, Typography, Paper, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import styles from '@/styles/Home.module.css';
+import {API_URL} from "@/constants";
 
 export default function HomePage() {
   const [userId, setUserId] = useState('');
@@ -33,7 +34,7 @@ export default function HomePage() {
 
   const fetchUserInfo = async (id) => {
     try {
-      const response = await fetch(`http://localhost:8080/users/${id}`);
+      const response = await fetch(`${API_URL}/users/${id}`);
       if (!response.ok) {
         throw new Error('Failed to fetch user info');
       }
@@ -98,7 +99,7 @@ export default function HomePage() {
 
   const handleUserUpdate = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/users/${userId}`);
+      const response = await fetch(`${API_URL}/users/${userId}`);
       if (!response.ok){
         throw new Error("Failed to fetch user data");
       }
@@ -114,7 +115,7 @@ export default function HomePage() {
         updatedUser.userAge = updatedValuesRef.current.userAge || userAge;
       }
 
-      const updatedResponse = await fetch (`http://localhost:8080/users`, {
+      const updatedResponse = await fetch (`${API_URL}/users`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

@@ -1,4 +1,4 @@
-    import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Button, Stack } from "@mui/material";
 import axios from 'axios';
 import { TextField } from '@mui/material';
@@ -6,7 +6,8 @@ import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate
 import MenuItem from '@mui/material/MenuItem';
 import { Box, Typography } from '@mui/material';
 import { useDispatch } from 'react-redux'; // Import useDispatch
-import { setToken } from '../utils/userSlice'; // Import the setToken action
+import { setToken } from '../utils/userSlice';
+import {API_URL} from "@/constants";
 
 const Register = () => {
     const [emailAddress, setEmailAddress] = useState('');
@@ -46,8 +47,8 @@ const Register = () => {
         };
 
         const url = userType === 'owner'
-            ? 'http://localhost:8080/api/auth/register/adoption-center'
-            : 'http://localhost:8080/api/auth/register/owner';
+            ? `${API_URL}/api/auth/register/adoption-center`
+            : `${API_URL}/api/auth/register/owner`;
 
 
         axios
@@ -66,7 +67,7 @@ const Register = () => {
         const loginRequest = { emailAddress, password };
 
         axios
-            .post('http://localhost:8080/api/auth/authenticate', loginRequest, {
+            .post(`${API_URL}/api/auth/authenticate`, loginRequest, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
