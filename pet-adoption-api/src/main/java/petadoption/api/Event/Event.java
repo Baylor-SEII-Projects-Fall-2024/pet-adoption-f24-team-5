@@ -7,7 +7,6 @@ import lombok.Data;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 
 @Data
 @Entity
@@ -34,7 +33,7 @@ public class Event {
     protected LocalDate event_date;
 
     @Column(name = "EVENT_TIME")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "hh:mm a")
+    @Convert(converter = LocalTimeConverter.class)
     protected LocalTime event_time;
 
     @Column(name = "DESCRIPTION")
