@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import Head from 'next/head';
-import { AppBar, Box, Button, Card, CardContent, Stack, Toolbar, Typography, Grid } from '@mui/material';
+import { useSelector } from 'react-redux';
+import { AppBar, Box, Button, Card, CardContent, Stack, Toolbar, Typography, Grid, CardMedia } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom'; // Use useNavigate for redirection
 import axios from 'axios';
-import styles from '@/styles/Home.module.css';
-import {API_URL, FRONTEND_URL} from "@/constants";
 
 function getSubjectFromToken(token) {
     try {
@@ -26,26 +24,11 @@ function getSubjectFromToken(token) {
 }
 
 const HomePage = () => {
-    const [events, setEvents] = useState([
-        { name: "Dog Pile", description: "This page will show all of the events and the main way you use the app and will show differently if you are a center or user" },
-        { name: "Cat Pile", description: "This page will show all of the events and the main way you use the app and will show differently if you are a center or user" },
-        { name: "Other Pile", description: "This page will show all of the events and the main way you use the app and will show differently if you are a center or user" },
-        { name: "Other Other Pile", description: "This page will show all of the events and the main way you use the app and will show differently if you are a center or user" },
-        { name: "Other Other Other Pile", description: "This page will show all of the events and the main way you use the app and will show differently if you are a center or user" },
-        { name: "Other Other Other Other Pile", description: "This page will show all of the events and the main way you use the app and will show differently if you are a center or user" },
-        { name: "Other Other Other Other Other Pile", description: "This page will show all of the events and the main way you use the app and will show differently if you are a center or user" },
-        { name: "Other Other Other Other Other Other Pile", description: "This page will show all of the events and the main way you use the app and will show differently if you are a center or user" },
-    ]);
-
-    const [pets, setPets] = useState([
-        { name: "Dog Pile", description: "This page will show all of the events and the main way you use the app and will show differently if you are a center or user" },
-        { name: "Cat Pile", description: "This page will show all of the events and the main way you use the app and will show differently if you are a center or user" },
-        { name: "Other Pile", description: "This page will show all of the events and the main way you use the app and will show differently if you are a center or user" },
-        { name: "Other Other Pile", description: "This page will show all of the events and the main way you use the app and will show differently if you are a center or user" },
-    ]);
+    const [events, setEvents] = useState([]);
+    const [pets, setPets] = useState([]);
     const [isEventsCollapsed, setIsEventsCollapsed] = useState(false);
     const [emailAddress, setEmailAddress] = useState('');
-    const token = localStorage.getItem('token');
+    const token = useSelector((state) => state.user.token);
     const navigate = useNavigate(); // Hook for navigation
 
     useEffect(() => {
@@ -60,6 +43,40 @@ const HomePage = () => {
         fetchEmailAddress();
     }, []);
 
+    useEffect(() => {
+        const fetchEvents = async () => {
+            try {
+                const response = await axios.get('http://localhost:8080/api/events', {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+                setEvents(response.data);
+            } catch (error) {
+                console.error('Error fetching events:', error);
+            }
+        };
+
+        const fetchPets = async () => {
+            const url = "http://localhost:8080/api/pets";
+            axios.get(url, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then((res) => {
+                    setPets(res.data);
+                    console.log(res.data);
+                })
+                .catch(error => console.error(`Error getting pets: ${error}`));
+        };
+
+        fetchEvents();
+        fetchPets();
+    }, [token]);
+
     const handleCollapseToggle = () => {
         setIsEventsCollapsed(!isEventsCollapsed);
     };
@@ -72,7 +89,7 @@ const HomePage = () => {
     const EventCard = ({ event }) => (
         <Card sx={{ width: '100%', height: '20vh' }} elevation={4} key={event.name}>
             <CardContent>
-                <Typography variant='h5' align='center'>{event.name}</Typography>
+                <Typography variant='h5' align='center'>{event.event_name}</Typography>
                 <Typography variant='body2' align='center'>{event.description}</Typography>
             </CardContent>
         </Card>
@@ -81,8 +98,19 @@ const HomePage = () => {
     const PetCard = ({ pet }) => (
         <Card sx={{ width: '48%' }} elevation={4} key={pet.name}>
             <CardContent>
-                <Typography variant='h5' align='center'>{pet.name}</Typography>
+                <Typography variant='h5' align='center'>{pet.petName}</Typography>
                 <Typography variant='body2' align='center'>{pet.description}</Typography>
+                <CardMedia
+                    component="img"
+                    image={pet.imageName}
+                    alt="Pet"
+                    sx={{
+                        float: 'left',
+                        margin: '0 15px 15px 0',
+                        maxWidth: '200px',
+                        height: 'auto'
+                    }}
+                />
             </CardContent>
         </Card>
     );
