@@ -79,7 +79,7 @@ const HomePage = () => {
                     <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'center' }}>
                         {emailAddress}
                     </Typography>
-                    <Button color="inherit" component={Link} to="/PostPet">Profile</Button>
+                    <Button color="inherit" component={Link} to="/PostPet">Post Pet</Button>
                     <Button color="inherit" component={Link} to="/CreateEvent">Create Event</Button>
                     <Button color="inherit" component={Link} to="/SearchEngine">Search Engine</Button>
                     <Button color="inherit" component={Link} to="/Settings">Settings</Button>

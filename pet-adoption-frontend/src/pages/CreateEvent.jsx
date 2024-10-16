@@ -68,6 +68,7 @@ const CreateEvent = () => {
         setEventName('');
         setCenterID('');
         setEventDate(new Date());
+        setEventTime('');
         setDescription('');
         setSelectedEvent(null);
     };
