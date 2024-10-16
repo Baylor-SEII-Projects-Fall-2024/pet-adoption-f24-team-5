@@ -1,7 +1,6 @@
 package petadoption.api.pet;
 import jakarta.persistence.*;
 import lombok.*;
-import petadoption.api.images.ImageNameProvider;
 import petadoption.api.user.AdoptionCenter.AdoptionCenter;
 import petadoption.api.user.User;
 
@@ -12,7 +11,7 @@ import petadoption.api.user.User;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = Pet.TABLE_NAME)
-public class Pet implements ImageNameProvider {
+public class Pet  {
     public static final String TABLE_NAME = "Pets";
 
     @Id
@@ -52,10 +51,6 @@ public class Pet implements ImageNameProvider {
     @Column(name = "IMAGE_NAME", length = 1000)
     private String imageName;
 
-    @Override
-    public String getImageName() {
-        return imageName;
-    }
 
     public Pet(String species, String petName, String breed, String color, Integer age, Boolean adoptionStatus, String description) {
         this.species = species;

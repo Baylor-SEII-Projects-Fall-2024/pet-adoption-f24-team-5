@@ -24,9 +24,9 @@ public class ImageController {
         return imageService.saveImage(UPLOAD_DIRECTORY, file);
     }
 
-    @GetMapping
-    public byte[] getImage(@RequestBody ImageNameProvider fileNameProvider) throws IOException {
-        return imageService.getImage(UPLOAD_DIRECTORY, fileNameProvider.getImageName());
+    @GetMapping("/{imageName}")
+    public byte[] getImage(@PathVariable String imageName) throws IOException {
+        return imageService.getImage(UPLOAD_DIRECTORY, imageName);
     }
 
 }
