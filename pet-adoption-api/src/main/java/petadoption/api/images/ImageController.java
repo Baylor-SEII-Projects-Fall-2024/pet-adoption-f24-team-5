@@ -21,7 +21,6 @@ public class ImageController {
 
     @PostMapping("/upload")
     public String uploadImage(@RequestParam("file") MultipartFile file) throws IOException, FileNotFoundException {
-        System.out.println("Inside uploadImage");
         return imageService.saveImage(UPLOAD_DIRECTORY, file);
     }
 
