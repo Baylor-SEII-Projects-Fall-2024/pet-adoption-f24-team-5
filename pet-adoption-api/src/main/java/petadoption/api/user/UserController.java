@@ -1,5 +1,6 @@
 package petadoption.api.user;
 
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +14,7 @@ import java.util.List;
 
 @RequestMapping("/api/users")
 @RestController
-@CrossOrigin(origins = "localhost:3000")
+@CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
     @Autowired
     private final UserService userService;
@@ -24,7 +25,6 @@ public class UserController {
 
     @GetMapping
     public List<User> getUser() {
-        System.out.println("Inside Get users");
         return userService.findAllUsers();
     }
 
@@ -50,6 +50,15 @@ public class UserController {
         }
     }
 
+    @PutMapping("/update/CenterWorker")
+    public ResponseEntity<?> updateUser(@RequestBody CenterWorker user) {
+        return ResponseEntity.ok(userService.updateUser(user));
+    }
+
+    @PutMapping("/update/Owner")
+    public ResponseEntity<?> updateUser(@RequestBody Owner user) {
+        return ResponseEntity.ok(userService.updateUser(user));
+    }
 
     @PostMapping("/initialize")
     public List<User> initialize() {
@@ -59,4 +68,25 @@ public class UserController {
 
 
 
+    /*@PutMapping("/update/AdoptionCenter")
+    public ResponseEntity<?> updateUser(@RequestBody AdoptionCenter user) {
+        System.out.println("inside of AdoptionCenter");
+        return ResponseEntity.ok(userService.updateUser(user));
+    }*/
+    @PutMapping("/updateAdoptionCenter/{id}")
+    public ResponseEntity<?> updateUserAdoptionCenter(@RequestBody AdoptionCenter user, @PathVariable Long id) {
+        return userService.updateUser(id, user);
+    }
+
+    /*@PutMapping("/update/AdoptionCenter")
+    public ResponseEntity<?> getUser(@RequestParam("id") Long id) {
+        User user = userService.findUser(id);
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }*/
+
+    @GetMapping("/getUser")
+    public ResponseEntity<?> getUser(@RequestParam("id") Long id) {
+        User user = userService.findUser(id);
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
 }

@@ -20,7 +20,7 @@ public class UserEndpoint {
 
     @GetMapping("/users/{id}")
     public User findUserById(@PathVariable Long id) {
-        var user = userService.findUser(id).orElse(null);
+        var user = userService.findUser(id);
 
         if (user == null) {
             log.warn("User not found");
@@ -31,7 +31,7 @@ public class UserEndpoint {
 
     @GetMapping("/users/{id}/emailAddress")
     public ResponseEntity<String> getEmailAddressById(@PathVariable Long id) {
-        var user = userService.findUser(id).orElse(null);
+        var user = userService.findUser(id);
 
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
@@ -44,9 +44,4 @@ public class UserEndpoint {
     public User saveUser(@RequestBody User user) {
         return userService.saveUser(user);
     }
-
-    @PutMapping("/users")
-    @Transactional
-    public User updateUser(@RequestBody User user) {
-        return userService.updateUser(user); }
 }
