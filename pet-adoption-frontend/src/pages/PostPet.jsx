@@ -12,8 +12,10 @@ import {
     LinearProgress
 } from "@mui/material";
 import {Link} from "react-router-dom";
-import axios from "axios";
 import MenuItem from "@mui/material/MenuItem";
+import axios from 'axios';
+import {PetCard} from "@/utils/PetCard";
+import FileUploadComponent from "@/components/FileUploadComponent";
 
 const PostPet = () => {
     const [species, setSpecies] = React.useState('');
@@ -23,12 +25,12 @@ const PostPet = () => {
     const [age, setAge] = React.useState('');
     const [description, setDescription] = React.useState('');
     const [adoptionStatus, setStatus] = React.useState(false);
-    const [image, setImage] = React.useState('');
+    const [imageName, setImageName] = React.useState('');
     const [pets, setPets] = React.useState( [] );
     const [postNewPet, setPostNewPet] = React.useState(false);
     const [uploadProgress, setUploadProgress] = React.useState(0);
 
-    //i did something
+
     const handlePostNewPet = () => {
         setPostNewPet(!postNewPet);
     }
@@ -50,28 +52,14 @@ const PostPet = () => {
         getAllPets();
     }, []);
 
+
     const handleChangeSelection = (event) => {
         setStatus(event.target.value);
     }
 
-    const handleFileUpload = (event) => {
-        const file = event.target.files[0];
-        const formData = new FormData();
-        formData.append('file', file);
-
-        //resolve api here
-        axios.post('/upload', formData, {
-            onUploadProgress: (progressEvent) => {
-                const percentCompleted = Math.round((progressEvent.loaded * 100)/ progressEvent.total);
-                setUploadProgress(percentCompleted);
-            }
-        })
-            .then(res => {
-                console.log(res);
-            })
-            .catch(err => {
-                console.log(err);
-            });
+    const handleImageUpload = (name) => {
+        console.log("Uploaded image name:", name);
+        setImageName(name);
     };
 
     const resetFields = () => {
@@ -83,6 +71,7 @@ const PostPet = () => {
         setDescription("");
         setPetColor("");
         setStatus(false);
+        setImageName('');
     }
 
     const handleSubmit = (event) => {
@@ -96,6 +85,7 @@ const PostPet = () => {
             age,
             adoptionStatus,
             description,
+            imageName,
         };
 
         console.log('Pet Data: ', petData);
@@ -114,24 +104,12 @@ const PostPet = () => {
             });
     };
 
-    const PetCard = ({ pet }) => (
-        <Card sx={{ width: '48%' }} elevation={4} key={pet.petName}>
-            <CardContent>
-                <Typography variant='h5' align='center'>{pet.petName}</Typography>
-                <Typography variant='body2' align='center'>{pet.species}</Typography>
-                <Typography variant='body2' align='center'>{pet.breed}</Typography>
-                <Typography variant='body2' align='center'>{pet.color}</Typography>
-                <Typography variant='body2' align='center'>{pet.age}</Typography>
-                <Typography variant='body2' align='center'>{pet.description}</Typography>
-            </CardContent>
-        </Card>
-    );
 
     return (
         <Box sx={{height: '100vh', width: '100vw', display: 'flex', flexDirection: 'column'}}>
-            <Box sx={{ height: '8vh', width: '100vw', backgroundColor: 'primary.main' }}>
+            <Box sx={{height: '8vh', width: '100vw', backgroundColor: 'primary.main'}}>
                 <Toolbar>
-                    <Typography variant="h6" sx={{ flexGrow: 1 }}>
+                <Typography variant="h6" sx={{ flexGrow: 1 }}>
                         Post Pet
                     </Typography>
                     <Button color="inherit" component={Link} to="/PostPet">Profile</Button>
@@ -201,15 +179,8 @@ const PostPet = () => {
                             <MenuItem value={'false'}>Up For Adoption</MenuItem>
                             <MenuItem value={'true'}>Owned</MenuItem>
                         </Select>
-                        <TextField type="file" />
-                        <LinearProgress variant="determinate" value={uploadProgress} />
-                        <Button variant="contained"
-                                color="primary"
-                                component="span"
-                                onClick={handleFileUpload}>Upload</Button>
-
+                        <FileUploadComponent onImageUpload={handleImageUpload}/>
                         <Button type="submit" variant="contained">Post</Button>
-
                     </Stack>
                     </Box>
                 )}
