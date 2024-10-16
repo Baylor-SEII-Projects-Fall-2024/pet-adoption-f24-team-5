@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { TextField, Button, LinearProgress } from '@mui/material';
 import axios from 'axios';
 
-const FileUploadComponent = ({ onImageUpload }) => {
+const ImageUploadComponent = ({ onImageUpload }) => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [uploadProgress, setUploadProgress] = useState(0);
+    const token = localStorage.getItem('token');
 
     const handleFileSelect = (event) => {
         if (event.target.files && event.target.files.length > 0) {
@@ -22,12 +23,17 @@ const FileUploadComponent = ({ onImageUpload }) => {
         const formData = new FormData();
         formData.append('file', selectedFile);
 
-        axios.post('http://localhost:8080/api/images/upload', formData, {
-            onUploadProgress: (progressEvent) => {
-                const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                setUploadProgress(percentCompleted);
-            }
-        })
+        axios.post('http://localhost:8080/api/images/upload',
+            formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`, // Pass token in the header
+                    'Content-Type': 'multipart/form-data'
+                },
+                onUploadProgress: (progressEvent) => {
+                    const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                    setUploadProgress(percentCompleted);
+                }
+            })
             .then(res => {
                 console.log(res);
                 if (onImageUpload) {
@@ -61,5 +67,5 @@ const FileUploadComponent = ({ onImageUpload }) => {
     );
 };
 
-export default FileUploadComponent;
+export default ImageUploadComponent;
 

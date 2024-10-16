@@ -14,8 +14,8 @@ import {
 import {Link} from "react-router-dom";
 import MenuItem from "@mui/material/MenuItem";
 import axios from 'axios';
-import {PetCard} from "@/utils/PetCard";
-import FileUploadComponent from "@/components/FileUploadComponent";
+import PetCard from "@/components/PetCard";
+import ImageUploadComponent from "@/components/ImageUploadComponent";
 
 const PostPet = () => {
     const [species, setSpecies] = React.useState('');
@@ -28,7 +28,8 @@ const PostPet = () => {
     const [imageName, setImageName] = React.useState('');
     const [pets, setPets] = React.useState( [] );
     const [postNewPet, setPostNewPet] = React.useState(false);
-    const [uploadProgress, setUploadProgress] = React.useState(0);
+    const token = localStorage.getItem('token');
+
 
 
     const handlePostNewPet = () => {
@@ -40,7 +41,12 @@ const PostPet = () => {
 
         const url = "http://localhost:8080/api/pets";
 
-        axios.get(url)
+        axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${token}`, // Pass token in the header
+                'Content-Type': 'application/json'
+            }
+            })
             .then((res) => {
                 setPets(res.data);
                 console.log(res.data);
@@ -93,14 +99,19 @@ const PostPet = () => {
         const url = "http://localhost:8080/api/pets/save/pet";
 
         axios
-            .post(url, petData)
+            .post(url, petData, {
+                headers: {
+                    Authorization: `Bearer ${token}`, // Pass token in the header
+                    'Content-Type': 'application/json'
+                }
+            })
             .then((res) => {
                 alert('Pet Saved!');
                 resetFields();
             })
             .catch((err) => {
                 console.error('An error occurred during registration:', err);
-                alert('An error occured saving pet. Please try again later.');
+                alert('An error occurred saving pet. Please try again later.');
             });
     };
 
@@ -179,7 +190,7 @@ const PostPet = () => {
                             <MenuItem value={'false'}>Up For Adoption</MenuItem>
                             <MenuItem value={'true'}>Owned</MenuItem>
                         </Select>
-                        <FileUploadComponent onImageUpload={handleImageUpload}/>
+                        <ImageUploadComponent onImageUpload={handleImageUpload}/>
                         <Button type="submit" variant="contained">Post</Button>
                     </Stack>
                     </Box>
