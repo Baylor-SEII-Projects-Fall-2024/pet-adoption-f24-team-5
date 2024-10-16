@@ -135,21 +135,31 @@ export default function HomePage() {
   
       const currentUser = response.data;
       
-      const updatedUser = {
+      /*const updatedUser = {
         ...currentUser,
         password: updatedValuesRef.current.password || password,
         phoneNumber: updatedValuesRef.current.phoneNumber || phoneNumber,
         // Maybe need to add userAge update (see below for check)
-      };
+      };*/
+
+      const updatedUser = {
+        id: currentUser.id,
+        emailAddress: currentUser.emailAddress,
+        password: updatedValuesRef.current.password || password,
+        userType: currentUser.userType,
+        phoneNumber: updatedValuesRef.current.phoneNumber || phoneNumber
+      }
+      const updatedUserJson = JSON.stringify(updatedUser, null, 2);
+      console.log(updatedUserJson);
 
       console.log("Id: " + userId);
-      console.log("Updated user: " + JSON.stringify(updatedUser));
+      console.log(JSON.stringify(updatedUser));
   
-      if (updatedUser.userType !== "CenterOwner") {
+      /*if (updatedUser.userType !== "CenterOwner") {
         updatedUser.userAge = updatedValuesRef.current.userAge || userAge;
-      }
+      }*/
   
-      const updatedResponse = await axios.put(`http://localhost:8080/api/users/update/${userType}`, updatedUser, {
+      const updatedResponse = await axios.put(`http://localhost:8080/api/users/updateAdoptionCenter/${userId}`, JSON.stringify(updatedUser), {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
