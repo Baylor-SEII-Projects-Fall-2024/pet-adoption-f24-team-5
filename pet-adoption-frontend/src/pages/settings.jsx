@@ -1,6 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Head from 'next/head';
 import { Button, Card, CardContent, Stack, TextField, Typography, Paper, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import { useDispatch, useSelector } from 'react-redux';
+import { setToken } from '../utils/userSlice'; 
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import styles from '@/styles/Home.module.css';
 
 export default function HomePage() {
@@ -20,37 +24,58 @@ export default function HomePage() {
   const [invalidPhoneNumber, setInvalidPhoneNumber] = useState(false);
   const [userType, setUserType] = useState('');
   const [userAge, setUserAge] = useState('');
+  const token = localStorage.getItem('token');
 
   const updatedValuesRef = useRef({});
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const storedUserId = Number(localStorage.getItem('currentId'));
+    const storedToken = localStorage.getItem('token');
+    const storedUserId = Number(localStorage.getItem('currentId')); // Need this to update to correct id
+
+    if (storedToken) {
+      dispatch(setToken(storedToken));
+    }
+
     if (storedUserId) {
       setUserId(storedUserId);
-      fetchUserInfo(storedUserId);
+      fetchUserInfo(storedToken);
     }
   }, []);
 
-  const fetchUserInfo = async (id) => {
+  const fetchUserInfo = async (token) => {
     try {
-      const response = await fetch(`http://localhost:8080/users/${id}`);
+      console.log("Id: " + id);
+      const response = await fetch(`http://localhost:8080/api/users/getUser`, {
+        params: { id: userId },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        }
+      });
+
       if (!response.ok) {
         throw new Error('Failed to fetch user info');
       }
 
       const userInfo = await response.json();
+      console.log(JSON.stringify(userInfo));
+      setUserId(userInfo.id);
       setFirstNameLabel(userInfo.firstName);
       setLastNameLabel(userInfo.lastName);
       setPhoneNumberLabel(userInfo.phoneNumber);
       setOldPassword(userInfo.password);
       setUserType(userInfo.userType);
-      if (userInfo.userType != "CenterOwner"){
+      if (userInfo.userType !== "CenterOwner") {
         setUserAge(userInfo.userAge);
       }
-      console.log("ID: " + id);
-      console.log(userInfo.emailAddress);
     } catch (error) {
       console.error('Error fetching user info:', error);
+      if (error.response && error.response.status === 401) {
+        alert('Session expired, please log in again.');
+        navigate('/login');
+      }
     }
   };
 
@@ -98,38 +123,50 @@ export default function HomePage() {
 
   const handleUserUpdate = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/users/${userId}`);
-      if (!response.ok){
-        throw new Error("Failed to fetch user data");
-      }
+      const response = await axios.get(`http://localhost:8080/api/users/getUser`, {
+        params: {id: userId},
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        }
+      });
 
-      const currentUser = await response.json();
+      console.log("Fetched user: " + JSON.stringify(response.data));
+  
+      const currentUser = response.data;
+      
       const updatedUser = {
         ...currentUser,
         password: updatedValuesRef.current.password || password,
         phoneNumber: updatedValuesRef.current.phoneNumber || phoneNumber,
+        // Maybe need to add userAge update (see below for check)
       };
 
-      if (updatedUser.userType != "CenterOwner"){
+      console.log("Id: " + userId);
+      console.log("Updated user: " + JSON.stringify(updatedUser));
+  
+      if (updatedUser.userType !== "CenterOwner") {
         updatedUser.userAge = updatedValuesRef.current.userAge || userAge;
       }
-
-      const updatedResponse = await fetch (`http://localhost:8080/users`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(updatedUser),
-    });
-
-    if (!updatedResponse.ok){
-      throw new Error("Failed to update user data");
-    }
-    }
-    catch (error){
+  
+      const updatedResponse = await axios.put(`http://localhost:8080/api/users/update/${userType}`, updatedUser, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        }
+      });
+  
+      if (updatedResponse.status !== 200) {
+        throw new Error("Failed to update user data");
+      }
+      
+      console.log('User updated successfully', updatedResponse.data);
+  
+    } catch (error) {
       console.error('Failed to update user', error);
     }
   };
+  
 
   return (
     <>
