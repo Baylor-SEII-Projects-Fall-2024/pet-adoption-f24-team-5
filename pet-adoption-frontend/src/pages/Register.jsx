@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { Button, Stack } from "@mui/material";
 import axios from 'axios';
 import { TextField } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate
 import MenuItem from '@mui/material/MenuItem';
 import { Box, Typography } from '@mui/material';
+import { useDispatch } from 'react-redux'; // Import useDispatch
+import { setToken } from '../utils/userSlice'; // Import the setToken action
 
 const Register = () => {
     const [emailAddress, setEmailAddress] = useState('');
@@ -18,9 +20,9 @@ const Register = () => {
     const [centerState, setCenterState] = useState('');
     const [centerZip, setCenterZip] = useState('');
     const [numberOfPets, setNumberOfPets] = useState('');
-    const token = localStorage.getItem('token');
 
-
+    const dispatch = useDispatch(); // Initialize dispatch
+    const navigate = useNavigate(); // Initialize useNavigate
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -43,21 +45,41 @@ const Register = () => {
             phoneNumber,
         };
 
-        console.log('Registration Data:', registrationData); // Log the payload
-
         const url = userType === 'owner'
-            ? 'http://localhost:8080/api/users/register/adoptioncenter'
-            : 'http://localhost:8080/api/users/register/owner';
+            ? 'http://localhost:8080/api/auth/register/owner'
+            : 'http://localhost:8080/api/auth/register/center-worker';
 
         axios
-            .post(url, registrationData)
-            .then((res) => {
-                alert('Registration successful! Your user ID is: ' + res.data);
-                // Reset form fields
+            .post( url, registrationData)
+            .then(() => {
+                // After registration, call loginUser to log in the user
+                loginUser();
             })
             .catch((err) => {
                 console.error('An error occurred during registration:', err);
                 alert('An error occurred during registration. Please try again later.');
+            });
+    };
+
+    const loginUser = () => {
+        const loginRequest = { emailAddress, password };
+
+        axios
+            .post('http://localhost:8080/api/auth/authenticate', loginRequest, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then((res) => {
+                const { token } = res.data;
+                localStorage.setItem('token', token); // Store the token
+                dispatch(setToken(token)); // Dispatch the setToken action to update Redux state
+                alert('Registration and login successful!');
+                navigate('/'); // Redirect to the home page or dashboard
+            })
+            .catch((err) => {
+                console.error('An error occurred during login:', err);
+                alert('An error occurred during login. Please try again later.');
             });
     };
 

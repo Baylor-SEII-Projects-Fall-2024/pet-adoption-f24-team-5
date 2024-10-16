@@ -46,7 +46,7 @@ const PostPet = () => {
                 Authorization: `Bearer ${token}`, // Pass token in the header
                 'Content-Type': 'application/json'
             }
-            })
+        })
             .then((res) => {
                 setPets(res.data);
                 console.log(res.data);
@@ -56,7 +56,7 @@ const PostPet = () => {
 
     useEffect(() => {
         getAllPets();
-    }, []);
+    }, [postNewPet]);
 
 
     const handleChangeSelection = (event) => {
@@ -120,7 +120,7 @@ const PostPet = () => {
         <Box sx={{height: '100vh', width: '100vw', display: 'flex', flexDirection: 'column'}}>
             <Box sx={{height: '8vh', width: '100vw', backgroundColor: 'primary.main'}}>
                 <Toolbar>
-                <Typography variant="h6" sx={{ flexGrow: 1 }}>
+                    <Typography variant="h6" sx={{ flexGrow: 1 }}>
                         Post Pet
                     </Typography>
                     <Button color="inherit" component={Link} to="/PostPet">Profile</Button>
@@ -154,7 +154,7 @@ const PostPet = () => {
                         <TextField
                             label="Breed"
                             value={breed}
-                                onChange={(e) => setBreed(e.target.value)}
+                            onChange={(e) => setBreed(e.target.value)}
                             required
                             fullWidth
                         />
@@ -186,25 +186,25 @@ const PostPet = () => {
                             label="Adoption Status"
                             value={adoptionStatus}
                             onChange={handleChangeSelection}
-                            >
+                        >
                             <MenuItem value={'false'}>Up For Adoption</MenuItem>
                             <MenuItem value={'true'}>Owned</MenuItem>
                         </Select>
                         <ImageUploadComponent onImageUpload={handleImageUpload}/>
                         <Button type="submit" variant="contained">Post</Button>
                     </Stack>
-                    </Box>
-                )}
+                </Box>
+            )}
 
-                {!postNewPet && (
+            {!postNewPet && (
 
-                    <Stack sx={{paddingTop:4}} alignItems='center' gap={5}>
-                        <Button onClick={handlePostNewPet} color='inherit' variant='contaiend'>Post Pet</Button>
-                        {pets.map((pet) => (
-                            <PetCard pet={pet} key={pet.petName} />
-                        ))}
-                    </Stack>)
-                }
+                <Stack sx={{paddingTop:4}} alignItems='center' gap={5}>
+                    <Button onClick={handlePostNewPet} color='inherit' variant='contaiend'>Post Pet</Button>
+                    {pets.map((pet) => (
+                        <PetCard pet={pet} key={pet.petName} />
+                    ))}
+                </Stack>)
+            }
 
 
         </Box>
