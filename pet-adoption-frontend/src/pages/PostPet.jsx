@@ -56,7 +56,7 @@ const PostPet = () => {
 
     useEffect(() => {
         getAllPets();
-    }, []);
+    }, [postNewPet]);
 
 
     const handleChangeSelection = (event) => {
