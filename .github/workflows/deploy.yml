@@ -14,7 +14,8 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Create credentials file from secret
-        run: echo "${{ secrets.GCP_SA_KEY }}" > /tmp/key.json
+        run: |
+          printf "%s" "${{ secrets.GCP_SA_KEY }}" > /tmp/key.json
 
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
@@ -23,16 +24,20 @@ jobs:
           service_account_key_file: /tmp/key.json
           export_default_credentials: true
         env:
-          GOOGLE_APPLICATION_CREDENTIALS: /tmp/key.json  # Make it globally available
-      
+          GOOGLE_APPLICATION_CREDENTIALS: /tmp/key.json
+
       - name: Verify Key File Creation
         run: |
           ls -l /tmp/key.json
           cat /tmp/key.json
-      
+          jq . /tmp/key.json  # Optional JSON validation
+
       - name: Authenticate and activate service account
         run: |
-            gcloud auth activate-service-account github-ci-cd@possible-cocoa-438319-m0.iam.gserviceaccount.com --key-file=/tmp/key.json
+          gcloud auth activate-service-account \
+            github-ci-cd@possible-cocoa-438319-m0.iam.gserviceaccount.com \
+            --key-file=/tmp/key.json
+
       - name: Verify Authentication 
         run: |
           gcloud auth list
