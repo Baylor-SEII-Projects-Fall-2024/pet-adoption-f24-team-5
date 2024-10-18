@@ -14,10 +14,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Create credentials file from secret
-        run: |
-          echo "${{ secrets.GCP_SA_KEY }}" > /tmp/key.json
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: /tmp/key.json
+        run: echo "${{ secrets.GCP_SA_KEY }}" > /tmp/key.json
 
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
@@ -25,7 +22,9 @@ jobs:
           project_id: "possible-cocoa-438319-m0"
           service_account_key_file: /tmp/key.json
           export_default_credentials: true
-          
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: /tmp/key.json  # Make it globally available
+
       - name: Verify Authentication 
         run: |
           gcloud auth list
@@ -34,10 +33,11 @@ jobs:
       - name: Authenticate Docker with Artifact Registry
         run: |
           gcloud auth configure-docker us-south1-docker.pkg.dev
-          
+
       - name: Build and push backend image
         run: |
-          docker build --no-cache -f "docker/pet-adoption-api.Dockerfile" -t us-south1-docker.pkg.dev/possible-cocoa-438319-m0/dogpile-repo/spring-backend:latest .
+          docker build --no-cache -f "docker/pet-adoption-api.Dockerfile" \
+            -t us-south1-docker.pkg.dev/possible-cocoa-438319-m0/dogpile-repo/spring-backend:latest .
           docker push us-south1-docker.pkg.dev/possible-cocoa-438319-m0/dogpile-repo/spring-backend:latest
 
       - name: Restart backend pods
@@ -46,7 +46,8 @@ jobs:
 
       - name: Build and push frontend image
         run: |
-          docker build --no-cache -f "docker/pet-adoption-frontend.Dockerfile" -t us-south1-docker.pkg.dev/possible-cocoa-438319-m0/dogpile-repo/react-frontend:latest .
+          docker build --no-cache -f "docker/pet-adoption-frontend.Dockerfile" \
+            -t us-south1-docker.pkg.dev/possible-cocoa-438319-m0/dogpile-repo/react-frontend:latest .
           docker push us-south1-docker.pkg.dev/possible-cocoa-438319-m0/dogpile-repo/react-frontend:latest
 
       - name: Restart frontend pods
