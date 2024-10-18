@@ -159,7 +159,8 @@ export default function HomePage() {
         updatedUser.userAge = updatedValuesRef.current.userAge || userAge;
       }*/
   
-      const updatedResponse = await axios.put(`http://localhost:8080/api/users/updateAdoptionCenter/${userId}`, JSON.stringify(updatedUser), {
+      //const updatedResponse = await axios.put(`http://localhost:8080/api/users/update/AdoptionCenter/${userId}`, JSON.stringify(updatedUser), {
+        const updatedResponse = await axios.put(`http://localhost:8080/api/users/update/${userType}/${userId}`, JSON.stringify(updatedUser), {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
