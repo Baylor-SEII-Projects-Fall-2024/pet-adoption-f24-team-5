@@ -24,7 +24,15 @@ jobs:
           export_default_credentials: true
         env:
           GOOGLE_APPLICATION_CREDENTIALS: /tmp/key.json  # Make it globally available
-
+      
+      - name: Verify Key File Creation
+        run: |
+          ls -l /tmp/key.json
+          cat /tmp/key.json
+      
+      - name: Authenticate and activate service account
+        run: |
+            gcloud auth activate-service-account github-ci-cd@possible-cocoa-438319-m0.iam.gserviceaccount.com --key-file=/tmp/key.json
       - name: Verify Authentication 
         run: |
           gcloud auth list
