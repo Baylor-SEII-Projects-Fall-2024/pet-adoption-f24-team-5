@@ -38,9 +38,11 @@ jobs:
           gcloud auth list
           gcloud config list
 
-      - name: Authenticate Docker with Artifact Registry
+      - name: Re-authenticate Docker with Artifact Registry
         run: |
+          gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
           gcloud auth configure-docker us-south1-docker.pkg.dev
+          
       - name: Build and push backend image
         run: |
           docker build --no-cache -f "docker/pet-adoption-api.Dockerfile" -t us-south1-docker.pkg.dev/possible-cocoa-438319-m0/dogpile-repo/spring-backend:latest .
