@@ -13,34 +13,26 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Create credentials file from secret
+        run: |
+          echo "${{ secrets.GCP_SA_KEY }}" > /tmp/key.json
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: /tmp/key.json
+
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
         with:
           project_id: "possible-cocoa-438319-m0"
-          service_account_key: |
-            {
-              "type": "service_account",
-              "project_id": "possible-cocoa-438319-m0",
-              "private_key_id": "faae1e8fcebb0329cbbaf07430737f35be1dadd8",
-              "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDomusKIj26Lgg0\niYxBNmVC5ljso7bo1SwytqB+KuBxZrHFvcZpiRQpfBK1UOjG6L4cTPSKPaHp9wWv\nKgEinPM7Gus9y0MAYewSS5HODfoRIouRo4I0UW5JydUZzhTqUr1uCEBn3XPXXIot\nLf/K59zNAGJs36PhJKzq3fAJgR23AYKkYaziBQnUDkW7DWjaTS0yzbi4/uNnjD1L\nyVYVXd0/bZc/FqZeYjeEj90Ymb8CsOgQber/oDaAfajoraqipKz0c+ULRjQu4Ief\nubC0GoTlT81bR2ecFDTT3qID8yD6Llu5gLF6luXz3vS1scdC6QQ+J5k73A607LkU\nIuIoCMi/AgMBAAECggEACRll49wYRYURIv5VX8DPYdTBUznYE75pv7Xmb7H2QElo\nwwLN40I5PoX7u9DXSWyyYrp58V5AoWhddivIGF1fTrH+DUlJV4k1/4wbzXMEaTuF\nVTKPizWeuiTJD0P6DEIlkQRM11w1VEcHMBREFOEXrC5vKz/tg7/p7VSaDPtacfMI\nk91P5r9d/BfBHooI6524v65f6listkpJ+bMvkhwNAHRLKo0H0TLGGY4cS3/q/7dr\nuS6kP/+vKRix5vQHe8ubzx3Xbb2Ce3VEl9BRTcBvZm6AEKIRxMe/hzaG+CJ0wLeA\nw2/K+Jyb5Anz+eVVYLw9K3DiPGVN6FAv45vFIcqh5QKBgQD6WW8H1TMWh8fk96La\nK0bmW8mYCvWxRM7RRDXGu6qEgSrrtzWtf1Zeh6ccmvG0sYTmrpSb6PdFDAFC2OSj\nx/q2JXJJdewvoLon+L7b5k6QqjdmldBTKuLPaMIvMzn2hIc2Lnm3bSSOl6l9CR4d\n5vMnDDvJ2mIM6LcB4ze1PgJO6wKBgQDt2vR82NXkxehQ1b2oQO52uAmnhz/+YCaJ\ne3mgS9Sv4fZaL9N3UfE9ZHLfJAx6TUqHNIL5fk4BARzSNM4R+OILWcXVpuNKVyH1\nUigSBk1AN44MIl3cE/oP/ELebQ8bkzZOoNWYv3w+Rr0w298bmldjJh8wnfOIiNN8\n+VVkMyjAfQKBgQCWWKtjathZiYW0rjtxBlh381uoIbzXjtkdt/cLuJx5IxFhqg9k\neHqoHpNvjGXn/EwyNVouH8SQBNulB5iX+3tHdEmkcFs9Zysk4i/M5Az+uBq5UvNf\nXvwDT4h+zCbdM034bgTO8Y7oy5AP9S/PCWmxY5lsaehElGWDjq9f+zNrrQKBgQDm\nI6vZvKhAoajlxdmrGaBhqDJXMUse4oOHFLya96RDxbvqiUnvso5bW3y2IRgdoflR\nluJ/atEosZ3kWgllZE26s9LypXZYMLR/vE1fG0/Vqas8XGg6j+2tV+SPeDBc+vRZ\n4c6p6+TYEPPveV6HQ6/4FCOrk7jWS6Vtz4Xq3IE6tQKBgDzaW5REJ6Iu30u7E2qT\n3E6luEn8pd7Yv6UgQ4vvRBXUVCoXy/t1tAvtwtORLTlIUDDWiVYED6T+cHcx5UYf\nUiN96GfX5gSBkUqCvxh8HrFGrSs9lOafYCgDsLg630pg8WIQkTVMnyzUh20F0kEu\nuevdzgshCNjG0grDYBEx04cI\n-----END PRIVATE KEY-----\n",
-              "client_email": "github-ci-cd@possible-cocoa-438319-m0.iam.gserviceaccount.com",
-              "client_id": "100946585635785395334",
-              "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-              "token_uri": "https://oauth2.googleapis.com/token",
-              "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-              "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/github-ci-cd%40possible-cocoa-438319-m0.iam.gserviceaccount.com",
-              "universe_domain": "googleapis.com"
-            }
-
+          service_account_key_file: /tmp/key.json
           export_default_credentials: true
-      - name: Verify Authentication (Optional Debugging Step)
+          
+      - name: Verify Authentication 
         run: |
           gcloud auth list
           gcloud config list
 
-      - name: Re-authenticate Docker with Artifact Registry
+      - name: Authenticate Docker with Artifact Registry
         run: |
-          gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
           gcloud auth configure-docker us-south1-docker.pkg.dev
           
       - name: Build and push backend image
