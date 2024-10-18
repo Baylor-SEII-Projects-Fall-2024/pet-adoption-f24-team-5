@@ -60,7 +60,7 @@ const HomePage = () => {
         };
 
         const fetchPets = async () => {
-            const url = "http://localhost:8080/api/pets";
+            const url = `${API_URL}/api/pets`;
             axios.get(url, {
                 headers: {
                     Authorization: `Bearer ${token}`,
