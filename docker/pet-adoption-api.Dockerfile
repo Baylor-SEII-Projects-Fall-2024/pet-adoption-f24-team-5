@@ -5,6 +5,7 @@ COPY . .
 # Change to pet-adoption-api to run ./gradlew
 WORKDIR /build/pet-adoption-api
 RUN ./gradlew build --no-daemon
+WORKDIR /build
 
 # Copy the build artifacts
 FROM openjdk:22
