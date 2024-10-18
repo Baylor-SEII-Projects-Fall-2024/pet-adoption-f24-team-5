@@ -3,7 +3,7 @@ FROM gradle:8.9.0-jdk22 AS build
 WORKDIR /build
 COPY . .
 
-RUN ./gradlew build --no-daemon -p .
+RUN pet-adoption-api/gradlew build --no-daemon -p .
 
 # Copy the build artifacts
 FROM openjdk:22
