@@ -33,6 +33,10 @@ jobs:
             }
 
           export_default_credentials: true
+      - name: Verify Authentication (Optional Debugging Step)
+        run: |
+          gcloud auth list
+          gcloud config list
 
       - name: Authenticate Docker with Artifact Registry
         run: |
