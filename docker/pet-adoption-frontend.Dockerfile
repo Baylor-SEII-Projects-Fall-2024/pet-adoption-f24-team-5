@@ -2,10 +2,10 @@
 FROM node:20 AS build
 WORKDIR /app
 
-# Copy only package.json and yarn.lock to leverage Docker caching
+# Copy only package.json and yarn.lock to cache dependencies
 COPY pet-adoption-frontend/package.json pet-adoption-frontend/yarn.lock ./
 
-# Install dependencies
+# Install all dependencies (including development dependencies)
 RUN yarn install
 
 # Copy the rest of the frontend code
@@ -18,10 +18,10 @@ RUN yarn build
 FROM node:20
 WORKDIR /app
 
-# Copy the built app from the previous stage
+# Copy the build artifacts from the previous stage
 COPY --from=build /app/.next ./.next
 
-# Copy the public folder (if it exists)
+# Copy the public folder if it exists
 COPY --from=build /app/public ./public
 
 # Copy the package.json and install only production dependencies
