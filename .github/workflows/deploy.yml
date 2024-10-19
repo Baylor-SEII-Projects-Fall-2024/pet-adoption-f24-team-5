@@ -36,8 +36,7 @@ jobs:
 
       - name: Get GKE Credentials
         run: |
-          gcloud container clusters get-credentials <cluster-name> \
-            --zone <zone> --project ${{ secrets.GCP_PROJECT_ID }}
+          gcloud container clusters get-credentials dogpile-cluster-1 --zone us-central1 --project ${{ secrets.GCP_PROJECT_ID }}
 
       - name: Verify Cluster Connection
         run: |
