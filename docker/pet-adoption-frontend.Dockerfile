@@ -1,32 +1,18 @@
-# Stage 1: Build the React app
+this is my docker file:
+
+# Create a build of the project
 FROM node:20 AS build
 WORKDIR /build
-
-# Copy only the package.json and yarn.lock to install dependencies
-COPY ./package.json ./yarn.lock ./
-
-# Install dependencies
-RUN yarn install
-
-# Now copy the rest of the source code
 COPY . .
 
-# Build the app
+WORKDIR /build/pet-adoption-frontend
+RUN yarn install
 RUN yarn run build
 
-# Stage 2: Create a lightweight image to serve the app
+# Copy the build artifacts
 FROM node:20
 WORKDIR /app
+COPY --from=build /build .
 
-# Copy the built app from the previous stage
-COPY --from=build /build/build ./build
-
-# Install only production dependencies
-COPY ./package.json ./yarn.lock ./
-RUN yarn install --production
-
-# Expose the port the app runs on
-EXPOSE 3000
-
-# Start the app
-CMD ["yarn", "start"]
+# Run the app
+ENTRYPOINT exec yarn start
