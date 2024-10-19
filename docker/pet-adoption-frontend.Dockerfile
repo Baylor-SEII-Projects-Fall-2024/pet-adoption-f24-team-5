@@ -1,4 +1,3 @@
-this is my docker file:
 
 # Create a build of the project
 FROM node:20 AS build
