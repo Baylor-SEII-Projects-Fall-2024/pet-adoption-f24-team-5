@@ -2,11 +2,11 @@
 FROM node:20 AS build
 WORKDIR /app
 
-# Copy only package.json and yarn.lock to cache dependencies
+# Copy only necessary files to avoid invalidating the cache
 COPY pet-adoption-frontend/package.json pet-adoption-frontend/yarn.lock ./
 
 # Install all dependencies (including development dependencies)
-RUN yarn install
+RUN yarn install --frozen-lockfile
 
 # Copy the rest of the frontend code
 COPY pet-adoption-frontend/ .
@@ -18,15 +18,15 @@ RUN yarn build
 FROM node:20
 WORKDIR /app
 
-# Copy the build artifacts from the previous stage
+# Copy build artifacts from the previous stage
 COPY --from=build /app/.next ./.next
-
-# Copy the public folder if it exists
 COPY --from=build /app/public ./public
 
-# Copy the package.json and install only production dependencies
-COPY pet-adoption-frontend/package.json ./
-RUN yarn install --production
+# Copy package.json and yarn.lock
+COPY pet-adoption-frontend/package.json pet-adoption-frontend/yarn.lock ./
+
+# Install production dependencies
+RUN yarn install --frozen-lockfile --production
 
 # Expose the app's port
 EXPOSE 3000
