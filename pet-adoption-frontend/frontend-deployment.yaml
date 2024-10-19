@@ -28,6 +28,7 @@ spec:
   selector:
     app: react-frontend
   ports:
-    - protocol: TCP
+    - name: http # Add a unique name to the port
+      protocol: TCP
       port: 80
       targetPort: 3000
