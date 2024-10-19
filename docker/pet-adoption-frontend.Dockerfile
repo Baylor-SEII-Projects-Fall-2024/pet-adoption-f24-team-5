@@ -1,8 +1,8 @@
-# Stage 1: Build the React app
+# Stage 1: Build the Next.js app
 FROM node:20 AS build
 WORKDIR /app
 
-# Copy only package.json and yarn.lock to cache dependencies
+# Copy only package.json and yarn.lock to leverage Docker caching
 COPY pet-adoption-frontend/package.json pet-adoption-frontend/yarn.lock ./
 
 # Install dependencies
@@ -12,22 +12,23 @@ RUN yarn install
 COPY pet-adoption-frontend/ .
 
 # Build the Next.js app
-RUN yarn run build
+RUN yarn build
 
 # Stage 2: Create the final image
 FROM node:20
 WORKDIR /app
 
-# Copy the build artifacts from the previous stage
-COPY --from=build /app/.next ./next
+# Copy the built app from the previous stage
+COPY --from=build /app/.next ./.next
 
-# Copy package.json to /app so yarn can run the app
+# Copy the public folder (if it exists)
+COPY --from=build /app/public ./public
+
+# Copy the package.json and install only production dependencies
 COPY pet-adoption-frontend/package.json ./
-
-# Install only production dependencies
 RUN yarn install --production
 
-# Expose the port the app runs on
+# Expose the app's port
 EXPOSE 3000
 
 # Start the Next.js app
