@@ -42,9 +42,11 @@ jobs:
       run: |
         gcloud container clusters get-credentials ${{ secrets.GCP_CLUSTER_NAME }} --zone us-central1
 
-    - name: Deploy to GKE
+    - name: Apply Kubernetes Configs
       run: |
-        kubectl apply -f k8s/mysql-deployment.yaml
-        kubectl set image deployment/frontend frontend=${{ secrets.FRONTEND_IMAGE }}
-        kubectl set image deployment/backend backend=${{ secrets.BACKEND_IMAGE }}
+        kubectl delete pods -l app=spring-backend
+        kubectl delete pods -l app=react-frontend
+        kubectl apply -f pet-adoption-api/mysql-deployment.yaml
+        kubectl apply -f pet-adoption-api/frontend-deployment.yaml
+        kubectl apply -f pet-adoption-api/backend-deployment.yaml
 
