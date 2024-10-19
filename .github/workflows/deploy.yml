@@ -22,8 +22,7 @@ jobs:
       uses: google-github-actions/setup-gcloud@v1
       with:
         project_id: ${{ secrets.GCP_PROJECT_ID }}
-        install_components: 'gcr'
-
+        
     - name: Authenticate Docker with GCP
       run: |
         gcloud auth configure-docker us-south1-docker.pkg.dev
