@@ -26,6 +26,12 @@ jobs:
           ${{ secrets.GCP_SA_KEY }}
           EOF
 
+      - name: Authenticate with Google Cloud
+        run: |
+          gcloud auth activate-service-account --key-file=/tmp/key.json
+          gcloud config set project ${{ secrets.GCP_PROJECT_ID }}
+          gcloud auth configure-docker "us-south1-docker.pkg.dev"
+
       - name: Authenticate with GKE Cluster
         run: |
           gcloud container clusters get-credentials dogpile-cluster-1 --region us-central1 --project ${{ secrets.GCP_PROJECT_ID }}
@@ -33,31 +39,21 @@ jobs:
       - name: Verify Kubernetes Connection
         run: |
           kubectl get pods --all-namespaces
-      
-      - name: Verify Key File Content
-        run: |
-          cat /tmp/key.json
-      
-      - name: Authenticate with Google Cloud
-        run: |
-          gcloud auth activate-service-account --key-file=/tmp/key.json
-          gcloud config set project ${{ secrets.GCP_PROJECT_ID }}
-          gcloud auth configure-docker "us-south1-docker.pkg.dev"
 
-      - name: Build and push backend image
+      - name: Build and Push Backend Image
         run: |
           docker build --no-cache -f "docker/pet-adoption-api.Dockerfile" -t ${{ secrets.BACKEND_IMAGE }}:latest .
           docker push ${{ secrets.BACKEND_IMAGE }}:latest
 
-      - name: Restart backend pods
+      - name: Restart Backend Pods
         run: |
           kubectl delete pods -l app=spring-backend --wait
 
-      - name: Build and push frontend image
+      - name: Build and Push Frontend Image
         run: |
           docker build --no-cache -f "docker/pet-adoption-frontend.Dockerfile" -t ${{ secrets.FRONTEND_IMAGE }}:latest .
           docker push ${{ secrets.FRONTEND_IMAGE }}:latest
 
-      - name: Restart frontend pods
+      - name: Restart Frontend Pods
         run: |
           kubectl delete pods -l app=react-frontend --wait
