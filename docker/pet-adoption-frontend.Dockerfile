@@ -2,8 +2,8 @@
 FROM node:20 AS build
 WORKDIR /build
 
-# Copy only package.json and yarn.lock first (to cache dependencies installation)
-COPY package.json yarn.lock ./
+# Copy only the package.json and yarn.lock to install dependencies
+COPY ./package.json ./yarn.lock ./
 
 # Install dependencies
 RUN yarn install
@@ -14,19 +14,19 @@ COPY . .
 # Build the app
 RUN yarn run build
 
-# Stage 2: Create a minimal image to run the app
+# Stage 2: Create a lightweight image to serve the app
 FROM node:20
 WORKDIR /app
 
-# Copy only the build artifacts from the previous stage
+# Copy the built app from the previous stage
 COPY --from=build /build/build ./build
 
 # Install only production dependencies
-COPY package.json yarn.lock ./
+COPY ./package.json ./yarn.lock ./
 RUN yarn install --production
 
-# Expose the port that your app will run on
+# Expose the port the app runs on
 EXPOSE 3000
 
-# Start the application
+# Start the app
 CMD ["yarn", "start"]
