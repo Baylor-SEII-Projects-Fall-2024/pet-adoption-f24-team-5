@@ -25,6 +25,14 @@ jobs:
           cat <<EOF > /tmp/key.json
           ${{ secrets.GCP_SA_KEY }}
           EOF
+
+      - name: Authenticate with GKE Cluster
+        run: |
+          gcloud container clusters get-credentials dogpile-cluster-1 --region us-central1 --project ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Verify Kubernetes Connection
+        run: |
+          kubectl get pods --all-namespaces
       
       - name: Verify Key File Content
         run: |
