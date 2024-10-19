@@ -58,7 +58,7 @@ jobs:
       run: |
         kubectl delete pods -l app=spring-backend
         kubectl delete pods -l app=react-frontend
-        kubectl apply -f pet-adoption-api/mysql-deployment.yaml
-        kubectl apply -f pet-adoption-frontend/frontend-deployment.yaml
-        kubectl apply -f pet-adoption-api/backend-deployment.yaml
+#        kubectl apply -f pet-adoption-api/mysql-deployment.yaml
+#        kubectl apply -f pet-adoption-frontend/frontend-deployment.yaml
+#        kubectl apply -f pet-adoption-api/backend-deployment.yaml
 
