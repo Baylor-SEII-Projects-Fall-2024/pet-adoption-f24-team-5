@@ -3,42 +3,31 @@ import { Card, CardContent, Typography, CircularProgress } from '@mui/material';
 import { fetchImage } from '@/utils/fetchImage';
 
 const PetCard = ({ pet, onClick }) => {
-    const [imageSrc, setImageSrc] = useState('');
-    const [loading, setLoading] = useState(true); // Track loading status
     const [error, setError] = useState(false); // Track fetch errors
+    const [imageType, setImageType] = useState("");
+    const [imageData, setImageData] = useState("");
+
 
     useEffect(() => {
-        let isMounted = true; // Prevent state updates after unmount
-        let objectUrl = null;
 
         const loadImage = async () => {
             try {
-                const imgUrl = await fetchImage(pet.imageName); // Fetch image URL
-                if (isMounted && imgUrl) {
-                    objectUrl = imgUrl;
-                    setImageSrc(imgUrl);
-                } else {
-                    setError(true); // Handle missing image URL
-                }
+                const {imageType, imageData} = await fetchImage(pet.imageName); // Fetch image URL
+                setImageType(imageType);
+                setImageData(imageData);
+
             } catch (err) {
                 console.error('Image fetch failed:', err);
                 setError(true); // Set error state on failure
-            } finally {
-                setLoading(false); // Stop loading regardless of outcome
             }
         };
 
         if (pet.imageName) loadImage(); // Trigger image load if name exists
 
-        return () => {
-            isMounted = false;
-            if (objectUrl) URL.revokeObjectURL(objectUrl); // Cleanup on unmount
-        };
     }, [pet.imageName]);
 
     const handleImageError = () => {
         setError(true); // Handle image load errors
-        setLoading(false); // Stop spinner on error
     };
 
     return (
@@ -50,13 +39,8 @@ const PetCard = ({ pet, onClick }) => {
                     border: '2px solid blue',
                     },}} elevation={4} key={pet.petName}>
             <CardContent>
-                {loading ? (
-                    <CircularProgress /> // Show loading spinner
-                ) : error ? (
-                    <Typography variant="body2">Image not available</Typography>
-                ) : (
                     <img
-                        src={imageSrc}
+                        src={`data:${imageType};base64,${imageData}`}
                         alt="Pet"
                         onError={handleImageError}
                         style={{
@@ -67,8 +51,6 @@ const PetCard = ({ pet, onClick }) => {
                             height: 'auto',
                         }}
                     />
-                )}
-                {!loading && (
                     <>
                         <Typography variant="h4" align="left">
                             {pet.petName}
@@ -89,7 +71,6 @@ const PetCard = ({ pet, onClick }) => {
                             {pet.description}
                         </Typography>
                     </>
-                )}
             </CardContent>
         </Card>
     );
