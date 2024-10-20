@@ -1,5 +1,7 @@
 package petadoption.api.user;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
@@ -7,6 +9,8 @@ import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import petadoption.api.user.AdoptionCenter.CenterWorker;
+import petadoption.api.user.Owner.Owner;
 
 import java.util.Collection;
 import java.util.List;
@@ -18,6 +22,15 @@ import java.util.List;
 @Table(name = User.TABLE_NAME)
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "USER_TYPE", discriminatorType = DiscriminatorType.STRING)
+/*@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "userType"
+)*/
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = CenterWorker.class, name = "CenterWorker"),
+        @JsonSubTypes.Type(value = Owner.class, name = "Owner")
+})
 public class User implements UserDetails {
     public static final String TABLE_NAME = "USERS";
 
@@ -39,26 +52,22 @@ public class User implements UserDetails {
     @Column(name = "PHONE_NUMBER")
     private String phoneNumber;
 
-    public User() {
-
-    }
+    public User() {}
 
     public User(String emailAddress, String password, UserType userType, String phoneNumber) {
         this.emailAddress = emailAddress;
         this.password = password;
         this.userType = userType;
         this.phoneNumber = phoneNumber;
-
     }
+
     public User(Long id, String emailAddress, String password, UserType userType, String phoneNumber) {
         this.id = id;
         this.emailAddress = emailAddress;
         this.password = password;
         this.userType = userType;
         this.phoneNumber = phoneNumber;
-
     }
-
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
