@@ -2,10 +2,10 @@ import React, { useEffect, useState, useRef } from 'react';
 import Head from 'next/head';
 import { Button, Card, CardContent, Stack, TextField, Typography, Paper, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { setToken } from '../utils/userSlice'; 
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import styles from '@/styles/Home.module.css';
+import { getSubjectFromToken } from '../utils/tokenUtils';
+//import {API_URL, FRONTEND_URL} from "@/constants";
 
 export default function HomePage() {
   const [userId, setUserId] = useState('');
@@ -24,15 +24,18 @@ export default function HomePage() {
   const [invalidPhoneNumber, setInvalidPhoneNumber] = useState(false);
   const [userType, setUserType] = useState('');
   const [userAge, setUserAge] = useState('');
+  const [userEmail, setUserEmail] = useState('');
   const token = localStorage.getItem('token');
+
 
   const updatedValuesRef = useRef({});
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  useEffect(() => {
+  /*useEffect(() => {
     const storedToken = localStorage.getItem('token');
-    const storedUserId = Number(localStorage.getItem('currentId')); // Need this to update to correct id
+    //const storedUserId = Number(localStorage.getItem('currentId')); // Need this to update to correct id
+    const storedEmail = extractEmail(storedToken);
 
     if (storedToken) {
       dispatch(setToken(storedToken));
@@ -42,43 +45,56 @@ export default function HomePage() {
       setUserId(storedUserId);
       fetchUserInfo(storedToken);
     }
-  }, []);
+  }, []);*/
 
-  const fetchUserInfo = async (token) => {
+  useEffect(() => {
     try {
-      console.log("Id: " + id);
-      const response = await fetch(`http://localhost:8080/api/users/getUser`, {
-        params: { id: userId },
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+      let email = '';
+      // Extract user email (subject) from the token
+      if (token) { 
+        const subject = getSubjectFromToken(token); // Use the provided function
+        if (subject) {
+            setUserEmail(subject); // Store the user email (subject)
+            email = subject;
         }
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch user info');
       }
 
-      const userInfo = await response.json();
-      console.log(JSON.stringify(userInfo));
-      setUserId(userInfo.id);
-      setFirstNameLabel(userInfo.firstName);
-      setLastNameLabel(userInfo.lastName);
-      setPhoneNumberLabel(userInfo.phoneNumber);
-      setOldPassword(userInfo.password);
-      setUserType(userInfo.userType);
-      if (userInfo.userType !== "CenterOwner") {
-        setUserAge(userInfo.userAge);
-      }
-    } catch (error) {
+      const fetchUserInfo = async () => {
+        try{
+          const response = await axios.get(`http://localhost:8080/api/users/getUser`, {
+            params: { emailAddress: email },
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            }
+          });
+
+          setUserId(response.data.id);
+          setFirstNameLabel(response.data.firstName);
+          setLastNameLabel(response.data.lastName);
+          setPhoneNumberLabel(response.data.phoneNumber);
+          setOldPassword(response.data.password);
+          /*setUserType(userInfo.userType);
+          if (userInfo.userType !== "CenterOwner") {
+            setUserAge(userInfo.userAge);
+          }*/
+        }
+        catch (error){
+          console.error('Failed to fetch user', error);
+        }
+      };
+
+      fetchUserInfo();
+    } 
+    catch (error) {
       console.error('Error fetching user info:', error);
       if (error.response && error.response.status === 401) {
         alert('Session expired, please log in again.');
         navigate('/login');
       }
     }
-  };
-
+  }, [token]);
+  
   const handleFirstNameChange = () => {
     setFirstName(firstNameLabel);
     handleUserUpdate();
@@ -124,7 +140,7 @@ export default function HomePage() {
   const handleUserUpdate = async () => {
     try {
       const response = await axios.get(`http://localhost:8080/api/users/getUser`, {
-        params: {id: userId},
+        params: {emailAddress: userEmail},
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
@@ -134,13 +150,6 @@ export default function HomePage() {
       console.log("Fetched user: " + JSON.stringify(response.data));
   
       const currentUser = response.data;
-      
-      /*const updatedUser = {
-        ...currentUser,
-        password: updatedValuesRef.current.password || password,
-        phoneNumber: updatedValuesRef.current.phoneNumber || phoneNumber,
-        // Maybe need to add userAge update (see below for check)
-      };*/
 
       const updatedUser = {
         id: currentUser.id,
@@ -154,10 +163,6 @@ export default function HomePage() {
 
       console.log("Id: " + userId);
       console.log(JSON.stringify(updatedUser));
-  
-      /*if (updatedUser.userType !== "CenterOwner") {
-        updatedUser.userAge = updatedValuesRef.current.userAge || userAge;
-      }*/
   
       const updatedResponse = await axios.put(`http://localhost:8080/api/users/update/User/${userId}`, updatedUser, {
         headers: {
@@ -263,7 +268,7 @@ export default function HomePage() {
               </Typography>
             )}
           </Paper>
-          {userType != "CenterOwner" && (<Paper sx={{ width: 600 }} elevation={4}>
+          {/*userType != "CenterOwner" && (<Paper sx={{ width: 600 }} elevation={4}>
             <Stack direction = "row">
               <FormControl fullWidth>
                 <InputLabel id="Age">Age</InputLabel>
@@ -281,7 +286,7 @@ export default function HomePage() {
                 </Select>
               </FormControl>
             </Stack>
-          </Paper>)}
+          </Paper>)*/}
         </Stack>
       </main>
     </>
