@@ -101,9 +101,15 @@ public class UserController {
         return new ResponseEntity<>(user, HttpStatus.OK);
     }*/
 
-    @GetMapping("/getUser")
+    /*@GetMapping("/getUser")
     public ResponseEntity<?> getUser(@RequestParam("id") Long id) {
         User user = userService.findUser(id);
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }*/
+
+    @GetMapping("/getUser")
+    public ResponseEntity<?> getUser(@RequestParam("emailAddress") String emailAddress) {
+        User user = userService.findUser(emailAddress);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 }

@@ -27,8 +27,16 @@ public class UserService {
     @Autowired
     private CenterWorkerRepository centerWorkerRepository;
 
-    public User findUser(Long userId) {
+    /*public User findUser(Long userId) {
         Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
+            throw new IllegalArgumentException("Invalid username or password");
+        }
+        return user.get();
+    }*/
+
+    public User findUser(String emailAddress) {
+        Optional<User> user = userRepository.findByEmailAddress(emailAddress);
         if (user.isEmpty()) {
             throw new IllegalArgumentException("Invalid username or password");
         }

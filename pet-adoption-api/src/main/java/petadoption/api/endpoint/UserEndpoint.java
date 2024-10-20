@@ -18,7 +18,7 @@ public class UserEndpoint {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/users/{id}")
+    /*@GetMapping("/users/{id}")
     public User findUserById(@PathVariable Long id) {
         var user = userService.findUser(id);
 
@@ -27,9 +27,9 @@ public class UserEndpoint {
         }
 
         return user;
-    }
+    }*/
 
-    @GetMapping("/users/{id}/emailAddress")
+    /*@GetMapping("/users/{id}/emailAddress")
     public ResponseEntity<String> getEmailAddressById(@PathVariable Long id) {
         var user = userService.findUser(id);
 
@@ -38,7 +38,7 @@ public class UserEndpoint {
         }
 
         return ResponseEntity.ok(user.getEmailAddress()); // Assuming the username is the email address
-    }
+    }*/
 
     @PostMapping("/users")
     public User saveUser(@RequestBody User user) {
