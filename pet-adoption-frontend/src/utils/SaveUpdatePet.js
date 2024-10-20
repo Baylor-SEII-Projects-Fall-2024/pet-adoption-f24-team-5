@@ -1,12 +1,17 @@
 import {API_URL} from "@/constants";
 import axios from "axios";
 
-export const saveUpdatePet = ({petData, token, resetFields}) => {
+export const saveUpdatePet = ({formType, petData, token, resetFields}) => {
 
+    let url = `${API_URL}/api/pets/`
+
+    if(formType === "update") {
+       url  += `update`;
+    } else if (formType === "save") {
+        url += `save`;
+    }
 
     console.log('Pet Data: ', petData);
-
-    const url = `${API_URL}/api/pets/save_update/pet`;
 
     axios
         .post(url, petData, {

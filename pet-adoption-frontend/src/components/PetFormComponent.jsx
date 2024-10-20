@@ -23,9 +23,9 @@ const PetFormComponent = (props) => {
 
     useEffect(() => {
         setFormType(props.type);
-        if (formType === "save") {
+        if (props.type === "save") {
             setButtonText("Save Pet");
-        } else if (formType === "update") {
+        } else if (props.type === "update") {
             setButtonText("Update Pet");
         }
         if (props.pet && props.pet.petId) {
@@ -39,7 +39,6 @@ const PetFormComponent = (props) => {
 
 
     const setFields = (pet) => {
-        console.log(pet.petId)
         setPetId(pet.petId);
         setSpecies(pet.species);
         setPetName(pet.petName);
@@ -99,7 +98,7 @@ const PetFormComponent = (props) => {
             }
             : basePetData;
 
-        saveUpdatePet({petData, token, resetFields});
+        saveUpdatePet({formType, petData, token, resetFields});
 
     }
 
