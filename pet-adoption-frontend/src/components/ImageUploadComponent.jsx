@@ -47,7 +47,7 @@ const ImageUploadComponent = ({ onImageUpload }) => {
             );
 
             console.log(response);
-            if (onImageUpload) onImageUpload(response.data); // Call upload callback
+            if (onImageUpload) onImageUpload(response.data);
         } catch (error) {
             console.error('Upload failed:', error);
             alert('An error occurred during upload. Please try again.');
