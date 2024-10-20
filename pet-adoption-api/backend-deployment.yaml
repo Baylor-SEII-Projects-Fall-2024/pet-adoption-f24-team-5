@@ -12,6 +12,7 @@ spec:
       labels:
         app: spring-backend
     spec:
+      serviceAccountName: gcp-access-sa  
       containers:
         - name: spring-backend
           image: us-south1-docker.pkg.dev/possible-cocoa-438319-m0/dogpile-repo/spring-backend:latest

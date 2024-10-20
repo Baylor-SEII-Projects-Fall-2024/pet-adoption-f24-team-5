@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import axios from "axios";
+import {API_URL, FRONTEND_URL} from "@/constants";
 
 const CreateEvent = () => {
     const [event_name, setEventName] = React.useState('');
@@ -26,7 +27,7 @@ const CreateEvent = () => {
 
     const fetchEvents = async () => {
         try {
-            const response = await axios.get('http://localhost:8080/api/events', {
+            const response = await axios.get(`${API_URL}/api/events`, {
                 headers: {
                     Authorization: `Bearer ${token}`, // Pass token in the header
                     'Content-Type': 'application/json'
@@ -78,7 +79,7 @@ const CreateEvent = () => {
             return;
         }
 
-        const url = `http://localhost:8080/api/events/delete_event/${selectedEvent.event_id}`;
+        const url = `${API_URL}/api/events/delete_event/${selectedEvent.event_id}`;
         try {
             const response = await axios.delete(url, {
                 headers: {
@@ -125,8 +126,8 @@ const CreateEvent = () => {
         console.log('Event Data', eventData);
 
         const url = selectedEvent
-            ? `http://localhost:8080/api/events/update_event/${selectedEvent.event_id}`
-            : 'http://localhost:8080/api/events/create_event';
+            ? `${API_URL}/api/events/update_event/${selectedEvent.event_id}`
+            : `${API_URL}/api/events/create_event`;
 
         try {
             const response = await (selectedEvent ? axios.put : axios.post)(url, eventData, {
@@ -194,7 +195,7 @@ const CreateEvent = () => {
                 <Toolbar>
                     <Typography variant="h6" sx={{ flexGrow: 1 }}>Create Event</Typography>
                     <Button color="inherit" component={Link} to="/">Home</Button>
-                    <Button color="inherit" component={Link} to="/PostPet">Post Pet</Button>
+                    <Button color="inherit" component={Link} to="/PetManager">Post Pet</Button>
                     <Button color="inherit" component={Link} to="/LocalAdoptionCenter">Local Adoption Center</Button>
                     <Button color="inherit" component={Link} to="/SearchEngine">Search Engine</Button>
                     <Button color="inherit" component={Link} to="/Settings">Settings</Button>

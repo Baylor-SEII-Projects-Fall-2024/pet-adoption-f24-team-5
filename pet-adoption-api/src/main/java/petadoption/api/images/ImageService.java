@@ -8,12 +8,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class ImageService {
 
-    public String saveImage (String uploadDirectory, MultipartFile imageFile) throws IOException, FileNotFoundException {
+    public String saveImage (String uploadDirectory, MultipartFile imageFile) throws IOException {
         if (imageFile == null) {
             throw new FileNotFoundException("File is null");
         }
@@ -32,24 +32,33 @@ public class ImageService {
         return uniqueImageName;
     }
 
-    public byte[] getImage(String uploadDirectory, String uniqueImageName) throws IOException {
+    public Map.Entry<String, String> getImage(String uploadDirectory, String uniqueImageName) throws IOException {
         Path imagePath = Path.of(uploadDirectory, uniqueImageName);
 
         if(Files.exists(imagePath)) {
-            return Files.readAllBytes(imagePath);
+            byte[] imageBytes = Files.readAllBytes(imagePath);
+
+            //encode string to standardize
+            String encodedString = Base64.getEncoder().encodeToString(imageBytes);
+
+            //get filetype
+            String mimeType = Files.probeContentType(imagePath);
+
+            return new AbstractMap.SimpleEntry<>(mimeType, encodedString);
         } else {
-            return null; ///TODO: handle missing images
+            throw new IOException("image not found");
+            ///TODO return standard image for not found when that is added to resources
         }
     }
 
-    public String deleteImage(String uploadDirectory, String uniqueImageName) throws IOException {
+    public Boolean deleteImage(String uploadDirectory, String uniqueImageName) throws IOException {
         Path imagePath = Path.of(uploadDirectory, uniqueImageName);
 
         if(Files.exists(imagePath)) {
             Files.delete(imagePath);
-            return "Success";
+            return true;
         } else {
-            return "Error"; ///TODO case handle imssing image.
+            throw new IOException("image not found");
         }
     }
 }
