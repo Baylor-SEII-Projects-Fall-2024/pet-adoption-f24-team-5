@@ -57,7 +57,9 @@ export default function HomePage() {
 
           setUserId(response.data.id);
           setFirstNameLabel(response.data.firstName);
+          updatedValuesRef.current.firstName = response.data.firstName;
           setLastNameLabel(response.data.lastName);
+          updatedValuesRef.current.lastName = response.data.lastName;
           setPhoneNumberLabel(response.data.phoneNumber);
           setPhoneNumber(response.data.phoneNumber);
           updatedValuesRef.current.phoneNumber = response.data.phoneNumber;
@@ -88,11 +90,13 @@ export default function HomePage() {
   
   const handleFirstNameChange = () => {
     setFirstName(firstNameLabel);
+    updatedValuesRef.current.firstName = firstNameLabel;
     handleUserUpdate();
   };
 
   const handleLastNameChange = () => {
     setLastName(lastNameLabel);
+    updatedValuesRef.current.lastName = lastNameLabel;
     handleUserUpdate();
   }
 
@@ -150,6 +154,8 @@ export default function HomePage() {
 
       const updatedUser = {
         id: currentUser.id,
+        firstName: updatedValuesRef.current.firstName,
+        lastName: updatedValuesRef.current.lastName,
         emailAddress: currentUser.emailAddress,
         password: updatedValuesRef.current.password !== null ? updatedValuesRef.current.password : password,
         //userType: currentUser.userType,

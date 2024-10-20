@@ -26,18 +26,18 @@ public class Owner extends User {
     public Owner(){
         super();
     }
-    public Owner(String emailAddress, String password, UserType userType, int age, String phoneNumber) {
-        super(emailAddress, password, userType, phoneNumber);
+    public Owner(String firstName, String lastName, String emailAddress, String password, UserType userType, int age, String phoneNumber) {
+        super(firstName, lastName, emailAddress, password, userType, phoneNumber);
         this.age=age;
     }
-    public Owner(String emailAddress, String password, UserType userType, int age, String phoneNumber, Preference preference) {
-        super(emailAddress, password, userType, phoneNumber);
+    public Owner(String firstName, String lastName, String emailAddress, String password, UserType userType, int age, String phoneNumber, Preference preference) {
+        super(firstName, lastName, emailAddress, password, userType, phoneNumber);
         this.preference = preference;
         this.age=age;
     }
 
-    public Owner(Long id, String emailAddress, String password, UserType userType, int age, String phoneNumber, Preference preference) {
-        super(id, emailAddress, password, userType, phoneNumber);
+    public Owner(Long id, String firstName, String lastName, String emailAddress, String password, UserType userType, int age, String phoneNumber, Preference preference) {
+        super(id, firstName, lastName, emailAddress, password, userType, phoneNumber);
         this.preference = preference;
         this.age=age;
     }
