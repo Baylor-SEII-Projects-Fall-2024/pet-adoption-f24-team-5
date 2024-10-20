@@ -146,7 +146,7 @@ export default function HomePage() {
         id: currentUser.id,
         emailAddress: currentUser.emailAddress,
         password: updatedValuesRef.current.password || password,
-        userType: currentUser.userType,
+        //userType: currentUser.userType,
         phoneNumber: updatedValuesRef.current.phoneNumber || phoneNumber
       }
       const updatedUserJson = JSON.stringify(updatedUser, null, 2);
@@ -159,8 +159,7 @@ export default function HomePage() {
         updatedUser.userAge = updatedValuesRef.current.userAge || userAge;
       }*/
   
-      //const updatedResponse = await axios.put(`http://localhost:8080/api/users/update/AdoptionCenter/${userId}`, JSON.stringify(updatedUser), {
-        const updatedResponse = await axios.put(`http://localhost:8080/api/users/update/${userType}/${userId}`, JSON.stringify(updatedUser), {
+      const updatedResponse = await axios.put(`http://localhost:8080/api/users/update/User/${userId}`, updatedUser, {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
