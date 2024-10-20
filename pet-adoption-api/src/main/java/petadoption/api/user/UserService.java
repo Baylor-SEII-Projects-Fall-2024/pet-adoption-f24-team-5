@@ -60,6 +60,7 @@ public class UserService {
     public ResponseEntity<User> updateUser(Long id, User user) {
         //AdoptionCenter existingUser = adoptionCenterRepository.findById(user.getId())
         //        .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + user.getId()));
+        System.out.println("User inside update: " + userRepository.findById(id).get());
         return userRepository.findById(id)
                 .map(event -> {
                     // Update fields

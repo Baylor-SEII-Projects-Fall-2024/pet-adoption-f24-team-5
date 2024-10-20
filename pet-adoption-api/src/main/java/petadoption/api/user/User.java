@@ -22,11 +22,11 @@ import java.util.List;
 @Table(name = User.TABLE_NAME)
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "USER_TYPE", discriminatorType = DiscriminatorType.STRING)
-@JsonTypeInfo(
-        use = JsonTypeInfo.Id.NAME,        // Use the 'userType' field to determine the subclass
+/*@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.PROPERTY,
         property = "userType"
-)
+)*/
 @JsonSubTypes({
         @JsonSubTypes.Type(value = CenterWorker.class, name = "CenterWorker"),
         @JsonSubTypes.Type(value = Owner.class, name = "Owner")

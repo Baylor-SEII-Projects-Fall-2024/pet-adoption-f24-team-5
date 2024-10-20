@@ -50,7 +50,7 @@ public class UserController {
         }
     }
 
-    @PutMapping("/update/CenterWorker")
+    /*@PutMapping("/update/CenterWorker")
     public ResponseEntity<?> updateUser(@RequestBody CenterWorker user) {
         return ResponseEntity.ok(userService.updateUser(user));
     }
@@ -58,7 +58,7 @@ public class UserController {
     @PutMapping("/update/Owner")
     public ResponseEntity<?> updateUser(@RequestBody Owner user) {
         return ResponseEntity.ok(userService.updateUser(user));
-    }
+    }*/
 
     @PostMapping("/initialize")
     public List<User> initialize() {
@@ -67,6 +67,17 @@ public class UserController {
     }
 
 
+    /*@PutMapping("/update/User/{id}")
+    public ResponseEntity<?> updateUser(@RequestBody User user, @PathVariable Long id) {
+        System.out.println("THIS IS THE ONE");
+        return userService.updateUser(id, user);
+    }*/
+
+    @PutMapping("/update/User/{id}")
+    public String UpdateUser(@RequestBody User adoptionCenter, @PathVariable Long id) {
+        System.out.println(adoptionCenter.toString());
+        return adoptionCenter.toString();
+    }
 
     /*@PutMapping("/update/AdoptionCenter")
     public ResponseEntity<?> updateUser(@RequestBody AdoptionCenter user) {
