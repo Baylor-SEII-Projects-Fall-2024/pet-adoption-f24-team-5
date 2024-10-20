@@ -46,8 +46,9 @@ export default function HomePage() {
 
       const fetchUserInfo = async () => {
         try{
-          const response = await axios.get(`${API_URL}/api/users/getUser`, {
-            params: { emailAddress: email },
+          console.log("Email: " + email);
+          const url = `${API_URL}/api/users/getUser?emailAddress=${email}`;
+          const response = await axios.get(url, {
             headers: {
               'Content-Type': 'application/json',
               'Authorization': `Bearer ${token}`,
