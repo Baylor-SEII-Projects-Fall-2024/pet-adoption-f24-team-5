@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, Typography, CircularProgress } from '@mui/material';
 import { fetchImage } from '@/utils/fetchImage';
 
-const PetCard = ({ pet }) => {
+const PetCard = ({ pet, onClick }) => {
     const [imageSrc, setImageSrc] = useState('');
     const [loading, setLoading] = useState(true); // Track loading status
     const [error, setError] = useState(false); // Track fetch errors
@@ -42,7 +42,13 @@ const PetCard = ({ pet }) => {
     };
 
     return (
-        <Card sx={{ width: '48%' }} elevation={4} key={pet.petName}>
+        <Card onClick={onClick}
+              sx={{ width: '48%',
+                    backgroundColor: 'white',
+                    transition: 'border 0.3s',
+                    '&:hover': {
+                    border: '2px solid blue',
+                    },}} elevation={4} key={pet.petName}>
             <CardContent>
                 {loading ? (
                     <CircularProgress /> // Show loading spinner

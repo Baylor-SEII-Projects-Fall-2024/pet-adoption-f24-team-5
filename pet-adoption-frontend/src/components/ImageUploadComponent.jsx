@@ -60,7 +60,6 @@ const ImageUploadComponent = ({ onImageUpload }) => {
                 type="file"
                 onChange={handleFileSelect}
                 fullWidth
-                required
             />
             {previewSrc && (
                 <img

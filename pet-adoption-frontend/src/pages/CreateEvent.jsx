@@ -195,7 +195,7 @@ const CreateEvent = () => {
                 <Toolbar>
                     <Typography variant="h6" sx={{ flexGrow: 1 }}>Create Event</Typography>
                     <Button color="inherit" component={Link} to="/">Home</Button>
-                    <Button color="inherit" component={Link} to="/PostPet">Post Pet</Button>
+                    <Button color="inherit" component={Link} to="/PetManager">Post Pet</Button>
                     <Button color="inherit" component={Link} to="/LocalAdoptionCenter">Local Adoption Center</Button>
                     <Button color="inherit" component={Link} to="/SearchEngine">Search Engine</Button>
                     <Button color="inherit" component={Link} to="/Settings">Settings</Button>
