@@ -1,12 +1,12 @@
 import {API_URL} from "@/constants";
 import axios from "axios";
 
-export const savePet = ({petData, token, resetFields}) => {
+export const saveUpdatePet = ({petData, token, resetFields}) => {
 
 
     console.log('Pet Data: ', petData);
 
-    const url = `${API_URL}/api/pets/save/pet`;
+    const url = `${API_URL}/api/pets/save_update/pet`;
 
     axios
         .post(url, petData, {

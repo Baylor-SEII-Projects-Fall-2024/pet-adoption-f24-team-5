@@ -2,7 +2,7 @@ import {Box, Button, Select, Stack, TextField} from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
 import ImageUploadComponent from "@/components/ImageUploadComponent";
 import React, {useEffect, useState} from "react";
-import {savePet} from "@/utils/SavePet";
+import {saveUpdatePet} from "@/utils/SaveUpdatePet";
 
 
 
@@ -23,17 +23,23 @@ const PetFormComponent = (props) => {
 
     useEffect(() => {
         setFormType(props.type);
-        if(formType === "save") {
+        if (formType === "save") {
             setButtonText("Save Pet");
         } else if (formType === "update") {
             setButtonText("Update Pet");
         }
-        if(props.pet.petId) {
+        if (props.pet && props.pet.petId) {
             setFields(props.pet);
+        } else {
+            resetFields();
         }
-    }, [props.type])
+
+    }, [props.type, props.pet]);
+
+
 
     const setFields = (pet) => {
+        console.log(pet.petId)
         setPetId(pet.petId);
         setSpecies(pet.species);
         setPetName(pet.petName);
@@ -43,29 +49,6 @@ const PetFormComponent = (props) => {
         setStatus(pet.adoptionStatus);
         setDescription(pet.description);
         setImageName(pet.imageName);
-    }
-
-    const handleImageUpload = (name) => {
-        console.log("Uploaded image name:", name);
-        setImageName(name);
-    };
-
-    const handleChangeSelection = (event) => {
-        setStatus(event.target.value);
-    }
-
-    const handleSubmit = (event) => {
-        event.preventDefault();
-
-        const submitHandlers =  {
-            save: handleSavePet,
-            update: handleUpdatePet,
-        };
-
-        const submitHandler = submitHandlers[formType];
-        if(submitHandler) {
-            submitHandler();
-        }
     }
 
     const resetFields = () => {
@@ -80,8 +63,25 @@ const PetFormComponent = (props) => {
         setImageName('');
     }
 
-    const handleSavePet = () => {
-        const petData = {
+    const handleImageUpload = (name) => {
+        console.log("Uploaded image name:", name);
+        setImageName(name);
+    };
+
+    const handleChangeSelection = (event) => {
+        setStatus(event.target.value);
+    }
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+
+        handleSaveOrUpdatePet();
+    }
+
+
+    const handleSaveOrUpdatePet = () => {
+
+        const basePetData = {
             species,
             petName,
             breed,
@@ -90,13 +90,16 @@ const PetFormComponent = (props) => {
             adoptionStatus,
             description,
             imageName,
-        };
+        }
 
-        savePet({petData, token, resetFields});
+        const petData = (formType === "update")
+            ? {
+                petId,
+                ...basePetData,
+            }
+            : basePetData;
 
-    }
-
-    const handleUpdatePet = () => {
+        saveUpdatePet({petData, token, resetFields});
 
     }
 

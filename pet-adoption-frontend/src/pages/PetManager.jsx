@@ -21,6 +21,7 @@ const PetManager = () => {
     const [formPet, setFormPet] = React.useState({});
 
     const handleCardClick = (pet) => {
+        console.log(pet);
         setFormPet(pet);
         setFormType("update");
         setPostNewPet(!postNewPet);
@@ -30,6 +31,7 @@ const PetManager = () => {
     const handlePostNewPet = () => {
         setPostNewPet(!postNewPet);
         setFormType("save")
+        setFormPet({})
     }
 
 
@@ -51,7 +53,10 @@ const PetManager = () => {
     };
 
     useEffect(() => {
-        getAllPets();
+        if(postNewPet === false) {
+            getAllPets();
+            setFormType('');
+        }
     }, [postNewPet]);
 
 
