@@ -88,7 +88,7 @@ public class AuthenticationServiceTest {
     public void RegisterAdoptionCenterTest_Success() {
         // Arrange: Create the AdoptionCenter entity to register
         AdoptionCenter center = new AdoptionCenter(
-                "Alice", "Smith", "center1@gmail.com", "password", UserType.CenterOwner,
+                "center1@gmail.com", "password", UserType.CenterOwner,
                 "123-456-7890", "Happy Pets", "123 Pet Street",
                 "Austin", "TX", "78701", 15
         );
@@ -103,7 +103,7 @@ public class AuthenticationServiceTest {
     public void RegisterAdoptionCenterTest_Fail_DuplicateEmail() {
         // Arrange: Create an AdoptionCenter entity with a duplicate email
         AdoptionCenter center = new AdoptionCenter(
-                "Alice", "Smith", "duplicate@gmail.com", "password", UserType.CenterOwner,
+                "duplicate@gmail.com", "password", UserType.CenterOwner,
                 "123-456-7890", "Happy Pets", "123 Pet Street",
                 "Austin", "TX", "78701", 15
         );

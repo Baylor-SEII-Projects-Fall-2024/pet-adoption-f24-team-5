@@ -38,12 +38,6 @@ public class UserController {
         }
     }
 
-    // Default
-    /*@PutMapping("/update/User")
-    public ResponseEntity<User> updateUser(@RequestBody User user, @RequestParam("oldPassword") String oldPassword) {
-        return userService.updateUser(user, oldPassword);
-    }*/
-
     @PutMapping("/update/Owner")
     public ResponseEntity<Owner> updateOwner(@RequestBody Owner user, @RequestParam("oldPassword") String oldPassword) {
         return userService.updateOwner(user, oldPassword);
