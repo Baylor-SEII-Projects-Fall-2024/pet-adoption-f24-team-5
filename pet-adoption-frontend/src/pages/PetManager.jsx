@@ -11,6 +11,7 @@ import axios from 'axios';
 import PetCard from "@/components/PetCard";
 import PetFormComponent from "@/components/PetFormComponent";
 import {API_URL} from "@/constants";
+import TitleBar from "@/components/TitleBar";
 
 const PetManager = () => {
     const [formType, setFormType] = React.useState('');
@@ -64,15 +65,8 @@ const PetManager = () => {
     return (
         <Box sx={{height: '100vh', width: '100vw', display: 'flex', flexDirection: 'column'}}>
             <Box sx={{height: '8vh', width: '100vw', backgroundColor: 'primary.main'}}>
-                <Toolbar>
-                <Typography variant="h6" sx={{ flexGrow: 1 }}>
-                        Post Pet
-                    </Typography>
-                    <Button color="inherit" component={Link} to="/PetManager">Profile</Button>
-                    <Button color="inherit" component={Link} to="/SearchEngine">Search Engine</Button>
-                    <Button color="inherit" component={Link} to="/Settings">Settings</Button>
-                    <Button color="inherit" component={Link} to="/Login">Log Out</Button>
-                </Toolbar>
+
+                <TitleBar/>
             </Box>
 
 

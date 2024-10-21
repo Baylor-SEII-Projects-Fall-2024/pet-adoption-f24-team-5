@@ -4,31 +4,16 @@ import { AppBar, Box, Button, Card, CardContent, Stack, Toolbar, Typography, Gri
 import { Link, useNavigate } from 'react-router-dom'; // Use useNavigate for redirection
 import axios from 'axios';
 import {API_URL} from "@/constants";
+import {getSubjectFromToken, getAuthorityFromToken} from "@/utils/tokenUtils";
+import TitleBar from "@/components/TitleBar";
 
-function getSubjectFromToken(token) {
-    try {
-        const base64Url = token.split('.')[1]; // Get the payload part of the token
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/'); // Handle URL-safe base64
-        const jsonPayload = decodeURIComponent(
-            atob(base64)
-                .split('')
-                .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-                .join('')
-        );
-
-        const payload = JSON.parse(jsonPayload);
-        return payload.sub; // Return the subject
-    } catch (error) {
-        console.error('Invalid token:', error);
-        return null;
-    }
-}
 
 const HomePage = () => {
     const [events, setEvents] = useState([]);
     const [pets, setPets] = useState([]);
     const [isEventsCollapsed, setIsEventsCollapsed] = useState(false);
     const [emailAddress, setEmailAddress] = useState('');
+    const [authority, setAuthority] = useState('');
     const token = useSelector((state) => state.user.token);
     const navigate = useNavigate(); // Hook for navigation
 
@@ -36,6 +21,7 @@ const HomePage = () => {
         const fetchEmailAddress = async () => {
             try {
                 setEmailAddress(getSubjectFromToken(token));
+                setAuthority(getAuthorityFromToken(token));
             } catch (error) {
                 console.error('Error fetching email address:', error);
             }
@@ -82,10 +68,7 @@ const HomePage = () => {
         setIsEventsCollapsed(!isEventsCollapsed);
     };
 
-    const handleLogout = () => {
-        localStorage.removeItem('token'); // Remove token from local storage
-        navigate('/Login'); // Redirect to login page
-    };
+
 
     const EventCard = ({ event }) => (
         <Card sx={{ width: '100%', height: '20vh' }} elevation={4} key={event.name}>
@@ -119,19 +102,7 @@ const HomePage = () => {
     return (
         <Box sx={{ height: '100vh', width: '100vw', display: 'flex', flexDirection: 'column' }}>
             <Box sx={{ height: '8vh', width: '100vw', backgroundColor: 'primary.main' }}>
-                <Toolbar>
-                    <Typography variant="h6" sx={{ flexGrow: 1 }}>
-                        Pet Adoption
-                    </Typography>
-                    <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'center' }}>
-                        {emailAddress}
-                    </Typography>
-                    <Button color="inherit" component={Link} to="/PetManager">Pet Manager</Button>
-                    <Button color="inherit" component={Link} to="/CreateEvent">Create Event</Button>
-                    <Button color="inherit" component={Link} to="/SearchEngine">Search Engine</Button>
-                    <Button color="inherit" component={Link} to="/Settings">Settings</Button>
-                    <Button color="inherit" onClick={handleLogout}>Log Out</Button>
-                </Toolbar>
+                <TitleBar/>
             </Box>
             <Box sx={{ height: '92vh', display: 'flex', flexDirection: 'row' }}>
                 {!isEventsCollapsed && (

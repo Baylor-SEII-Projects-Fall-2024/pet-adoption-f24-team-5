@@ -12,11 +12,9 @@ import petadoption.api.user.User;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
-import java.util.Date;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class JwtService {
@@ -34,6 +32,12 @@ public class JwtService {
 
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         int tokenTimeLength = 1000  * 60 * 24;
+
+        if (userDetails instanceof User user) {
+            // Add the UserType as the authorities claim
+            extraClaims.put("authorities", user.getUserType().name());
+        }
+
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
@@ -63,7 +67,7 @@ public class JwtService {
         return claimsResolver.apply(claims);
     }
 
-    private Claims extractAllClaims(String token) {
+    public Claims extractAllClaims(String token) {
         return Jwts
                 .parserBuilder()
                 .setSigningKey(getSignInKey())

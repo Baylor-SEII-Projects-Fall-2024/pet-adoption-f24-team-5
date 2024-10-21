@@ -5,6 +5,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import axios from "axios";
 import {API_URL, FRONTEND_URL} from "@/constants";
+import TitleBar from "@/components/TitleBar";
 
 const CreateEvent = () => {
     const [event_name, setEventName] = React.useState('');
@@ -192,15 +193,7 @@ const CreateEvent = () => {
     return (
         <Box sx={{ height: '100vh', width: '100vw', display: 'flex', flexDirection: 'column' }}>
             <Box sx={{ height: '8vh', width: '100vw', backgroundColor: 'primary.main' }}>
-                <Toolbar>
-                    <Typography variant="h6" sx={{ flexGrow: 1 }}>Create Event</Typography>
-                    <Button color="inherit" component={Link} to="/">Home</Button>
-                    <Button color="inherit" component={Link} to="/PetManager">Post Pet</Button>
-                    <Button color="inherit" component={Link} to="/LocalAdoptionCenter">Local Adoption Center</Button>
-                    <Button color="inherit" component={Link} to="/SearchEngine">Search Engine</Button>
-                    <Button color="inherit" component={Link} to="/Settings">Settings</Button>
-                    <Button color="inherit" component={Link} to="/Login">Log Out</Button>
-                </Toolbar>
+                <TitleBar/>
             </Box>
 
             {createEvent && (
