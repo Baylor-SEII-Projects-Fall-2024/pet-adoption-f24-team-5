@@ -6,7 +6,7 @@ const initialState = {
     userType: '',
     age: null,
     phoneNumber: '',
-    token: null, // Add token to the state
+    token: null,
 };
 
 const userSlice = createSlice({
@@ -19,10 +19,10 @@ const userSlice = createSlice({
         clearUser(state) {
             return initialState;
         },
-        setToken(state, action) { // Add action to set token
+        setToken(state, action) {
             state.token = action.payload;
         },
-        clearToken(state) { // Add action to clear token
+        clearToken(state) {
             state.token = null;
         },
     },

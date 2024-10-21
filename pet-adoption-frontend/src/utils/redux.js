@@ -7,6 +7,11 @@ const reducers = combineReducers({
     // Add other reducers here
 });
 
+export const setToken = (token) => ({
+    type: 'SET_TOKEN',
+    payload: token,
+});
+
 export const buildStore = (initialState) => {
     return configureStore({
         preloadedState: initialState,

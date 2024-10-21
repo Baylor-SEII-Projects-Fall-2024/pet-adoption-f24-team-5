@@ -63,31 +63,19 @@ public class UserController {
         }
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        try{
-            User user = userService.loginUser(request.getEmail(), request.getPassword());
-            return new ResponseEntity<>(user, HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
-        }
-    }
-
-    @PostMapping("/initialize")
-    public List<User> initialize() {
-        userService.initialize();
-        return userService.findAllUsers();
-    }
-
-    @PutMapping("/update/User/{id}")
-    public String UpdateUser(@RequestBody User adoptionCenter, @PathVariable Long id) {
-        System.out.println(adoptionCenter.toString());
-        return adoptionCenter.toString();
+    @PutMapping("/update/User")
+    public ResponseEntity<User> UpdateUser(@RequestBody User user, @RequestParam("oldPassword") String oldPassword) {
+        return userService.updateUser(user, oldPassword);
     }
 
     @GetMapping("/getUser")
     public ResponseEntity<?> getUser(@RequestParam("emailAddress") String emailAddress) {
         User user = userService.findUser(emailAddress);
         return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
+    @GetMapping("/getFirstName")
+    public ResponseEntity<String> getFirstName(@RequestParam("emailAddress") String email) {
+        return userService.getFirstName(email);
     }
 }
