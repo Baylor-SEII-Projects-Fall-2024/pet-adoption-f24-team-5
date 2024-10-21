@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import petadoption.api.Event.Event;
 import petadoption.api.user.AdoptionCenter.AdoptionCenter;
 import petadoption.api.user.AdoptionCenter.AdoptionCenterRepository;
@@ -123,10 +124,13 @@ public class UserService {
         return userRepository.findAllAdoptionCenters();
     }
 
-    public Long findIdByEmail(String email) {
+    public ResponseEntity<Long> findIdByEmail(String email) {
         if (email == null || email.isEmpty()) {
-            throw new InvalidArgumentException();
+            throw new IllegalArgumentException("email must be valid");
         }
+        return ResponseEntity.status(HttpStatus.OK).body(userRepository.findIdByEmailAddress(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
+
     }
 
 }
