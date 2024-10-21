@@ -8,10 +8,10 @@ import { useSelector } from 'react-redux';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { PetAdoptionThemeProvider } from '@/utils/theme';
 import { buildStore } from '@/utils/redux';
+
 import '@/styles/globals.css';
 import '@/styles/styled-button.css';
 
-// Dynamically import BrowserRouter to ensure it only runs on the client side
 const BrowserRouter = dynamic(
   () => import('react-router-dom').then((mod) => mod.BrowserRouter),
   { ssr: false }
@@ -26,32 +26,26 @@ import Settings from './settings';
 import LocalAdoptionCenter from './LocalAdoptionCenter';
 import CreateEvent from "@/pages/CreateEvent";
 
-// Initialize Redux
 const reduxStore = buildStore({});
+
+import ProtectedRoute from './protectedRoute'; // Ensure the path is correct
 
 function AppRoutes() {
   const token = useSelector((state) => state.user.token);
 
   return (
     <BrowserRouter>
-      {token ? (
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/Register" element={<Register />} />
-          <Route path="/Login" element={<Login />} />
-          <Route path="/PetManager" element={<PetManager />} />
-          <Route path="/CreateEvent" element={<CreateEvent />} />
-          <Route path="/SearchEngine" element={<SearchEngine />} />
-          <Route path="/Settings" element={<Settings />} />
-          <Route path="/LocalAdoptionCenter" element={<LocalAdoptionCenter />} />
-        </Routes>
-      ) : (
-        <Routes>
-          <Route path="/Register" element={<Register />} />
-          <Route path="/Login" element={<Login />} />
-          <Route path="*" element={<Navigate to="/Login" />} />
-        </Routes>
-      )}
+      <Routes>
+        <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+        <Route path="/Register" element={<Register />} />
+        <Route path="/Login" element={<Login />} />
+        <Route path="/PetManager" element={<ProtectedRoute><PetManager /></ProtectedRoute>} />
+        <Route path="/CreateEvent" element={<ProtectedRoute><CreateEvent /></ProtectedRoute>} />
+        <Route path="/SearchEngine" element={<ProtectedRoute><SearchEngine /></ProtectedRoute>} />
+        <Route path="/Settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+        <Route path="/LocalAdoptionCenter" element={<ProtectedRoute><LocalAdoptionCenter /></ProtectedRoute>} />
+        <Route path="*" element={<Navigate to="/Login" />} />
+      </Routes>
     </BrowserRouter>
   );
 }

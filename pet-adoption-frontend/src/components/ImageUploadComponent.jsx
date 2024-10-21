@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { TextField, Button, LinearProgress, Typography } from '@mui/material';
 import axios from 'axios';
 import { API_URL } from '@/constants';
+import { useSelector } from 'react-redux';
 
 const ImageUploadComponent = ({ onImageUpload }) => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [uploadProgress, setUploadProgress] = useState(0);
     const [previewSrc, setPreviewSrc] = useState(''); // Store preview image
-    const token = localStorage.getItem('token');
+    const token = useSelector((state) => state.user.token);
 
     const handleFileSelect = (event) => {
         const file = event.target.files[0];

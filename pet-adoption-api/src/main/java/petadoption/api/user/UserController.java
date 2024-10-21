@@ -38,16 +38,28 @@ public class UserController {
         }
     }
 
+    @PutMapping("/update/Owner")
+    public ResponseEntity<Owner> updateOwner(@RequestBody Owner user, @RequestParam("oldPassword") String oldPassword) {
+        return userService.updateOwner(user, oldPassword);
+    }
 
-    @PutMapping("/update/User/{id}")
-    public String UpdateUser(@RequestBody User adoptionCenter, @PathVariable Long id) {
-        System.out.println(adoptionCenter.toString());
-        return adoptionCenter.toString();
+    @PutMapping("/update/CenterWorker")
+    public ResponseEntity<CenterWorker> updateCenterWorker(@RequestBody CenterWorker user, @RequestParam("oldPassword") String oldPassword) {
+        return userService.updateCenterWorker(user, oldPassword);
+    }
+
+    @PutMapping("/update/CenterOwner")
+    public ResponseEntity<AdoptionCenter> updateAdoptionCenter(@RequestBody AdoptionCenter user, @RequestParam("oldPassword") String oldPassword) {
+        return userService.updateAdoptionCenter(user, oldPassword);
     }
 
     @GetMapping("/getUser")
     public ResponseEntity<?> getUser(@RequestParam("emailAddress") String emailAddress) {
-        User user = userService.findUser(emailAddress);
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        return new ResponseEntity<>(userService.findUser(emailAddress), HttpStatus.OK);
+    }
+
+    @GetMapping("/getDisplayName")
+    public ResponseEntity<String> getDisplayName(@RequestParam("emailAddress") String email) {
+        return userService.getDisplayName(email);
     }
 }
