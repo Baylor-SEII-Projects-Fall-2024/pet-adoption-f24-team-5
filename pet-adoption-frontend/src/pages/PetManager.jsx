@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react'
+import React, { useEffect } from 'react'
 import {
     Typography,
     Box,
@@ -6,18 +6,18 @@ import {
     Toolbar,
     Stack,
 } from "@mui/material";
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 import axios from 'axios';
 import PetCard from "@/components/PetCard";
 import PetFormComponent from "@/components/PetFormComponent";
-import {API_URL} from "@/constants";
+import { API_URL } from "@/constants";
 import TitleBar from "@/components/TitleBar";
-
+import { useSelector } from 'react-redux';
 const PetManager = () => {
     const [formType, setFormType] = React.useState('');
-    const [pets, setPets] = React.useState( [] );
+    const [pets, setPets] = React.useState([]);
     const [postNewPet, setPostNewPet] = React.useState(false);
-    const token = localStorage.getItem('token');
+    const token = useSelector((state) => state.user.token);
     const [formPet, setFormPet] = React.useState({});
 
     const handleCardClick = (pet) => {
@@ -53,7 +53,7 @@ const PetManager = () => {
     };
 
     useEffect(() => {
-        if(postNewPet === false) {
+        if (postNewPet === false) {
             getAllPets();
             setFormType('');
         }
@@ -63,10 +63,10 @@ const PetManager = () => {
 
 
     return (
-        <Box sx={{height: '100vh', width: '100vw', display: 'flex', flexDirection: 'column'}}>
-            <Box sx={{height: '8vh', width: '100vw', backgroundColor: 'primary.main'}}>
+        <Box sx={{ height: '100vh', width: '100vw', display: 'flex', flexDirection: 'column' }}>
+            <Box sx={{ height: '8vh', width: '100vw', backgroundColor: 'primary.main' }}>
 
-                <TitleBar/>
+                <TitleBar />
             </Box>
 
 
@@ -77,13 +77,13 @@ const PetManager = () => {
 
             {!postNewPet && (
 
-                    <Stack sx={{paddingTop:4}} alignItems='center' gap={5}>
-                        <Button onClick={handlePostNewPet} color='inherit' variant='contaiend'>Post Pet</Button>
-                        {pets.map((pet) => (
-                            <PetCard pet={pet} key={pet.petName} onClick={() => handleCardClick(pet)}/>
-                        ))}
-                    </Stack>)
-                }
+                <Stack sx={{ paddingTop: 4 }} alignItems='center' gap={5}>
+                    <Button onClick={handlePostNewPet} color='inherit' variant='contaiend'>Post Pet</Button>
+                    {pets.map((pet) => (
+                        <PetCard pet={pet} key={pet.petName} onClick={() => handleCardClick(pet)} />
+                    ))}
+                </Stack>)
+            }
 
 
         </Box>

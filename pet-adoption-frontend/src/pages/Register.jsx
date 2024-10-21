@@ -68,7 +68,6 @@ const Register = () => {
             .post(`${API_URL}/api/auth/authenticate`, loginRequest)
             .then((res) => {
                 const { token } = res.data;
-                localStorage.setItem('token', token);
                 dispatch(setToken(token));
                 navigate('/');
             })
