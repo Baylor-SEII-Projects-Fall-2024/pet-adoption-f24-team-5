@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Head from 'next/head';
-import { Button, Card, CardContent, Stack, TextField, Typography, Paper, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import { Button, Card, CardContent, Stack, TextField, Typography, Paper } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { getSubjectFromToken } from '../utils/tokenUtils';
@@ -9,22 +9,18 @@ import TitleBar from "@/components/TitleBar";
 import { useSelector } from 'react-redux';
 
 export default function HomePage() {
-  const [userId, setUserId] = useState('');
-  const [firstName, setFirstName] = useState('');
   const [firstNameLabel, setFirstNameLabel] = useState('');
-  const [lastName, setLastName] = useState('');
   const [lastNameLabel, setLastNameLabel] = useState('');
   const [password, setPassword] = useState('');
   const [passwordLabel, setPasswordLabel] = useState('');
+  const [oldPasswordLabel, setOldPasswordLabel] = useState('');
   const [invalidPassword, setInvalidPassword] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [phoneNumberLabel, setPhoneNumberLabel] = useState('');
   const [invalidPhoneNumber, setInvalidPhoneNumber] = useState(false);
-  //const [userAge, setUserAge] = useState('');
   const [userEmail, setUserEmail] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const token = useSelector((state) => state.user.token);
-
 
   const updatedValuesRef = useRef({});
   const navigate = useNavigate();
@@ -51,7 +47,6 @@ export default function HomePage() {
             }
           });
 
-          setUserId(response.data.id);
           setFirstNameLabel(response.data.firstName);
           updatedValuesRef.current.firstName = response.data.firstName;
           setLastNameLabel(response.data.lastName);
@@ -78,33 +73,18 @@ export default function HomePage() {
   }, [token]);
 
   const handleFirstNameChange = () => {
-    setFirstName(firstNameLabel);
     updatedValuesRef.current.firstName = firstNameLabel;
   };
 
   const handleLastNameChange = () => {
-    setLastName(lastNameLabel);
     updatedValuesRef.current.lastName = lastNameLabel;
   }
 
   const handlePasswordChange = () => {
-    // Getting rid of for now, should work but need to bypass password decryption
-    /*if (oldPassword === oldPasswordLabel){
-      console.log("Making it inside");
-      setPassword(passwordLabel);
-      setOldPassword(passwordLabel);
-      updatedValuesRef.current.password = passwordLabel;
-      setOldPasswordLabel("");
-      handleUserUpdate();
-    }
-    else{
-      setInvalidPassword(true);
-    }*/
-    if (passwordLabel !== "") {
-      setPassword(passwordLabel);
-      updatedValuesRef.current.password = passwordLabel;
-      setPasswordLabel("");
-    }
+    setPassword(passwordLabel);
+    updatedValuesRef.current.password = passwordLabel;
+    updatedValuesRef.current.oldPassword = oldPasswordLabel;
+    handleUserUpdate();
   };
 
   const handlePhoneNumberChange = () => {
@@ -121,30 +101,29 @@ export default function HomePage() {
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     handleFirstNameChange();
     handleLastNameChange();
     handlePasswordChange();
     let invalidInfo = handlePhoneNumberChange();
-    if (!invalidInfo) {
-      handleUserUpdate();
-      setIsEditing(false);
-      console.log("Here");
-    }
-    else {
-      console.log("Here instead");
+    
+    if (!invalidInfo){
+      const updateSuccess = await handleUserUpdate();
+      if (updateSuccess === 0){
+        setInvalidPassword(false);
+        setIsEditing(false);
+        setPasswordLabel("");
+        setOldPasswordLabel("");
+      }
+      else{
+        setInvalidPassword(true);
+      }
     }
   }
 
   const handleEdit = () => {
     setIsEditing(true);
   }
-
-  /*const handleAgeChange = (event) => {
-    setUserAge(event.target.value);
-    updatedValuesRef.current.userAge = event.target.value;
-    handleUserUpdate();
-  };*/
 
   const handleUserUpdate = async () => {
     try {
@@ -156,8 +135,6 @@ export default function HomePage() {
         }
       });
 
-      console.log("Fetched user: " + JSON.stringify(response.data));
-
       const currentUser = response.data;
 
       const updatedUser = {
@@ -168,9 +145,10 @@ export default function HomePage() {
         password: updatedValuesRef.current.password !== null ? updatedValuesRef.current.password : password,
         phoneNumber: updatedValuesRef.current.phoneNumber !== '' ? updatedValuesRef.current.phoneNumber : phoneNumber
       }
-      const updatedUserJson = JSON.stringify(updatedUser, null, 2);
+  
+      const updatedResponse = await axios.put(`${API_URL}/api/users/update/User`, updatedUser, {
+        params: { oldPassword: updatedValuesRef.current.oldPassword},
 
-      const updatedResponse = await axios.put(`${API_URL}/api/users/update/User/${userId}`, updatedUser, {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
@@ -178,11 +156,13 @@ export default function HomePage() {
       });
 
       if (updatedResponse.status !== 200) {
-        throw new Error("Failed to update user data");
+        return 1;
       }
 
       console.log('User updated successfully', updatedResponse.data);
 
+      return 0;
+  
     } catch (error) {
       console.error('Failed to update user', error);
     }
@@ -233,7 +213,7 @@ export default function HomePage() {
               />
             </Stack>
           </Paper>
-          <Paper sx={{ width: 600, height: 50 }} elevation={4}>
+          <Paper sx={{ width: 600, height: invalidPhoneNumber ? 70 : 50 }} elevation={4}>
             <Stack spacing={1} direction="row" alignItems='center'>
               <Typography variant='h5'>Phone Number</Typography>
               <TextField
@@ -246,24 +226,27 @@ export default function HomePage() {
                   readOnly: !isEditing
                 }}
               />
-              {invalidPhoneNumber && (
+            </Stack>
+            {invalidPhoneNumber && (
                 <Typography color="error" variant="body2">
                   Please enter a valid phone number.
                 </Typography>
               )}
-            </Stack>
           </Paper>
-          <Paper sx={{ width: 600, height: 80 }} elevation={4}>
-            {/*<Stack spacing={1} direction="row" alignItems='center'>
+          <Paper sx={{ width: 600, height: invalidPassword ? 120 : 90 }} elevation={4}>
+            <Stack spacing={1} direction="row" alignItems='center'>
               <Typography variant='h5' width={160}>Old Password</Typography>
               <TextField
                 label="Old Password"
                 align='center'
                 value={oldPasswordLabel}
                 onChange={(e) => setOldPasswordLabel(e.target.value)}
-                InputProps={{ style: { height: '40px', width: '420px' } }}
+                InputProps={{ 
+                  style: { height: '40px', width: '425px' },
+                  readOnly: !isEditing
+                }}
               />
-            </Stack>*/}
+            </Stack>
             <Stack spacing={1} direction="row" alignItems='center'>
               <Typography variant='h5'>New Password</Typography>
               <TextField
@@ -284,25 +267,6 @@ export default function HomePage() {
             )}
           </Paper>
           <Button onClick={isEditing ? handleSave : handleEdit}>{isEditing ? 'Save' : 'Edit'}</Button>
-          {/*userType != "CenterOwner" && (<Paper sx={{ width: 600 }} elevation={4}>
-            <Stack direction = "row">
-              <FormControl fullWidth>
-                <InputLabel id="Age">Age</InputLabel>
-                <Select
-                  labelId="Age"
-                  value={userAge}
-                  onChange={handleAgeChange}
-                  displayEmpty
-                >
-                  {[...Array(100).keys()].map((num) => (
-                    <MenuItem key={num + 1} value={num + 1}>
-                      {num + 1}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Stack>
-          </Paper>)*/}
         </Stack>
       </main>
     </>
