@@ -25,6 +25,7 @@ export default function HomePage() {
   const [userType, setUserType] = useState('');
   const [userAge, setUserAge] = useState('');
   const [userEmail, setUserEmail] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
   const token = localStorage.getItem('token');
 
 
@@ -91,13 +92,11 @@ export default function HomePage() {
   const handleFirstNameChange = () => {
     setFirstName(firstNameLabel);
     updatedValuesRef.current.firstName = firstNameLabel;
-    handleUserUpdate();
   };
 
   const handleLastNameChange = () => {
     setLastName(lastNameLabel);
     updatedValuesRef.current.lastName = lastNameLabel;
-    handleUserUpdate();
   }
 
   const handlePasswordChange = () => {
@@ -113,10 +112,11 @@ export default function HomePage() {
     else{
       setInvalidPassword(true);
     }*/
-    setPassword(passwordLabel);
-    updatedValuesRef.current.password = passwordLabel;
-    setPasswordLabel("");
-    handleUserUpdate();
+    if (passwordLabel !== ""){
+      setPassword(passwordLabel);
+      updatedValuesRef.current.password = passwordLabel;
+      setPasswordLabel("");
+    }
   };
 
   const handlePhoneNumberChange = () => {
@@ -128,9 +128,21 @@ export default function HomePage() {
       setInvalidPhoneNumber(false);
       updatedValuesRef.current.phoneNumber = phoneNumberLabel;
       setPhoneNumber(phoneNumberLabel);
-      handleUserUpdate();
     }
   };
+
+  const handleSave = () => {
+    handleFirstNameChange();
+    handleLastNameChange();
+    handlePasswordChange();
+    handlePhoneNumberChange();
+    handleUserUpdate();
+    setIsEditing(false);
+  }
+
+  const handleEdit = () => {
+    setIsEditing(true);
+  }
 
   /*const handleAgeChange = (event) => {
     setUserAge(event.target.value);
@@ -207,9 +219,11 @@ export default function HomePage() {
                 align='center'
                 value={firstNameLabel}
                 onChange={(e) => setFirstNameLabel(e.target.value)}
-                InputProps={{ style: { height: '40px', width: '400px' } }}
+                InputProps={{ 
+                  style: { height: '40px', width: '400px' }, 
+                  readOnly: !isEditing 
+                }}
               />
-              <Button onClick={handleFirstNameChange}>Change</Button>
             </Stack>
           </Paper>
           <Paper sx={{ width: 600, height: 50 }} elevation={4}>
@@ -220,9 +234,11 @@ export default function HomePage() {
                 align='center'
                 value={lastNameLabel}
                 onChange={(e) => setLastNameLabel(e.target.value)}
-                InputProps={{ style: { height: '40px', width: '400px' } }}
+                InputProps={{ 
+                  style: { height: '40px', width: '400px' }, 
+                  readOnly: !isEditing 
+                }}
               />
-              <Button onClick={handleLastNameChange}>Change</Button>
             </Stack>
           </Paper>
           <Paper sx={{ width: 600, height: 50 }} elevation={4}>
@@ -233,14 +249,16 @@ export default function HomePage() {
                 align='center'
                 value={phoneNumberLabel}
                 onChange={(e) => setPhoneNumberLabel(e.target.value)}
-                InputProps={{ style: { height: '40px', width: '300px' } }}
+                InputProps={{ 
+                  style: { height: '40px', width: '300px' }, 
+                  readOnly: !isEditing 
+                }}
               />
               {invalidPhoneNumber && (
                 <Typography color="error" variant="body2">
                   Please enter a valid phone number.
                 </Typography>
               )}
-              <Button onClick={handlePhoneNumberChange}>Change</Button>
             </Stack>
           </Paper>
           <Paper sx={{ width: 600, height: 80 }} elevation={4}>
@@ -261,16 +279,19 @@ export default function HomePage() {
                 align='center'
                 value={passwordLabel}
                 onChange={(e) => setPasswordLabel(e.target.value)}
-                InputProps={{ style: { height: '40px', width: '420px' } }}
+                InputProps={{ 
+                  style: { height: '40px', width: '420px' }, 
+                  readOnly: !isEditing
+                }}
               />
             </Stack>
-            <Button onClick={handlePasswordChange}>Confirm</Button>
             {invalidPassword && (
               <Typography color="error" variant = "body2" sx={{ marginTop: 1}}>
                 Please enter a valid password.
               </Typography>
             )}
           </Paper>
+          <Button onClick={isEditing ? handleSave : handleEdit}>{isEditing ? 'Save' : 'Edit'}</Button>
           {/*userType != "CenterOwner" && (<Paper sx={{ width: 600 }} elevation={4}>
             <Stack direction = "row">
               <FormControl fullWidth>
