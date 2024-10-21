@@ -31,7 +31,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.client.ExpectedCount.times;
 
 @SpringBootTest
-@ActiveProfiles("test")
+@ActiveProfiles("testdb")
 public class AuthenticationServiceTest {
 
     @Autowired
