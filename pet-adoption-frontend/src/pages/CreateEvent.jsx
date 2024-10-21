@@ -22,6 +22,7 @@ const CreateEvent = () => {
     const [selectedEvent, setSelectedEvent] = useState(null);
     const token = localStorage.getItem('token');
     const EventCard = ({ event }) => {
+        console.log("Creating event card...");
         const [day, month, year] = event.event_date.split('/');
         return (
             <Card
@@ -38,13 +39,33 @@ const CreateEvent = () => {
                 elevation={4}
                 key={event.event_id}
                 onClick={() => {
+                    console.log("Setting event...");
                     setSelectedEvent(event);
+                    console.log("Success!");
+
+                    console.log("Setting event name...");
                     setEventName(event.event_name);
+                    console.log("Success!");
+
+                    console.log("Setting center ID...");
                     setCenterID(event.center_id);
-                    setEventDate(event.event_date);
+                    console.log("Success!");
+
+                    console.log("Setting event date...");
+                    setEventDate(handleDateStringToDate(event.event_date));
+                    console.log("Success!");
+
+                    console.log("Setting event time...");
                     setEventTime(event.event_time);
+                    console.log("Success!");
+
+                    console.log("Setting event description...");
                     setEventDescription(event.description);
+                    console.log("Success!");
+
+                    console.log("Setting create event...");
                     setCreateEvent(true);
+                    console.log("Success!");
                 }}
             >
                 <CardContent>
@@ -102,17 +123,60 @@ const CreateEvent = () => {
             handleFetchEvents();
         }
     };
+    const handleDateStringToDate = (dateString) => {
+        console.log("Converting dateString to date...")
+        const [day, month, year] = dateString.split('/');
+        const newDate = new Date(year, month - 1, day);
+        console.log("Original date: " + dateString + " | New date: " + newDate);
+
+        return newDate;
+    }
+    const handleTimeStringToTime = (timeString) => {
+        console.log("Converting timeString to time...");
+        const [hours, minutes] = timeString.split(':');
+        const now = new Date();
+        now.setHours(parseInt(hours, 10));
+        now.setMinutes(parseInt(minutes, 10));
+        console.log("Original time: " + timeString + " | New time: " + now);
+        return now;
+    }
     const handleDateToTimeString = (selectedDate) => {
-        return selectedDate.toLocaleTimeString('en-US', {
+        console.log("Converting date to time string...");
+        // Check if selectedDate is valid before proceeding
+        if (!selectedDate) {
+            console.error("No date provided.");
+            return "Invalid time";
+        }
+
+        // Attempt to convert to Date if not already a Date object
+        const dateObj = selectedDate instanceof Date && !isNaN(selectedDate)
+            ? selectedDate
+            : new Date(selectedDate);
+
+        // Check if the dateObj is valid
+        if (isNaN(dateObj.getTime())) {
+            console.error("Invalid date:", selectedDate);
+            return "Invalid time";
+        }
+
+        console.log("Old date: " + selectedDate + " | New date: " + dateObj.toLocaleTimeString('en-US', {
             hour: '2-digit',
             minute: '2-digit',
             hour12: false,
-        })
-    }
+        }));
+
+        return dateObj.toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false,
+        });
+    };
     const handleDateToString = (selectedDate) => {
+        console.log("Converting date to string...");
         const day = String(selectedDate.getDate()).padStart(2, '0');
         const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
         const year = selectedDate.getFullYear();
+        console.log("Old date: " + selectedDate + " | New date: " + `${day}/${month}/${year}`);
         return `${day}/${month}/${year}`;
     }
     const handleCenterIDStringToInt = (centerID) => {
@@ -151,24 +215,30 @@ const CreateEvent = () => {
                 console.log("Success!");
 
                 console.log("Validating event is >= today date...");
-                if (event.event_date < handleDateToString(new Date())) { // is passed date greater than today
+                if (handleDateStringToDate(event.event_date) < new Date()) {
                     console.log("event.event_date is before today");
                     return false;
                 }
                 console.log("Success!");
 
                 console.log("Validating event time is after current time...")
-                if (event.event_time < handleDateToTimeString(new Date())) {
-                    console.log("event.event_time is before current time");
-                    return false;
+                if (handleDateStringToDate(event.event_date) === new Date()) {
+                    console.log("Event is today...");
+                    if (handleTimeStringToTime(event.event_time) <
+                        handleTimeStringToTime(handleDateToTimeString(new Date()))) {
+                        console.log("event.event_time is before current time");
+                        return false;
+                    }
                 }
-                console.log("Success!")
+                console.log("Success!");
 
                 console.log("Returning event validation");
                 return true;
             });
 
-            const sortedEvents = filteredEvents.sort((a, b) => {return a.event_date - b.event_date;});
+            const sortedEvents = filteredEvents.sort((a, b) => {
+                return handleDateStringToDate(a.event_date) - handleDateStringToDate(b.event_date);
+            });
 
             setEvents(sortedEvents); // list of events that occur after current date and time
             setNoFutureEvents(sortedEvents.length === 0); // if no events, none will be displayed
