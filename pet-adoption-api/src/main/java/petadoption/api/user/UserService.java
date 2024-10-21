@@ -89,4 +89,10 @@ public class UserService {
         return userRepository.findAllAdoptionCenters();
     }
 
+    public Long findIdByEmail(String email) {
+        if (email == null || email.isEmpty()) {
+            throw new InvalidArgumentException();
+        }
+    }
+
 }
