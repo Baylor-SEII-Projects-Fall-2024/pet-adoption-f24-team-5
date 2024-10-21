@@ -3,9 +3,12 @@ import {Link, useNavigate} from "react-router-dom";
 import React, {useEffect, useState} from "react";
 import {getAuthorityFromToken, getSubjectFromToken} from "@/utils/tokenUtils";
 import {useSelector} from "react-redux";
+import { API_URL } from "../constants";
+import axios from 'axios';
 
 const TitleBar = () => {
     const [emailAddress, setEmailAddress] = useState('');
+    const [firstName, setFirstName] = useState('');
     const [authority, setAuthority] = useState('');
     const token = useSelector((state) => state.user.token);
     const navigate = useNavigate(); // Hook for navigation
@@ -22,6 +25,27 @@ const TitleBar = () => {
 
         fetchEmailAddress();
     }, []);
+
+    useEffect(() => {
+        const fetchFirstName = async () => {
+            try{
+                console.log("Email: " + emailAddress);
+                const response = await axios.get(`${API_URL}/api/users/getFirstName`, {
+                    params: {emailAddress: emailAddress},
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    }
+                });
+                setFirstName(response.data);
+            }
+            catch (error) {
+                console.error("Error fetching first name: ", error);
+            }
+        }
+
+        fetchFirstName();
+    }, [emailAddress])
 
     const handleLogout = () => {
         localStorage.removeItem('token'); // Remove token from local storage
@@ -40,8 +64,8 @@ const TitleBar = () => {
                 <Typography variant="h6" sx={{ flexGrow: 1 }}>
                     <Button color="inherit" component={Link} to="/">DogPile Solutions</Button>
                 </Typography>
-                <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'center' }}>
-                    Welcome {emailAddress}
+                <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'left' }}>
+                    Welcome {firstName}
                 </Typography>
 
                 {(authority === 'CenterOwner' || authority === 'CenterWorker') && (

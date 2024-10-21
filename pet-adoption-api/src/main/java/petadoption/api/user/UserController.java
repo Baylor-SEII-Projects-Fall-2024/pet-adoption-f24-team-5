@@ -38,16 +38,19 @@ public class UserController {
         }
     }
 
-
-    @PutMapping("/update/User/{id}")
-    public String UpdateUser(@RequestBody User adoptionCenter, @PathVariable Long id) {
-        System.out.println(adoptionCenter.toString());
-        return adoptionCenter.toString();
+    @PutMapping("/update/User")
+    public ResponseEntity<User> UpdateUser(@RequestBody User user, @RequestParam("oldPassword") String oldPassword) {
+        return userService.updateUser(user, oldPassword);
     }
 
     @GetMapping("/getUser")
     public ResponseEntity<?> getUser(@RequestParam("emailAddress") String emailAddress) {
         User user = userService.findUser(emailAddress);
         return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
+    @GetMapping("/getFirstName")
+    public ResponseEntity<String> getFirstName(@RequestParam("emailAddress") String email) {
+        return userService.getFirstName(email);
     }
 }
