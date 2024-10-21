@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { getSubjectFromToken } from '../utils/tokenUtils';
 import {API_URL, FRONTEND_URL} from "@/constants";
+import TitleBar from "@/components/TitleBar";
 
 export default function HomePage() {
   const [userId, setUserId] = useState('');
@@ -189,8 +190,10 @@ export default function HomePage() {
   return (
     <>
       <Head>
-        <title>Home Page</title>
+        <title>Settings Page</title>
       </Head>
+
+      <TitleBar/>
 
       <main>
         <Stack sx={{ paddingTop: 4 }} alignItems='center' gap={2}>
