@@ -103,25 +103,25 @@ const CreateEvent = () => {
         const formattedDate = formatDate(event_date); // Format event_date as dd/MM/yyyy
         const parsedCenterID = parseInt(center_id, 10);
 
-
         // Validate required fields
         if (!event_name || isNaN(parsedCenterID) || !description) {
             alert("Please fill out all fields correctly.");
             return;
         }
-        setEventTime(event_date.toLocaleTimeString('en-US', {
+
+        const formattedTime = event_date.toLocaleTimeString('en-US', {
             hour: '2-digit',
             minute: '2-digit',
-            hour12: true,
-        }))
+            hour12: false,
+        });
+
         const eventData = {
             center_id: parsedCenterID,
             event_name,
             event_date: formattedDate, // Send formatted date
-            event_time,
+            event_time: formattedTime,
             description,
         };
-
 
         console.log('Event Data', eventData);
 
@@ -173,7 +173,7 @@ const CreateEvent = () => {
                     setSelectedEvent(event);
                     setEventName(event.event_name);
                     setCenterID(event.center_id);
-                    setEventDate(event.event_date);
+                    setEventDate(parseEventDate(event.event_date)); // Parse the event date correctly
                     setEventTime(event.event_time);
                     setDescription(event.description);
                     setCreateEvent(true);
@@ -183,7 +183,9 @@ const CreateEvent = () => {
                     <Typography variant='h5' align='center'>{event.event_name || "Unnamed Event"}</Typography>
                     <Typography variant='body1' align='center'>{event.description}</Typography>
                     <Typography variant='body2' align='center'>{`${day}/${month}/${year}`}</Typography>
-                    <Typography variant='body2' align='center' color="textSecondary"> {`Time: ${event.event_time || "N/A"}`}</Typography>
+                    <Typography variant='body2' align='center' color="textSecondary">
+                        {`Time: ${event.event_time ? event.event_time : "N/A"}`}
+                    </Typography>
                 </CardContent>
             </Card>
         );
@@ -224,7 +226,9 @@ const CreateEvent = () => {
                             customInput={<TextField label="Event Date" fullWidth />}
                         />
                         <TextField label="Description" value={description} onChange={(e) => setDescription(e.target.value)} required fullWidth />
-                        <Button type="submit" variant='contained'>{selectedEvent ? 'Update Event' : 'Post Event'}</Button>
+                        <Button type="submit" variant='contained' disabled={!event_name || !center_id || !description}>
+                            {selectedEvent ? 'Update Event' : 'Post Event'}
+                        </Button>
                     </Stack>
                 </Box>
             )}
