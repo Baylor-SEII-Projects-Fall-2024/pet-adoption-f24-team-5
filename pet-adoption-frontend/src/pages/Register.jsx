@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { Button, Stack } from "@mui/material";
+import {
+    Button, TextField, Stack, Typography, Box, Grid, MenuItem, InputAdornment
+} from '@mui/material';
+import { Email, Lock, Phone } from '@mui/icons-material'; // Import icons for fields
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { TextField } from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate
-import MenuItem from '@mui/material/MenuItem';
-import { Box, Typography } from '@mui/material';
-import { useDispatch } from 'react-redux'; // Import useDispatch
+import { useDispatch } from 'react-redux';
 import { setToken } from '../utils/userSlice';
-import {API_URL} from "@/constants";
+import { API_URL } from "@/constants";
 
 const Register = () => {
     const [emailAddress, setEmailAddress] = useState('');
@@ -22,8 +22,8 @@ const Register = () => {
     const [centerZip, setCenterZip] = useState('');
     const [numberOfPets, setNumberOfPets] = useState('');
 
-    const dispatch = useDispatch(); // Initialize dispatch
-    const navigate = useNavigate(); // Initialize useNavigate
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -50,11 +50,9 @@ const Register = () => {
             ? `${API_URL}/api/auth/register/adoption-center`
             : `${API_URL}/api/auth/register/owner`;
 
-
         axios
-            .post( url, registrationData)
+            .post(url, registrationData)
             .then(() => {
-                // After registration, call loginUser to log in the user
                 loginUser();
             })
             .catch((err) => {
@@ -67,17 +65,12 @@ const Register = () => {
         const loginRequest = { emailAddress, password };
 
         axios
-            .post(`${API_URL}/api/auth/authenticate`, loginRequest, {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            })
+            .post(`${API_URL}/api/auth/authenticate`, loginRequest)
             .then((res) => {
                 const { token } = res.data;
-                localStorage.setItem('token', token); // Store the token
-                dispatch(setToken(token)); // Dispatch the setToken action to update Redux state
-                alert('Registration and login successful!');
-                navigate('/'); // Redirect to the home page or dashboard
+                localStorage.setItem('token', token);
+                dispatch(setToken(token));
+                navigate('/');
             })
             .catch((err) => {
                 console.error('An error occurred during login:', err);
@@ -86,122 +79,178 @@ const Register = () => {
     };
 
     return (
-        <Box>
-            <Typography variant="h4" component="h1" gutterBottom>
-                Register
-            </Typography>
-            <Box component="form" onSubmit={handleSubmit}>
-                <Stack spacing={2}>
-                    <TextField
-                        select
-                        label="User Type"
-                        value={userType}
-                        onChange={(e) => setUserType(e.target.value)}
-                        required
-                        fullWidth
-                    >
-                        <MenuItem value="owner">Adoption Center</MenuItem>
-                        <MenuItem value="user">Pet Owner</MenuItem>
-                    </TextField>
-                    <TextField
-                        label="Email"
-                        type="email"
-                        value={emailAddress}
-                        onChange={(e) => setEmailAddress(e.target.value)}
-                        required
-                        fullWidth
-                    />
-                    <TextField
-                        label="Password"
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                        fullWidth
-                    />
-                    <TextField
-                        label="Phone Number"
-                        type="tel"
-                        value={phoneNumber}
-                        onChange={(e) => setPhoneNumber(e.target.value)}
-                        required
-                        fullWidth
-                    />
-                    {userType === 'owner' && (
+        <Box
+            sx={{
+                height: '100vh',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'linear-gradient(135deg, #4b6cb7 30%, #182848 90%)',
+                overflow: 'auto', // Enable scrolling when content overflows
+            }}
+        >
+            <Box
+                sx={{
+                    width: '400px',
+                    maxHeight: '90vh', // Restrict height to prevent overflow
+                    overflowY: 'auto', // Add vertical scroll if content exceeds height
+                    backgroundColor: 'white',
+                    borderRadius: '12px',
+                    boxShadow: '0px 0px 15px rgba(0, 0, 0, 0.1)',
+                    padding: 4,
+                    textAlign: 'center',
+                }}
+            >
+                <Typography variant="h4" gutterBottom>
+                    Register
+                </Typography>
+
+                <form onSubmit={handleSubmit}>
+                    <Stack spacing={2}>
                         <TextField
-                            label="Adoption Center Name"
-                            type="text"
-                            value={centerName}
-                            onChange={(e) => setCenterName(e.target.value)}
+                            select
+                            label="User Type"
+                            value={userType}
+                            onChange={(e) => setUserType(e.target.value)}
                             required
                             fullWidth
-                        />
-                    )}
-                    {userType === 'owner' && (
+                        >
+                            <MenuItem value="owner">Adoption Center</MenuItem>
+                            <MenuItem value="user">Pet Owner</MenuItem>
+                        </TextField>
+
                         <TextField
-                            label="Address"
-                            type="text"
-                            value={centerAddress}
-                            onChange={(e) => setCenterAddress(e.target.value)}
+                            label="Email"
+                            type="email"
+                            value={emailAddress}
+                            onChange={(e) => setEmailAddress(e.target.value)}
                             required
                             fullWidth
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <Email />
+                                    </InputAdornment>
+                                ),
+                            }}
                         />
-                    )}
-                    {userType === 'owner' && (
+
                         <TextField
-                            label="City"
-                            type="text"
-                            value={centerCity}
-                            onChange={(e) => setCenterCity(e.target.value)}
+                            label="Password"
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                             required
                             fullWidth
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <Lock />
+                                    </InputAdornment>
+                                ),
+                            }}
                         />
-                    )}
-                    {userType === 'owner' && (
+
                         <TextField
-                            label="State"
-                            type="text"
-                            value={centerState}
-                            onChange={(e) => setCenterState(e.target.value)}
+                            label="Phone Number"
+                            type="tel"
+                            value={phoneNumber}
+                            onChange={(e) => setPhoneNumber(e.target.value)}
                             required
                             fullWidth
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <Phone />
+                                    </InputAdornment>
+                                ),
+                            }}
                         />
-                    )}
-                    {userType === 'owner' && (
-                        <TextField
-                            label="Zip Code"
-                            type="text"
-                            value={centerZip}
-                            onChange={(e) => setCenterZip(e.target.value)}
-                            required
+
+                        {userType === 'owner' && (
+                            <>
+                                <TextField
+                                    label="Adoption Center Name"
+                                    value={centerName}
+                                    onChange={(e) => setCenterName(e.target.value)}
+                                    required
+                                    fullWidth
+                                />
+                                <TextField
+                                    label="Address"
+                                    value={centerAddress}
+                                    onChange={(e) => setCenterAddress(e.target.value)}
+                                    required
+                                    fullWidth
+                                />
+                                <TextField
+                                    label="City"
+                                    value={centerCity}
+                                    onChange={(e) => setCenterCity(e.target.value)}
+                                    required
+                                    fullWidth
+                                />
+                                <TextField
+                                    label="State"
+                                    value={centerState}
+                                    onChange={(e) => setCenterState(e.target.value)}
+                                    required
+                                    fullWidth
+                                />
+                                <TextField
+                                    label="Zip Code"
+                                    value={centerZip}
+                                    onChange={(e) => setCenterZip(e.target.value)}
+                                    required
+                                    fullWidth
+                                />
+                                <TextField
+                                    label="Center Pet Count"
+                                    type="number"
+                                    value={numberOfPets}
+                                    onChange={(e) => setNumberOfPets(e.target.value)}
+                                    required
+                                    fullWidth
+                                />
+                            </>
+                        )}
+
+                        {userType === 'user' && (
+                            <TextField
+                                label="Age"
+                                type="number"
+                                value={age}
+                                onChange={(e) => setAge(e.target.value)}
+                                required
+                                fullWidth
+                            />
+                        )}
+
+                        <Button
+                            type="submit"
+                            variant="contained"
                             fullWidth
-                        />
-                    )}
-                    {userType === 'owner' && (
-                        <TextField
-                            label="Center Pet Count"
-                            type="number"
-                            value={numberOfPets}
-                            onChange={(e) => setNumberOfPets(e.target.value)}
-                            required
-                            fullWidth
-                        />
-                    )}
-                    {userType === 'user' && (
-                        <TextField
-                            label="Age"
-                            type="number"
-                            value={age}
-                            onChange={(e) => setAge(e.target.value)}
-                            required
-                            fullWidth
-                        />
-                    )}
-                </Stack>
-                <Stack direction="row" spacing={2} mt={2}>
-                    <Button variant="contained" component={Link} to="/Login">Login</Button>
-                    <Button type="submit" variant="contained">Register</Button>
-                </Stack>
+                            sx={{
+                                background: 'linear-gradient(90deg, #43cea2, #185a9d)',
+                                color: 'white',
+                                borderRadius: '50px',
+                                padding: '10px 0',
+                                '&:hover': {
+                                    background: 'linear-gradient(90deg, #185a9d, #43cea2)',
+                                },
+                            }}
+                        >
+                            Register
+                        </Button>
+                    </Stack>
+                </form>
+
+                <Typography variant="body2" marginTop={2}>
+                    Already have an account?{' '}
+                    <Link to="/login" style={{ color: '#43cea2', textDecoration: 'none' }}>
+                        Login
+                    </Link>
+                </Typography>
             </Box>
         </Box>
     );

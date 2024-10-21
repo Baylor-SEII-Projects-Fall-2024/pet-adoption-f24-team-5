@@ -28,7 +28,14 @@ const TitleBar = () => {
         navigate('/Login'); // Redirect to login page
     };
     return (
-        <AppBar position="static" color="primary"> {}
+        <AppBar
+            position="static"
+            sx={{
+                background: 'linear-gradient(135deg, #4b6cb7 30%, #182848 90%)',
+                boxShadow: 'none',
+            }}
+        > {}
+
             <Toolbar>
                 <Typography variant="h6" sx={{ flexGrow: 1 }}>
                     <Button color="inherit" component={Link} to="/">DogPile Solutions</Button>
