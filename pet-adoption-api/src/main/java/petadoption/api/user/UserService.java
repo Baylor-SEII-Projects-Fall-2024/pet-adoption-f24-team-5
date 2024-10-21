@@ -57,6 +57,14 @@ public class UserService {
         return new ResponseEntity<>(userRepository.save(newUser), HttpStatus.OK);
     }
 
+    public ResponseEntity<String> getFirstName(String email) {
+        String firstName = userRepository.findByEmailAddress(email).get().getFirstName();
+        if (firstName == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(firstName, HttpStatus.OK);
+    }
+
     public void deleteUser(Long userId) {
         userRepository.deleteById(userId);
     }

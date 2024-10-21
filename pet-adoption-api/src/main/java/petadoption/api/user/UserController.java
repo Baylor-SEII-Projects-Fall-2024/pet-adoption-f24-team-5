@@ -38,7 +38,6 @@ public class UserController {
         }
     }
 
-
     @PutMapping("/update/User")
     public ResponseEntity<User> UpdateUser(@RequestBody User user, @RequestParam("oldPassword") String oldPassword) {
         return userService.updateUser(user, oldPassword);
@@ -48,5 +47,10 @@ public class UserController {
     public ResponseEntity<?> getUser(@RequestParam("emailAddress") String emailAddress) {
         User user = userService.findUser(emailAddress);
         return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
+    @GetMapping("/getFirstName")
+    public ResponseEntity<String> getFirstName(@RequestParam("emailAddress") String email) {
+        return userService.getFirstName(email);
     }
 }
