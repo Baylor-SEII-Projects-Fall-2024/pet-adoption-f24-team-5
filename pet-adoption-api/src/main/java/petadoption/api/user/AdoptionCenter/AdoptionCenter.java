@@ -35,9 +35,9 @@ public class AdoptionCenter extends User {
     public AdoptionCenter() {
     }
 
-    public AdoptionCenter(String emailAddress, String password, UserType userType, String phoneNumber,
+    public AdoptionCenter(String firstName, String lastName, String emailAddress, String password, UserType userType, String phoneNumber,
                           String centerName, String centerAddress, String centerCity, String centerState, String centerZip, int numberOfPets) {
-        super(emailAddress, password, userType, phoneNumber);
+        super(firstName, lastName, emailAddress, password, userType, phoneNumber);
         this.centerName = centerName;
         this.centerAddress = centerAddress;
         this.centerCity = centerCity;
@@ -46,9 +46,9 @@ public class AdoptionCenter extends User {
         this.numberOfPets = numberOfPets;
     }
 
-    public AdoptionCenter(Long id, String emailAddress, String password, UserType userType, String phoneNumber,
+    public AdoptionCenter(Long id, String firstName, String lastName, String emailAddress, String password, UserType userType, String phoneNumber,
                           String centerName, String centerAddress, String centerCity, String centerState, String centerZip, int numberOfPets) {
-        super(id, emailAddress, password, userType, phoneNumber);
+        super(id, firstName, lastName, emailAddress, password, userType, phoneNumber);
         this.id = id;
         this.centerName = centerName;
         this.centerAddress = centerAddress;
@@ -58,3 +58,6 @@ public class AdoptionCenter extends User {
         this.numberOfPets = numberOfPets;
     }
 }
+
+
+

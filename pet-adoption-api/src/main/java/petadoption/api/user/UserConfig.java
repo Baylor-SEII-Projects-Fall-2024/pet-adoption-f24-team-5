@@ -23,6 +23,8 @@ public class UserConfig {
     CommandLineRunner commandLineRunner(AuthenticationController authenticationController, CenterWorkerRepository centerWorkerRepository, OwnerRepository ownerRepository, AdoptionCenterRepository adoptionCenterRepository, UserRepository userRepository) {
         return args -> {
             CenterWorker user1 = new CenterWorker(
+                    "Peter",
+                    "Whitcomb",
                     "peter727@gmail.com",
                     "password",
                     UserType.CenterWorker,
@@ -32,6 +34,8 @@ public class UserConfig {
             );
 
             CenterWorker user2 = new CenterWorker(
+                    "Ben",
+                    "Szabo",
                     "ben@gmail.com",
                     "password2",
                     UserType.CenterWorker,
@@ -41,6 +45,8 @@ public class UserConfig {
             );
 
             Owner user3 = new Owner(
+                    "Jackson",
+                    "Henry",
                     "Jackson@gmail.com",
                     "password3",
                     UserType.Owner,
@@ -49,6 +55,8 @@ public class UserConfig {
             );
 
             AdoptionCenter adoptionCenter1 = new AdoptionCenter(
+                    "Andrew",
+                    "Parks",
                     "Andrew@gmail.com",
                     "password4",
                     UserType.CenterOwner,

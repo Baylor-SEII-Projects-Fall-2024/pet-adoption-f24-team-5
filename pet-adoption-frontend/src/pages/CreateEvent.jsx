@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { Card, CardContent, Typography, Box, Button, Toolbar, Stack, TextField } from "@mui/material";
 import { Link } from "react-router-dom";
 import DatePicker from "react-datepicker";
@@ -6,14 +6,15 @@ import "react-datepicker/dist/react-datepicker.css";
 import axios from "axios";
 
 const CreateEvent = () => {
-    const [event_name, setEventName] = useState('');
-    const [center_id, setCenterID] = useState('');
-    const [event_date, setEventDate] = useState(new Date()); // Initialize as Date object
-    const [description, setDescription] = useState('');
-    const [createEvent, setCreateEvent] = useState(false);
-    const [events, setEvents] = useState([]);
-    const [noFutureEvents, setNoFutureEvents] = useState(false);
-    const [selectedEvent, setSelectedEvent] = useState(null);
+    const [event_name, setEventName] = React.useState('');
+    const [center_id, setCenterID] = React.useState('');
+    const [event_date, setEventDate] = React.useState(new Date()); // LocalDate as Date object for ease
+    const [event_time , setEventTime] = React.useState('');
+    const [description, setDescription] = React.useState('');
+    const [createEvent, setCreateEvent] = React.useState(false);
+    const [events, setEvents] = React.useState([]);
+    const [noFutureEvents, setNoFutureEvents] = React.useState(false);
+    const [selectedEvent, setSelectedEvent] = React.useState(null);
     const token = localStorage.getItem('token');
 
     const formatDate = (date) => {
@@ -26,8 +27,12 @@ const CreateEvent = () => {
     const fetchEvents = async () => {
         try {
             const response = await axios.get('http://localhost:8080/api/events', {
-                headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
+                headers: {
+                    Authorization: `Bearer ${token}`, // Pass token in the header
+                    'Content-Type': 'application/json'
+                }
             });
+            console.log("Fetched Events:", response.data);
 
             const now = new Date();
             const parseEventDate = (dateString) => {
@@ -37,6 +42,7 @@ const CreateEvent = () => {
 
             const filteredEvents = response.data.filter((event) => {
                 if (!event.event_date) return false;
+
                 const eventDate = parseEventDate(event.event_date);
                 return eventDate >= now;
             });
@@ -74,15 +80,18 @@ const CreateEvent = () => {
 
         const url = `http://localhost:8080/api/events/delete_event/${selectedEvent.event_id}`;
         try {
-            await axios.delete(url, {
-                headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
+            const response = await axios.delete(url, {
+                headers: {
+                    Authorization: `Bearer ${token}`, // Pass token in the header
+                    'Content-Type': 'application/json'
+                }
             });
             alert('Event deleted.');
-            fetchEvents();
-            resetForm();
-            setCreateEvent(false);
+            fetchEvents(); // Refresh the events list after deletion
+            resetForm(); // Reset the form fields and selected event
+            setCreateEvent(false); // Close the create/edit view if open
         } catch (error) {
-            console.error('Error deleting event:', error);
+            console.error('Error: could not delete event:', error);
             alert('Error: could not delete event');
         }
     };
@@ -90,43 +99,49 @@ const CreateEvent = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        const formattedDate = formatDate(event_date);
+        const formattedDate = formatDate(event_date); // Format event_date as dd/MM/yyyy
         const parsedCenterID = parseInt(center_id, 10);
 
+
+        // Validate required fields
         if (!event_name || isNaN(parsedCenterID) || !description) {
             alert("Please fill out all fields correctly.");
             return;
         }
-
-        const formattedTime = event_date.toLocaleTimeString('en-US', {
+        setEventTime(event_date.toLocaleTimeString('en-US', {
             hour: '2-digit',
             minute: '2-digit',
-            hour12: false,  // Use 24-hour format to match "HH:mm" pattern
-        });
-
+            hour12: true,
+        }))
         const eventData = {
             center_id: parsedCenterID,
             event_name,
-            event_date: formattedDate,
-            event_time: formattedTime,
+            event_date: formattedDate, // Send formatted date
+            event_time,
             description,
         };
+
+
+        console.log('Event Data', eventData);
 
         const url = selectedEvent
             ? `http://localhost:8080/api/events/update_event/${selectedEvent.event_id}`
             : 'http://localhost:8080/api/events/create_event';
 
         try {
-            await (selectedEvent ? axios.put : axios.post)(url, eventData, {
-                headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
+            const response = await (selectedEvent ? axios.put : axios.post)(url, eventData, {
+                headers: {
+                    Authorization: `Bearer ${token}`, // Pass token in the header
+                    'Content-Type': 'application/json'
+                }
             });
-            alert(selectedEvent ? 'Event updated.' : 'Event created.');
+            alert(selectedEvent ? 'Event updated.' : `Event created. Event ID is: ${response.data}`);
             fetchEvents();
             resetForm();
             setCreateEvent(false);
         } catch (error) {
-            console.error('Error registering event:', error.response?.data || error.message);
-            alert(`Error: ${error.response?.data?.message || 'could not register event'}`);
+            console.error('Error: could not register event:', error);
+            alert('Error: could not register event');
         }
     };
 
@@ -142,12 +157,14 @@ const CreateEvent = () => {
         return (
             <Card
                 sx={{
-                    flexBasis: '45%',
+                    flexBasis: '45%', // Takes about half the row space
                     flexGrow: 1,
-                    maxWidth: '600px',
+                    maxWidth: '600px', // Controls maximum card width
                     backgroundColor: 'white',
                     transition: 'border 0.3s',
-                    '&:hover': { border: '2px solid blue' },
+                    '&:hover': {
+                        border: '2px solid blue',
+                    },
                 }}
                 elevation={4}
                 key={event.event_id}
@@ -155,7 +172,8 @@ const CreateEvent = () => {
                     setSelectedEvent(event);
                     setEventName(event.event_name);
                     setCenterID(event.center_id);
-                    setEventDate(eventDate); // Set as Date object for DatePicker
+                    setEventDate(event.event_date);
+                    setEventTime(event.event_time);
                     setDescription(event.description);
                     setCreateEvent(true);
                 }}
@@ -187,8 +205,15 @@ const CreateEvent = () => {
             {createEvent && (
                 <Box component="form" onSubmit={handleSubmit}>
                     <Button onClick={handleCreateEvent} variant='contained'>Back to Events</Button>
+
+                    {/* Render Delete Button only if an event is selected */}
                     {selectedEvent && (
-                        <Button onClick={handleDelete} color="error" variant='contained' sx={{ marginLeft: 2 }}>
+                        <Button
+                            onClick={handleDelete}
+                            color="error"
+                            variant='contained'
+                            sx={{ marginLeft: 2 }}
+                        >
                             Delete Event
                         </Button>
                     )}

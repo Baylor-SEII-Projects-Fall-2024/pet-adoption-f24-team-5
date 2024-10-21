@@ -1,0 +1,64 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Google Cloud SDK Repository
+      run: |
+        sudo apt-get update
+        sudo apt-get install apt-transport-https ca-certificates gnupg curl
+        curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
+        echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+        sudo apt-get update && sudo apt-get install google-cloud-cli
+    
+    - name: Install gke-gcloud-auth-plugin
+      run: |
+        sudo apt-get install -y google-cloud-sdk-gke-gcloud-auth-plugin
+
+    - name: Authenticate with Google Cloud
+      uses: google-github-actions/auth@v1
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+    - name: Set up Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+      with:
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+        
+    - name: Authenticate Docker with GCP
+      run: |
+        gcloud auth configure-docker us-south1-docker.pkg.dev
+
+    - name: Build and Push Frontend Image
+      run: |
+        
+        docker build --no-cache -f "docker/pet-adoption-frontend.Dockerfile" -t  ${{ secrets.FRONTEND_IMAGE }}:latest .
+        docker push ${{ secrets.FRONTEND_IMAGE }}:latest
+
+    - name: Build and Push Backend Image
+      run: |
+        docker build --no-cache -f "docker/pet-adoption-api.Dockerfile" -t${{ secrets.BACKEND_IMAGE }}:latest  .
+        docker push ${{ secrets.BACKEND_IMAGE }}
+
+    - name: Get GKE Cluster Credentials
+      run: |
+        gcloud container clusters get-credentials ${{ secrets.GCP_CLUSTER_NAME }} --zone us-central1
+
+    - name: Apply Kubernetes Configs
+      run: |
+        kubectl delete pods -l app=spring-backend
+        kubectl delete pods -l app=react-frontend
+#        kubectl apply -f pet-adoption-api/mysql-deployment.yaml
+#        kubectl apply -f pet-adoption-frontend/frontend-deployment.yaml
+#        kubectl apply -f pet-adoption-api/backend-deployment.yaml
+

@@ -1,5 +1,6 @@
 package petadoption.api.user;
 
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +14,6 @@ import java.util.List;
 
 @RequestMapping("/api/users")
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
     @Autowired
     private final UserService userService;
@@ -38,7 +38,6 @@ public class UserController {
         }
     }
 
-
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try{
@@ -49,5 +48,21 @@ public class UserController {
         }
     }
 
+    @PostMapping("/initialize")
+    public List<User> initialize() {
+        userService.initialize();
+        return userService.findAllUsers();
+    }
 
+    @PutMapping("/update/User/{id}")
+    public String UpdateUser(@RequestBody User adoptionCenter, @PathVariable Long id) {
+        System.out.println(adoptionCenter.toString());
+        return adoptionCenter.toString();
+    }
+
+    @GetMapping("/getUser")
+    public ResponseEntity<?> getUser(@RequestParam("emailAddress") String emailAddress) {
+        User user = userService.findUser(emailAddress);
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
 }

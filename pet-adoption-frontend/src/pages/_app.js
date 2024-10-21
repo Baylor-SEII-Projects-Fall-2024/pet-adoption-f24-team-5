@@ -20,7 +20,7 @@ const BrowserRouter = dynamic(
 import HomePage from './home';
 import Register from './Register';
 import Login from './Login';
-import PostPet from './PostPet';
+import PetManager from './PetManager';
 import SearchEngine from './SearchEngine';
 import Settings from './settings';
 import LocalAdoptionCenter from './LocalAdoptionCenter';
@@ -39,7 +39,7 @@ function AppRoutes() {
           <Route path="/" element={<HomePage />} />
           <Route path="/Register" element={<Register />} />
           <Route path="/Login" element={<Login />} />
-          <Route path="/PostPet" element={<PostPet />} />
+          <Route path="/PetManager" element={<PetManager />} />
           <Route path="/CreateEvent" element={<CreateEvent />} />
           <Route path="/SearchEngine" element={<SearchEngine />} />
           <Route path="/Settings" element={<Settings />} />

@@ -36,3 +36,11 @@ public class SecurityConfiguration {
         return http.build();
     }
 }
+
+/*
+// Restricted endpoints based on authorities
+    .requestMatchers("/api/owner/**").hasAuthority("Owner")
+    .requestMatchers("/api/center-worker/**").hasAuthority("CenterWorker")
+    .requestMatchers("/api/center-owner/**").hasAuthority("CenterOwner")
+    .requestMatchers("/api/admin/**").hasAuthority("Admin")
+ */
