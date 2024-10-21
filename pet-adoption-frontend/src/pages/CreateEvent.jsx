@@ -1,23 +1,24 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, Typography, Box, Button, Toolbar, Stack, TextField } from "@mui/material";
 import { Link } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import axios from "axios";
-import {API_URL, FRONTEND_URL} from "@/constants";
+import { API_URL } from "@/constants";
+import { useSelector } from 'react-redux';
 import TitleBar from "@/components/TitleBar";
 
 const CreateEvent = () => {
     const [event_name, setEventName] = React.useState('');
     const [center_id, setCenterID] = React.useState('');
     const [event_date, setEventDate] = React.useState(new Date()); // LocalDate as Date object for ease
-    const [event_time , setEventTime] = React.useState('');
+    const [event_time, setEventTime] = React.useState('');
     const [description, setDescription] = React.useState('');
     const [createEvent, setCreateEvent] = React.useState(false);
     const [events, setEvents] = React.useState([]);
     const [noFutureEvents, setNoFutureEvents] = React.useState(false);
     const [selectedEvent, setSelectedEvent] = React.useState(null);
-    const token = localStorage.getItem('token');
+    const token = useSelector((state) => state.user.token);
 
     const formatDate = (date) => {
         const day = String(date.getDate()).padStart(2, '0');
@@ -193,7 +194,7 @@ const CreateEvent = () => {
     return (
         <Box sx={{ height: '100vh', width: '100vw', display: 'flex', flexDirection: 'column' }}>
             <Box sx={{ height: '8vh', width: '100vw', backgroundColor: 'primary.main' }}>
-                <TitleBar/>
+                <TitleBar />
             </Box>
 
             {createEvent && (

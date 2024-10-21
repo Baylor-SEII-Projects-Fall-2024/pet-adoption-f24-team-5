@@ -1,13 +1,15 @@
-import { Button, Toolbar, Typography, AppBar} from "@mui/material";
-import {Link, useNavigate} from "react-router-dom";
-import React, {useEffect, useState} from "react";
-import {getAuthorityFromToken, getSubjectFromToken} from "@/utils/tokenUtils";
-import {useSelector} from "react-redux";
+import { Button, Toolbar, Typography, AppBar } from "@mui/material";
+import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { clearToken } from '../utils/userSlice'; // Adjust the path as necessary
+import { getAuthorityFromToken, getSubjectFromToken } from "@/utils/tokenUtils";
+import { useSelector, useDispatch } from "react-redux";
 
 const TitleBar = () => {
     const [emailAddress, setEmailAddress] = useState('');
     const [authority, setAuthority] = useState('');
     const token = useSelector((state) => state.user.token);
+    const dispatch = useDispatch();
     const navigate = useNavigate(); // Hook for navigation
 
     useEffect(() => {
@@ -24,9 +26,10 @@ const TitleBar = () => {
     }, []);
 
     const handleLogout = () => {
-        localStorage.removeItem('token'); // Remove token from local storage
+        dispatch(clearToken()); // Clear token in Redux
         navigate('/Login'); // Redirect to login page
     };
+
     return (
         <AppBar
             position="static"
@@ -34,7 +37,7 @@ const TitleBar = () => {
                 background: 'linear-gradient(135deg, #4b6cb7 30%, #182848 90%)',
                 boxShadow: 'none',
             }}
-        > {}
+        > { }
 
             <Toolbar>
                 <Typography variant="h6" sx={{ flexGrow: 1 }}>

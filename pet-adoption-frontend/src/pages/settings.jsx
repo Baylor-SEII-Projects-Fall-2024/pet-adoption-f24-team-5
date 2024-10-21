@@ -4,8 +4,9 @@ import { Button, Card, CardContent, Stack, TextField, Typography, Paper, Select,
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { getSubjectFromToken } from '../utils/tokenUtils';
-import {API_URL, FRONTEND_URL} from "@/constants";
+import { API_URL, FRONTEND_URL } from "@/constants";
 import TitleBar from "@/components/TitleBar";
+import { useSelector } from 'react-redux';
 
 export default function HomePage() {
   const [userId, setUserId] = useState('');
@@ -22,7 +23,7 @@ export default function HomePage() {
   //const [userAge, setUserAge] = useState('');
   const [userEmail, setUserEmail] = useState('');
   const [isEditing, setIsEditing] = useState(false);
-  const token = localStorage.getItem('token');
+  const token = useSelector((state) => state.user.token);
 
 
   const updatedValuesRef = useRef({});
@@ -32,16 +33,16 @@ export default function HomePage() {
     try {
       let email = '';
       // Extract user email (subject) from the token
-      if (token) { 
+      if (token) {
         const subject = getSubjectFromToken(token); // Use the provided function
         if (subject) {
-            setUserEmail(subject); // Store the user email (subject)
-            email = subject;
+          setUserEmail(subject); // Store the user email (subject)
+          email = subject;
         }
       }
 
       const fetchUserInfo = async () => {
-        try{
+        try {
           const url = `${API_URL}/api/users/getUser?emailAddress=${email}`;
           const response = await axios.get(url, {
             headers: {
@@ -60,13 +61,13 @@ export default function HomePage() {
           updatedValuesRef.current.phoneNumber = response.data.phoneNumber;
           updatedValuesRef.current.password = response.data.password;
         }
-        catch (error){
+        catch (error) {
           console.error('Failed to fetch user', error);
         }
       };
 
       fetchUserInfo();
-    } 
+    }
     catch (error) {
       console.error('Error fetching user info:', error);
       if (error.response && error.response.status === 401) {
@@ -75,7 +76,7 @@ export default function HomePage() {
       }
     }
   }, [token]);
-  
+
   const handleFirstNameChange = () => {
     setFirstName(firstNameLabel);
     updatedValuesRef.current.firstName = firstNameLabel;
@@ -99,7 +100,7 @@ export default function HomePage() {
     else{
       setInvalidPassword(true);
     }*/
-    if (passwordLabel !== ""){
+    if (passwordLabel !== "") {
       setPassword(passwordLabel);
       updatedValuesRef.current.password = passwordLabel;
       setPasswordLabel("");
@@ -108,11 +109,11 @@ export default function HomePage() {
 
   const handlePhoneNumberChange = () => {
     const isValidPhone = /^\d{3}-\d{3}-\d{4}$/.test(phoneNumberLabel);
-    if (!isValidPhone){
+    if (!isValidPhone) {
       setInvalidPhoneNumber(true);
       return true;
     }
-    else{
+    else {
       setInvalidPhoneNumber(false);
       updatedValuesRef.current.phoneNumber = phoneNumberLabel;
       setPhoneNumber(phoneNumberLabel);
@@ -125,12 +126,12 @@ export default function HomePage() {
     handleLastNameChange();
     handlePasswordChange();
     let invalidInfo = handlePhoneNumberChange();
-    if (!invalidInfo){
+    if (!invalidInfo) {
       handleUserUpdate();
       setIsEditing(false);
       console.log("Here");
     }
-    else{
+    else {
       console.log("Here instead");
     }
   }
@@ -148,7 +149,7 @@ export default function HomePage() {
   const handleUserUpdate = async () => {
     try {
       const response = await axios.get(`${API_URL}/api/users/getUser`, {
-        params: {emailAddress: userEmail},
+        params: { emailAddress: userEmail },
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
@@ -156,7 +157,7 @@ export default function HomePage() {
       });
 
       console.log("Fetched user: " + JSON.stringify(response.data));
-  
+
       const currentUser = response.data;
 
       const updatedUser = {
@@ -168,20 +169,20 @@ export default function HomePage() {
         phoneNumber: updatedValuesRef.current.phoneNumber !== '' ? updatedValuesRef.current.phoneNumber : phoneNumber
       }
       const updatedUserJson = JSON.stringify(updatedUser, null, 2);
-  
+
       const updatedResponse = await axios.put(`${API_URL}/api/users/update/User/${userId}`, updatedUser, {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         }
       });
-  
+
       if (updatedResponse.status !== 200) {
         throw new Error("Failed to update user data");
       }
-      
+
       console.log('User updated successfully', updatedResponse.data);
-  
+
     } catch (error) {
       console.error('Failed to update user', error);
     }
@@ -193,7 +194,7 @@ export default function HomePage() {
         <title>Settings Page</title>
       </Head>
 
-      <TitleBar/>
+      <TitleBar />
 
       <main>
         <Stack sx={{ paddingTop: 4 }} alignItems='center' gap={2}>
@@ -210,9 +211,9 @@ export default function HomePage() {
                 align='center'
                 value={firstNameLabel}
                 onChange={(e) => setFirstNameLabel(e.target.value)}
-                InputProps={{ 
-                  style: { height: '40px', width: '470px' }, 
-                  readOnly: !isEditing 
+                InputProps={{
+                  style: { height: '40px', width: '470px' },
+                  readOnly: !isEditing
                 }}
               />
             </Stack>
@@ -225,9 +226,9 @@ export default function HomePage() {
                 align='center'
                 value={lastNameLabel}
                 onChange={(e) => setLastNameLabel(e.target.value)}
-                InputProps={{ 
-                  style: { height: '40px', width: '470px' }, 
-                  readOnly: !isEditing 
+                InputProps={{
+                  style: { height: '40px', width: '470px' },
+                  readOnly: !isEditing
                 }}
               />
             </Stack>
@@ -240,9 +241,9 @@ export default function HomePage() {
                 align='center'
                 value={phoneNumberLabel}
                 onChange={(e) => setPhoneNumberLabel(e.target.value)}
-                InputProps={{ 
-                  style: { height: '40px', width: '425px' }, 
-                  readOnly: !isEditing 
+                InputProps={{
+                  style: { height: '40px', width: '425px' },
+                  readOnly: !isEditing
                 }}
               />
               {invalidPhoneNumber && (
@@ -270,14 +271,14 @@ export default function HomePage() {
                 align='center'
                 value={passwordLabel}
                 onChange={(e) => setPasswordLabel(e.target.value)}
-                InputProps={{ 
-                  style: { height: '40px', width: '425px' }, 
+                InputProps={{
+                  style: { height: '40px', width: '425px' },
                   readOnly: !isEditing
                 }}
               />
             </Stack>
             {invalidPassword && (
-              <Typography color="error" variant = "body2" sx={{ marginTop: 1}}>
+              <Typography color="error" variant="body2" sx={{ marginTop: 1 }}>
                 Please enter a valid password.
               </Typography>
             )}
