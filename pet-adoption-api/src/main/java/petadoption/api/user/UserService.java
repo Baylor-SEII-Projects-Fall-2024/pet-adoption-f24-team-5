@@ -5,6 +5,7 @@ import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import petadoption.api.Event.Event;
 import petadoption.api.user.AdoptionCenter.AdoptionCenter;
@@ -16,6 +17,7 @@ import petadoption.api.user.Owner.OwnerRepository;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -28,6 +30,8 @@ public class UserService {
     private AdoptionCenterRepository adoptionCenterRepository;
     @Autowired
     private CenterWorkerRepository centerWorkerRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     /*public User findUser(Long userId) {
         Optional<User> user = userRepository.findById(userId);
@@ -47,49 +51,17 @@ public class UserService {
 
     public User saveUser(User user) {return userRepository.save(user);}
 
-    public ResponseEntity<User> updateUser(User user) {
+    public ResponseEntity<User> updateUser(User user, String oldPassword) {
+        if (!passwordEncoder.matches(oldPassword, findUser(user.getEmailAddress()).getPassword())) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
         User newUser = findUser(user.getEmailAddress());
         newUser.setFirstName(user.getFirstName());
         newUser.setLastName(user.getLastName());
         newUser.setPhoneNumber(user.getPhoneNumber());
-        newUser.setPassword(user.getPassword());
+        newUser.setPassword(passwordEncoder.encode(user.getPassword()));
         return new ResponseEntity<>(userRepository.save(newUser), HttpStatus.OK);
     }
-
-    /*public User updateUser(CenterWorker user) {
-        CenterWorker existingUser = centerWorkerRepository.findById(user.getId())
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + user.getId()));
-
-        existingUser.setPassword(user.getPassword());
-        existingUser.setPhoneNumber(user.getPhoneNumber());
-        existingUser.setAge(user.getAge());
-        return centerWorkerRepository.save(existingUser);
-    }
-
-    public User updateUser(Owner user) {
-        Owner existingUser = ownerRepository.findById(user.getId())
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + user.getId()));
-
-        existingUser.setPassword(user.getPassword());
-        existingUser.setPhoneNumber(user.getPhoneNumber());
-        existingUser.setAge(user.getAge());
-        return ownerRepository.save(existingUser);
-    }
-
-    public ResponseEntity<User> updateUser(Long id, User user) {
-        System.out.println("User inside update: " + userRepository.findById(id).get());
-        return userRepository.findById(id)
-                .map(event -> {
-                    // Update fields
-                    event.setPassword(user.getPassword());
-                    event.setPhoneNumber(user.getPhoneNumber());
-
-                    // Save updated event
-                    User savedUser = userRepository.save(event);
-                    return ResponseEntity.ok(savedUser);
-                })
-                .orElseGet(() -> ResponseEntity.notFound().build());
-    }*/
 
     public void deleteUser(Long userId) {
         userRepository.deleteById(userId);

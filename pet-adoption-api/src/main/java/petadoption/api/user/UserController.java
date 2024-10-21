@@ -54,9 +54,9 @@ public class UserController {
         return userService.findAllUsers();
     }
 
-    @PutMapping("/update/User/{id}")
-    public ResponseEntity<User> UpdateUser(@RequestBody User user, @PathVariable Long id) {
-        return userService.updateUser(user);
+    @PutMapping("/update/User")
+    public ResponseEntity<User> UpdateUser(@RequestBody User user, @RequestParam("oldPassword") String oldPassword) {
+        return userService.updateUser(user, oldPassword);
     }
 
     @GetMapping("/getUser")
