@@ -27,8 +27,16 @@ public class UserService {
     @Autowired
     private CenterWorkerRepository centerWorkerRepository;
 
-    public User findUser(Long userId) {
+    /*public User findUser(Long userId) {
         Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
+            throw new IllegalArgumentException("Invalid username or password");
+        }
+        return user.get();
+    }*/
+
+    public User findUser(String emailAddress) {
+        Optional<User> user = userRepository.findByEmailAddress(emailAddress);
         if (user.isEmpty()) {
             throw new IllegalArgumentException("Invalid username or password");
         }
@@ -149,6 +157,8 @@ public class UserService {
         try {
             if (userRepository.findByEmailAddress("peter727@gmail.com").isEmpty()) {
                 CenterWorker user1 = new CenterWorker(
+                        "Peter",
+                        "Whitcomb",
                         "peter727@gmail.com",
                         "password",
                         UserType.CenterWorker,
@@ -161,6 +171,8 @@ public class UserService {
 
             if (userRepository.findByEmailAddress("ben@gmail.com").isEmpty()) {
                 CenterWorker user2 = new CenterWorker(
+                        "Ben",
+                        "Szabo",
                         "ben@gmail.com",
                         "password2",
                         UserType.CenterWorker,
@@ -173,6 +185,8 @@ public class UserService {
 
             if (userRepository.findByEmailAddress("Jackson@gmail.com").isEmpty()) {
                 Owner user3 = new Owner(
+                        "Jackson",
+                        "Henry",
                         "Jackson@gmail.com",
                         "password3",
                         UserType.Owner,
@@ -184,6 +198,8 @@ public class UserService {
 
             if (userRepository.findByEmailAddress("Andrew@gmail.com").isEmpty()) {
                 AdoptionCenter adoptionCenter1 = new AdoptionCenter(
+                        "Andrew",
+                        "Parks",
                         "Andrew@gmail.com",
                         "password4",
                         UserType.CenterOwner,
