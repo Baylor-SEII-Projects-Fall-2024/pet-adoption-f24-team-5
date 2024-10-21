@@ -64,7 +64,7 @@ const TitleBar = () => {
                 <Typography variant="h6" sx={{ flexGrow: 1 }}>
                     <Button color="inherit" component={Link} to="/">DogPile Solutions</Button>
                 </Typography>
-                <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'center' }}>
+                <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'left' }}>
                     Welcome {firstName}
                 </Typography>
 
