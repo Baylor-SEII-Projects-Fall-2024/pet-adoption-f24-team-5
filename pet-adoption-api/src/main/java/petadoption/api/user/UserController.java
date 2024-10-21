@@ -55,9 +55,8 @@ public class UserController {
     }
 
     @PutMapping("/update/User/{id}")
-    public String UpdateUser(@RequestBody User adoptionCenter, @PathVariable Long id) {
-        System.out.println(adoptionCenter.toString());
-        return adoptionCenter.toString();
+    public ResponseEntity<User> UpdateUser(@RequestBody User user, @PathVariable Long id) {
+        return userService.updateUser(user);
     }
 
     @GetMapping("/getUser")

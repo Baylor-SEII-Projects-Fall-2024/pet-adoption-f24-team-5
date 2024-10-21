@@ -1,7 +1,9 @@
 package petadoption.api.user;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import petadoption.api.Event.Event;
@@ -45,7 +47,16 @@ public class UserService {
 
     public User saveUser(User user) {return userRepository.save(user);}
 
-    public User updateUser(CenterWorker user) {
+    public ResponseEntity<User> updateUser(User user) {
+        User newUser = findUser(user.getEmailAddress());
+        newUser.setFirstName(user.getFirstName());
+        newUser.setLastName(user.getLastName());
+        newUser.setPhoneNumber(user.getPhoneNumber());
+        newUser.setPassword(user.getPassword());
+        return new ResponseEntity<>(userRepository.save(newUser), HttpStatus.OK);
+    }
+
+    /*public User updateUser(CenterWorker user) {
         CenterWorker existingUser = centerWorkerRepository.findById(user.getId())
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + user.getId()));
 
@@ -66,8 +77,6 @@ public class UserService {
     }
 
     public ResponseEntity<User> updateUser(Long id, User user) {
-        //AdoptionCenter existingUser = adoptionCenterRepository.findById(user.getId())
-        //        .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + user.getId()));
         System.out.println("User inside update: " + userRepository.findById(id).get());
         return userRepository.findById(id)
                 .map(event -> {
@@ -80,7 +89,7 @@ public class UserService {
                     return ResponseEntity.ok(savedUser);
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
-    }
+    }*/
 
     public void deleteUser(Long userId) {
         userRepository.deleteById(userId);

@@ -128,10 +128,6 @@ export default function HomePage() {
     if (!invalidInfo){
       handleUserUpdate();
       setIsEditing(false);
-      console.log("Here");
-    }
-    else{
-      console.log("Here instead");
     }
   }
 
