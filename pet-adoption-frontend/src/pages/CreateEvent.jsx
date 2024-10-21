@@ -336,6 +336,7 @@ const CreateEvent = () => {
                 }
             });
             alert('Event deleted.');
+            await handleFetchEvents();
             handleCreateEvent();
         } catch (error) {
             console.error('Error: could not delete event:', error);
