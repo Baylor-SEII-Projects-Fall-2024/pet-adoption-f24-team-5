@@ -38,21 +38,6 @@ public class UserController {
         }
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        try{
-            User user = userService.loginUser(request.getEmail(), request.getPassword());
-            return new ResponseEntity<>(user, HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
-        }
-    }
-
-    @PostMapping("/initialize")
-    public List<User> initialize() {
-        userService.initialize();
-        return userService.findAllUsers();
-    }
 
     @PutMapping("/update/User")
     public ResponseEntity<User> UpdateUser(@RequestBody User user, @RequestParam("oldPassword") String oldPassword) {
