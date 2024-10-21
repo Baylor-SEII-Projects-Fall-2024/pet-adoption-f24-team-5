@@ -24,7 +24,6 @@ public class AuthenticationController {
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-
     }
 
     @PostMapping("/register/center-worker")
