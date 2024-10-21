@@ -40,6 +40,8 @@ public class AuthenticationService {
         }
 
         var Owner = new Owner(
+                request.getFirstName(),
+                request.getLastName(),
                 request.getEmailAddress(),
                 passwordEncoder.encode(request.getPassword()),
                 UserType.Owner,
@@ -61,6 +63,8 @@ public class AuthenticationService {
         }
 
         var centerWorker = new CenterWorker(
+                request.getFirstName(),
+                request.getLastName(),
                 request.getEmailAddress(),
                 passwordEncoder.encode(request.getPassword()),
                 UserType.CenterWorker,
@@ -82,6 +86,8 @@ public class AuthenticationService {
         }
 
         var adoptionCenter = new AdoptionCenter(
+                request.getFirstName(),
+                request.getLastName(),
                 request.getEmailAddress(),
                 passwordEncoder.encode(request.getPassword()),
                 UserType.CenterOwner,

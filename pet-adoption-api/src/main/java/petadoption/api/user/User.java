@@ -39,6 +39,12 @@ public class User implements UserDetails {
     @Column(name = "USER_ID")
     protected Long id;
 
+    @Column(name = "FIRST_NAME")
+    protected String firstName;
+
+    @Column(name = "LAST_NAME")
+    protected String lastName;
+
     @Column(name = "EMAIL_ADDRESS")
     protected  String emailAddress;
 
@@ -54,15 +60,19 @@ public class User implements UserDetails {
 
     public User() {}
 
-    public User(String emailAddress, String password, UserType userType, String phoneNumber) {
+    public User(String firstName, String lastName, String emailAddress, String password, UserType userType, String phoneNumber) {
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.emailAddress = emailAddress;
         this.password = password;
         this.userType = userType;
         this.phoneNumber = phoneNumber;
     }
 
-    public User(Long id, String emailAddress, String password, UserType userType, String phoneNumber) {
+    public User(Long id, String firstName, String lastName, String emailAddress, String password, UserType userType, String phoneNumber) {
         this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.emailAddress = emailAddress;
         this.password = password;
         this.userType = userType;
