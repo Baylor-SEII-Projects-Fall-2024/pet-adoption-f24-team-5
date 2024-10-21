@@ -5,6 +5,7 @@ import AdoptionCenterCard from '../components/AdoptionCenterCard';
 import axios from 'axios';
 import { getSubjectFromToken } from '../utils/tokenUtils'; // Import the function
 import {API_URL, FRONTEND_URL} from "@/constants";
+import TitleBar from "@/components/TitleBar";
 
 export default function AdoptionCenterPage() {
     const [data, setData] = useState(null);
@@ -49,6 +50,7 @@ export default function AdoptionCenterPage() {
 
     return (
         <>
+            <TitleBar/>
             <Head>
                 <title>Local Adoption Centers</title>
             </Head>
