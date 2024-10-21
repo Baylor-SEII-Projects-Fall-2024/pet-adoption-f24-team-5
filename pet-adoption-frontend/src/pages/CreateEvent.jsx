@@ -193,7 +193,15 @@ const CreateEvent = () => {
     return (
         <Box sx={{ height: '100vh', width: '100vw', display: 'flex', flexDirection: 'column' }}>
             <Box sx={{ height: '8vh', width: '100vw', backgroundColor: 'primary.main' }}>
-                <TitleBar/>
+                <Toolbar>
+                    <Typography variant="h6" sx={{ flexGrow: 1 }}>Create Event</Typography>
+                    <Button color="inherit" component={Link} to="/">Home</Button>
+                    <Button color="inherit" component={Link} to="/PostPet">Post Pet</Button>
+                    <Button color="inherit" component={Link} to="/LocalAdoptionCenter">Local Adoption Center</Button>
+                    <Button color="inherit" component={Link} to="/SearchEngine">Search Engine</Button>
+                    <Button color="inherit" component={Link} to="/Settings">Settings</Button>
+                    <Button color="inherit" component={Link} to="/Login">Log Out</Button>
+                </Toolbar>
             </Box>
 
             {createEvent && (
