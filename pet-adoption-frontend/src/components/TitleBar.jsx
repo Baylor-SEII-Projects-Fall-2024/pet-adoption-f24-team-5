@@ -8,7 +8,7 @@ import axios from 'axios';
 
 const TitleBar = () => {
     const [emailAddress, setEmailAddress] = useState('');
-    const [firstName, setFirstName] = useState('');
+    const [displayName, setDisplayName] = useState('');
     const [authority, setAuthority] = useState('');
     const token = useSelector((state) => state.user.token);
     const navigate = useNavigate(); // Hook for navigation
@@ -27,24 +27,24 @@ const TitleBar = () => {
     }, []);
 
     useEffect(() => {
-        const fetchFirstName = async () => {
+        const fetchDisplayName = async () => {
             try{
                 console.log("Email: " + emailAddress);
-                const response = await axios.get(`${API_URL}/api/users/getFirstName`, {
+                const response = await axios.get(`${API_URL}/api/users/getDisplayName`, {
                     params: {emailAddress: emailAddress},
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`,
                     }
                 });
-                setFirstName(response.data);
+                setDisplayName(response.data);
             }
             catch (error) {
                 console.error("Error fetching first name: ", error);
             }
         }
 
-        fetchFirstName();
+        fetchDisplayName();
     }, [emailAddress])
 
     const handleLogout = () => {
@@ -65,7 +65,7 @@ const TitleBar = () => {
                     <Button color="inherit" component={Link} to="/">DogPile Solutions</Button>
                 </Typography>
                 <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'left' }}>
-                    Welcome {firstName}
+                    Welcome {displayName}
                 </Typography>
 
                 {(authority === 'CenterOwner' || authority === 'CenterWorker') && (

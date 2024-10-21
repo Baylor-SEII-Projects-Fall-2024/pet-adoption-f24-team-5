@@ -86,8 +86,6 @@ public class AuthenticationService {
         }
 
         var adoptionCenter = new AdoptionCenter(
-                request.getFirstName(),
-                request.getLastName(),
                 request.getEmailAddress(),
                 passwordEncoder.encode(request.getPassword()),
                 UserType.CenterOwner,
