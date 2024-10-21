@@ -2,8 +2,11 @@ package petadoption.api.user;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import petadoption.api.Event.Event;
 import petadoption.api.user.AdoptionCenter.AdoptionCenter;
 import petadoption.api.user.AdoptionCenter.AdoptionCenterRepository;
@@ -27,20 +30,20 @@ public class UserService {
     @Autowired
     private CenterWorkerRepository centerWorkerRepository;
 
-    /*public User findUser(Long userId) {
-        Optional<User> user = userRepository.findById(userId);
-        if (user.isEmpty()) {
-            throw new IllegalArgumentException("Invalid username or password");
-        }
-        return user.get();
-    }*/
-
     public User findUser(String emailAddress) {
         Optional<User> user = userRepository.findByEmailAddress(emailAddress);
         if (user.isEmpty()) {
             throw new IllegalArgumentException("Invalid username or password");
         }
         return user.get();
+    }
+
+    public CenterWorker findCenterWorker(long userID) {
+        Optional<CenterWorker> centerWorker = centerWorkerRepository.findById(userID);
+        if(centerWorker.isEmpty()) {
+            throw new IllegalArgumentException("Invalid ID");
+        }
+        return centerWorker.get();
     }
 
     public User saveUser(User user) {return userRepository.save(user);}

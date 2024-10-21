@@ -5,6 +5,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import axios from "axios";
 import {API_URL} from "@/constants";
 import TitleBar from "@/components/TitleBar";
+import {getSubjectFromToken} from "@/utils/tokenUtils";
 
 const CreateEvent = () => {
     const [event_name, setEventName] = useState('');
@@ -21,6 +22,81 @@ const CreateEvent = () => {
     const [noFutureEvents, setNoFutureEvents] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState(null);
     const token = localStorage.getItem('token');
+    const [userEmail, setUserEmail] = useState('');
+    const [userId, setUserId] = useState('');
+
+    useEffect(() => {
+        const fetchUserInfoAndRelatedData = async () => {
+            try {
+                let email = '';
+
+                // Extract user email (subject) from the token
+                if (token) {
+                    const subject = getSubjectFromToken(token); // Use the provided function
+                    if (subject) {
+                        setUserEmail(subject);
+                        email = subject;
+                        console.log("User email = " + email);
+                    }
+                }
+
+                if (!email) {
+                    console.error("No email found");
+                    return;
+                }
+
+                // Fetch user info based on email
+                const fetchUserInfo = async () => {
+                    try {
+                        console.log("Fetching user info...");
+                        const url = `${API_URL}/api/users/getUser?emailAddress=${email}`;
+                        const response = await axios.get(url, {
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`,
+                            }
+                        });
+                        const fetchedUserId = response.data.id;
+                        setUserId(fetchedUserId);
+                        console.log("User ID: " + fetchedUserId);
+                        return fetchedUserId; // Return userId to chain subsequent calls
+                    } catch (error) {
+                        console.error('Failed to fetch user', error);
+                        return null;
+                    }
+                };
+
+                // Fetch Center ID based on userId
+                const fetchCenterID = async (userId) => {
+                    if (!userId) return; // Return early if userId is not set
+                    try {
+                        console.log("Fetching center ID...");
+                        const url = `${API_URL}/api/users/getCenterID/${userId}`;
+                        const response = await axios.get(url, {
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`,
+                            }
+                        });
+                        const fetchedCenterID = response.data;
+                        setCenterID(fetchedCenterID);
+                        console.log("Center ID: " + fetchedCenterID);
+                    } catch (error) {
+                        setCenterID(0);
+                        console.error("Failed to fetch center ID", error);
+                    }
+                };
+
+                const userId = await fetchUserInfo();
+                await fetchCenterID(userId); // Fetch center ID only after user ID is available
+                await handleFetchEvents(); // Fetch events
+
+            } catch (error) {
+                console.error("Error fetching user info and related data", error);
+            }
+        };
+        fetchUserInfoAndRelatedData(); // Call the function
+    }, [token]); // Only re-run if the token changes
     const EventCard = ({ event }) => {
         console.log("Creating event card...");
         const [day, month, year] = event.event_date.split('/');
@@ -92,6 +168,76 @@ const CreateEvent = () => {
         setEventDescription('');
         setSelectedEvent(null);
     };
+    const handleFetchEvents = async () => {
+        try {
+            console.log("Fetching events...");
+            const response = await axios.get(`${API_URL}/api/events`, {
+                headers: {
+                    Authorization: `Bearer ${token}`, // Pass token in the header
+                    'Content-Type': 'application/json',
+                }
+            });
+            console.log("Fetched Events...", response.data);
+
+            const filteredEvents = response.data.filter((event) => {
+                console.log("Filtering event...");
+
+                console.log("Validating event_date...");
+                if (!event.event_date) {
+                    console.log("Error: " + event.event_date + " is not a date");
+                    return false;
+                }
+                console.log("Success!");
+
+                console.log("Validating event_time...");
+                if (!event.event_time) {
+                    console.log("Error: " + event.event_time + " is not a time");
+                    return false;
+                }
+                console.log("Success!");
+
+                console.log("Validating event is >= today date...");
+                const today = new Date();
+                today.setHours(0, 0, 0, 0); // Normalize today's date to midnight
+
+                if (handleDateStringToDate(event.event_date) < today) {
+                    console.log("The event date is before today");
+                    return false;
+                } else {
+                    console.log("The event date is today or in the future");
+                }
+                console.log("Success!");
+
+                console.log("Validating event time is after current time...");
+                const eventDate = handleDateStringToDate(event.event_date);
+
+                if (eventDate.getTime() === today.getTime()) {
+                    console.log("Event is today...");
+
+                    const eventTime = handleTimeStringToTime(event.event_time);
+                    const currentTime = handleTimeStringToTime(handleDateToTimeString(new Date()));
+
+                    if (eventTime.getTime() < currentTime.getTime()) {
+                        console.log("Event time is before the current time");
+                        return false;
+                    }
+                }
+                console.log("Success!");
+
+                console.log("Returning event validation");
+                return true;
+            });
+
+            const sortedEvents = filteredEvents.sort((a, b) => {
+                return handleDateStringToDate(a.event_date) - handleDateStringToDate(b.event_date);
+            });
+
+            setEvents(sortedEvents); // list of events that occur after current date and time
+            setNoFutureEvents(sortedEvents.length === 0); // if no events, none will be displayed
+        } catch (error) {
+            console.error("Error fetching events:", error);
+        }
+    };
     const handleValidateSetEvent = (displayAlert) => {
         if(event_name && !isNaN(center_id) && event_date && event_time && event_description) {
             return true;
@@ -120,50 +266,44 @@ const CreateEvent = () => {
         setCreateEvent(!createEvent);
         if (createEvent) {
             resetForm();
-            handleFetchEvents();
         }
     };
     const handleDateStringToDate = (dateString) => {
-        console.log("Converting dateString to date...")
+        console.log("Converting dateString to date...");
         const [day, month, year] = dateString.split('/');
         const newDate = new Date(year, month - 1, day);
+
+        // Normalize the time to midnight for accurate date comparison
+        newDate.setHours(0, 0, 0, 0); // Set time to 00:00:00.000
         console.log("Original date: " + dateString + " | New date: " + newDate);
 
         return newDate;
-    }
+    };
     const handleTimeStringToTime = (timeString) => {
         console.log("Converting timeString to time...");
         const [hours, minutes] = timeString.split(':');
         const now = new Date();
-        now.setHours(parseInt(hours, 10));
-        now.setMinutes(parseInt(minutes, 10));
+        now.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0); // Set to provided time, reset seconds and milliseconds
         console.log("Original time: " + timeString + " | New time: " + now);
+
         return now;
-    }
+    };
     const handleDateToTimeString = (selectedDate) => {
         console.log("Converting date to time string...");
-        // Check if selectedDate is valid before proceeding
+
         if (!selectedDate) {
             console.error("No date provided.");
             return "Invalid time";
         }
 
-        // Attempt to convert to Date if not already a Date object
         const dateObj = selectedDate instanceof Date && !isNaN(selectedDate)
             ? selectedDate
             : new Date(selectedDate);
 
-        // Check if the dateObj is valid
         if (isNaN(dateObj.getTime())) {
             console.error("Invalid date:", selectedDate);
             return "Invalid time";
         }
-
-        console.log("Old date: " + selectedDate + " | New date: " + dateObj.toLocaleTimeString('en-US', {
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false,
-        }));
 
         return dateObj.toLocaleTimeString('en-US', {
             hour: '2-digit',
@@ -179,76 +319,10 @@ const CreateEvent = () => {
         console.log("Old date: " + selectedDate + " | New date: " + `${day}/${month}/${year}`);
         return `${day}/${month}/${year}`;
     }
-    const handleCenterIDStringToInt = (centerID) => {
-        setCenterID(parseInt(centerID, 10));
-    }
     const handleDateChange = (selectedDate) => {
         setEventDate(selectedDate);
         setEventTime(handleDateToTimeString(selectedDate));
     }
-    const handleFetchEvents = async () => {
-        try {
-            console.log("Fetching Events...");
-            const response = await axios.get(`${API_URL}/api/events`, {
-                headers: {
-                    Authorization: `Bearer ${token}`, // Pass token in the header
-                    'Content-Type': 'application/json'
-                }
-            });
-            console.log("Fetched Events...", response.data);
-
-            const filteredEvents = response.data.filter((event) => {
-                console.log("Filtering event...");
-
-                console.log("Validating event_date...");
-                if (!event.event_date) {
-                    console.log("Error: " + event.event_date + " is not a date");
-                    return false;
-                }
-                console.log("Success!");
-
-                console.log("Validating event_time...");
-                if (!event.event_time) {
-                    console.log("Error: " + event.event_time + " is not a time");
-                    return false;
-                }
-                console.log("Success!");
-
-                console.log("Validating event is >= today date...");
-                if (handleDateStringToDate(event.event_date) < new Date()) {
-                    console.log("event.event_date is before today");
-                    return false;
-                }
-                console.log("Success!");
-
-                console.log("Validating event time is after current time...")
-                if (handleDateStringToDate(event.event_date) === new Date()) {
-                    console.log("Event is today...");
-                    if (handleTimeStringToTime(event.event_time) <
-                        handleTimeStringToTime(handleDateToTimeString(new Date()))) {
-                        console.log("event.event_time is before current time");
-                        return false;
-                    }
-                }
-                console.log("Success!");
-
-                console.log("Returning event validation");
-                return true;
-            });
-
-            const sortedEvents = filteredEvents.sort((a, b) => {
-                return handleDateStringToDate(a.event_date) - handleDateStringToDate(b.event_date);
-            });
-
-            setEvents(sortedEvents); // list of events that occur after current date and time
-            setNoFutureEvents(sortedEvents.length === 0); // if no events, none will be displayed
-        } catch (error) {
-            console.error("Error fetching events:", error);
-        }
-    };
-    useEffect(() => {
-        handleFetchEvents();
-    }, []);
     const handleDelete = async () => {
         if (!selectedEvent) {
             alert('No event selected for deletion.');
@@ -297,6 +371,7 @@ const CreateEvent = () => {
                 }
             });
             alert(selectedEvent ? 'Event updated.' : `Event created. Event ID is: ${response.data}`);
+            await handleFetchEvents();
             handleCreateEvent();
         } catch (error) {
             console.error('Error: could not register event:', error);
@@ -323,7 +398,6 @@ const CreateEvent = () => {
 
                     <Stack spacing={2} sx={{ marginTop: 2 }}>
                         <TextField label="Event Name" value={event_name} onChange={(e) => setEventName(e.target.value)} fullWidth />
-                        <TextField label="Center ID" value={center_id} onChange={(e) => handleCenterIDStringToInt(e.target.value)} fullWidth />
                         <DatePicker selected={event_date} onChange={(date) => handleDateChange(date)} fullWidth showTimeSelect dateFormat="Pp" customInput={<TextField label="Event Date" fullWidth />}/>
                         <TextField label="Description" value={event_description} onChange={(e) => setEventDescription(e.target.value)} fullWidth />
                         <Button type="submit" variant='contained' disabled={!handleValidateSetEvent(false)}> {selectedEvent ? 'Update Event' : 'Post Event'} </Button>
