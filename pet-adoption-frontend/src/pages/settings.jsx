@@ -55,6 +55,8 @@ export default function HomePage() {
           setPhoneNumber(response.data.phoneNumber);
           updatedValuesRef.current.phoneNumber = response.data.phoneNumber;
           updatedValuesRef.current.password = response.data.password;
+          updatedValuesRef.current.userType = response.data.userType;
+          console.log("UserType: " + updatedValuesRef.current.userType);
         }
         catch (error) {
           console.error('Failed to fetch user', error);
@@ -139,14 +141,31 @@ export default function HomePage() {
 
       const updatedUser = {
         id: currentUser.id,
-        firstName: updatedValuesRef.current.firstName,
-        lastName: updatedValuesRef.current.lastName,
         emailAddress: currentUser.emailAddress,
         password: updatedValuesRef.current.password !== null ? updatedValuesRef.current.password : password,
-        phoneNumber: updatedValuesRef.current.phoneNumber !== '' ? updatedValuesRef.current.phoneNumber : phoneNumber
+        phoneNumber: updatedValuesRef.current.phoneNumber !== '' ? updatedValuesRef.current.phoneNumber : phoneNumber,
+        UserType: updatedValuesRef.current.userType
+      }
+
+      if (updatedValuesRef.current.userType === `Owner` || updatedValuesRef.current.userType === `CenterWorker`){
+        updatedUser.age = updatedValuesRef.current.age;
+        updatedUser.firstName = updatedValuesRef.current.firstName;
+        updatedUser.lastName = updatedValuesRef.current.lastName;
+        if (updatedValuesRef.current.userType === `CenterWorker`){
+          updatedUser.centerId = currentUser.centerId;
+        }
+      }
+      else if (updatedValuesRef.current.userType === 'CenterOwner'){
+        updatedUser.centerName = currentUser.centerName;
+        updatedUser.centerAddress = currentUser.centerAddress;
+        updatedUser.centerCity = currentUser.centerCity;
+        updatedUser.centerState = currentUser.centerState;
+        updatedUser.centerZip = currentUser.centerZip;
+        updatedUser.centerPetCount = currentUser.centerPetCount;
       }
   
-      const updatedResponse = await axios.put(`${API_URL}/api/users/update/User`, updatedUser, {
+      const url = `${API_URL}/api/users/update/${updatedValuesRef.current.userType}`
+      const updatedResponse = await axios.put(url, updatedUser, {
         params: { oldPassword: updatedValuesRef.current.oldPassword},
 
         headers: {
@@ -158,7 +177,8 @@ export default function HomePage() {
       if (updatedResponse.status !== 200) {
         return 1;
       }
-
+      
+      //Add alert feature somehow to show that data was successfully inserted
       console.log('User updated successfully', updatedResponse.data);
 
       return 0;
@@ -183,7 +203,7 @@ export default function HomePage() {
               <Typography variant='h3' align='center'>Settings</Typography>
             </CardContent>
           </Card>
-          <Paper sx={{ width: 600, height: 50 }} elevation={4}>
+          {updatedValuesRef.current.userType != 'CenterOwner' && <Paper sx={{ width: 600, height: 50 }} elevation={4}>
             <Stack spacing={1} direction="row" alignItems='center'>
               <Typography variant='h5'>First Name</Typography>
               <TextField
@@ -197,8 +217,8 @@ export default function HomePage() {
                 }}
               />
             </Stack>
-          </Paper>
-          <Paper sx={{ width: 600, height: 50 }} elevation={4}>
+          </Paper>}
+          {updatedValuesRef.current.userType != 'CenterOwner' && <Paper sx={{ width: 600, height: 50 }} elevation={4}>
             <Stack spacing={1} direction="row" alignItems='center'>
               <Typography variant='h5'>Last Name</Typography>
               <TextField
@@ -212,7 +232,7 @@ export default function HomePage() {
                 }}
               />
             </Stack>
-          </Paper>
+          </Paper>}
           <Paper sx={{ width: 600, height: invalidPhoneNumber ? 70 : 50 }} elevation={4}>
             <Stack spacing={1} direction="row" alignItems='center'>
               <Typography variant='h5'>Phone Number</Typography>
