@@ -1,29 +1,26 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Head from 'next/head';
-import { Button, Card, CardContent, Stack, TextField, Typography, Paper, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import { Button, Card, CardContent, Stack, TextField, Typography, Paper } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { getSubjectFromToken } from '../utils/tokenUtils';
-import {API_URL, FRONTEND_URL} from "@/constants";
+import { API_URL, FRONTEND_URL } from "@/constants";
 import TitleBar from "@/components/TitleBar";
+import { useSelector } from 'react-redux';
 
 export default function HomePage() {
-  const [userId, setUserId] = useState('');
-  const [firstName, setFirstName] = useState('');
   const [firstNameLabel, setFirstNameLabel] = useState('');
-  const [lastName, setLastName] = useState('');
   const [lastNameLabel, setLastNameLabel] = useState('');
   const [password, setPassword] = useState('');
   const [passwordLabel, setPasswordLabel] = useState('');
+  const [oldPasswordLabel, setOldPasswordLabel] = useState('');
   const [invalidPassword, setInvalidPassword] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [phoneNumberLabel, setPhoneNumberLabel] = useState('');
   const [invalidPhoneNumber, setInvalidPhoneNumber] = useState(false);
-  //const [userAge, setUserAge] = useState('');
   const [userEmail, setUserEmail] = useState('');
   const [isEditing, setIsEditing] = useState(false);
-  const token = localStorage.getItem('token');
-
+  const token = useSelector((state) => state.user.token);
 
   const updatedValuesRef = useRef({});
   const navigate = useNavigate();
@@ -32,16 +29,16 @@ export default function HomePage() {
     try {
       let email = '';
       // Extract user email (subject) from the token
-      if (token) { 
+      if (token) {
         const subject = getSubjectFromToken(token); // Use the provided function
         if (subject) {
-            setUserEmail(subject); // Store the user email (subject)
-            email = subject;
+          setUserEmail(subject); // Store the user email (subject)
+          email = subject;
         }
       }
 
       const fetchUserInfo = async () => {
-        try{
+        try {
           const url = `${API_URL}/api/users/getUser?emailAddress=${email}`;
           const response = await axios.get(url, {
             headers: {
@@ -50,7 +47,6 @@ export default function HomePage() {
             }
           });
 
-          setUserId(response.data.id);
           setFirstNameLabel(response.data.firstName);
           updatedValuesRef.current.firstName = response.data.firstName;
           setLastNameLabel(response.data.lastName);
@@ -59,14 +55,16 @@ export default function HomePage() {
           setPhoneNumber(response.data.phoneNumber);
           updatedValuesRef.current.phoneNumber = response.data.phoneNumber;
           updatedValuesRef.current.password = response.data.password;
+          updatedValuesRef.current.userType = response.data.userType;
+          console.log("UserType: " + updatedValuesRef.current.userType);
         }
-        catch (error){
+        catch (error) {
           console.error('Failed to fetch user', error);
         }
       };
 
       fetchUserInfo();
-    } 
+    }
     catch (error) {
       console.error('Error fetching user info:', error);
       if (error.response && error.response.status === 401) {
@@ -75,44 +73,29 @@ export default function HomePage() {
       }
     }
   }, [token]);
-  
+
   const handleFirstNameChange = () => {
-    setFirstName(firstNameLabel);
     updatedValuesRef.current.firstName = firstNameLabel;
   };
 
   const handleLastNameChange = () => {
-    setLastName(lastNameLabel);
     updatedValuesRef.current.lastName = lastNameLabel;
   }
 
   const handlePasswordChange = () => {
-    // Getting rid of for now, should work but need to bypass password decryption
-    /*if (oldPassword === oldPasswordLabel){
-      console.log("Making it inside");
-      setPassword(passwordLabel);
-      setOldPassword(passwordLabel);
-      updatedValuesRef.current.password = passwordLabel;
-      setOldPasswordLabel("");
-      handleUserUpdate();
-    }
-    else{
-      setInvalidPassword(true);
-    }*/
-    if (passwordLabel !== ""){
-      setPassword(passwordLabel);
-      updatedValuesRef.current.password = passwordLabel;
-      setPasswordLabel("");
-    }
+    setPassword(passwordLabel);
+    updatedValuesRef.current.password = passwordLabel;
+    updatedValuesRef.current.oldPassword = oldPasswordLabel;
+    handleUserUpdate();
   };
 
   const handlePhoneNumberChange = () => {
     const isValidPhone = /^\d{3}-\d{3}-\d{4}$/.test(phoneNumberLabel);
-    if (!isValidPhone){
+    if (!isValidPhone) {
       setInvalidPhoneNumber(true);
       return true;
     }
-    else{
+    else {
       setInvalidPhoneNumber(false);
       updatedValuesRef.current.phoneNumber = phoneNumberLabel;
       setPhoneNumber(phoneNumberLabel);
@@ -120,18 +103,23 @@ export default function HomePage() {
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     handleFirstNameChange();
     handleLastNameChange();
     handlePasswordChange();
     let invalidInfo = handlePhoneNumberChange();
+    
     if (!invalidInfo){
-      handleUserUpdate();
-      setIsEditing(false);
-      console.log("Here");
-    }
-    else{
-      console.log("Here instead");
+      const updateSuccess = await handleUserUpdate();
+      if (updateSuccess === 0){
+        setInvalidPassword(false);
+        setIsEditing(false);
+        setPasswordLabel("");
+        setOldPasswordLabel("");
+      }
+      else{
+        setInvalidPassword(true);
+      }
     }
   }
 
@@ -139,48 +127,61 @@ export default function HomePage() {
     setIsEditing(true);
   }
 
-  /*const handleAgeChange = (event) => {
-    setUserAge(event.target.value);
-    updatedValuesRef.current.userAge = event.target.value;
-    handleUserUpdate();
-  };*/
-
   const handleUserUpdate = async () => {
     try {
       const response = await axios.get(`${API_URL}/api/users/getUser`, {
-        params: {emailAddress: userEmail},
+        params: { emailAddress: userEmail },
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         }
       });
 
-      console.log("Fetched user: " + JSON.stringify(response.data));
-  
       const currentUser = response.data;
 
       const updatedUser = {
         id: currentUser.id,
-        firstName: updatedValuesRef.current.firstName,
-        lastName: updatedValuesRef.current.lastName,
         emailAddress: currentUser.emailAddress,
         password: updatedValuesRef.current.password !== null ? updatedValuesRef.current.password : password,
-        phoneNumber: updatedValuesRef.current.phoneNumber !== '' ? updatedValuesRef.current.phoneNumber : phoneNumber
+        phoneNumber: updatedValuesRef.current.phoneNumber !== '' ? updatedValuesRef.current.phoneNumber : phoneNumber,
+        UserType: updatedValuesRef.current.userType
       }
-      const updatedUserJson = JSON.stringify(updatedUser, null, 2);
+
+      if (updatedValuesRef.current.userType === `Owner` || updatedValuesRef.current.userType === `CenterWorker`){
+        updatedUser.age = updatedValuesRef.current.age;
+        updatedUser.firstName = updatedValuesRef.current.firstName;
+        updatedUser.lastName = updatedValuesRef.current.lastName;
+        if (updatedValuesRef.current.userType === `CenterWorker`){
+          updatedUser.centerId = currentUser.centerId;
+        }
+      }
+      else if (updatedValuesRef.current.userType === 'CenterOwner'){
+        updatedUser.centerName = currentUser.centerName;
+        updatedUser.centerAddress = currentUser.centerAddress;
+        updatedUser.centerCity = currentUser.centerCity;
+        updatedUser.centerState = currentUser.centerState;
+        updatedUser.centerZip = currentUser.centerZip;
+        updatedUser.centerPetCount = currentUser.centerPetCount;
+      }
   
-      const updatedResponse = await axios.put(`${API_URL}/api/users/update/User/${userId}`, updatedUser, {
+      const url = `${API_URL}/api/users/update/${updatedValuesRef.current.userType}`
+      const updatedResponse = await axios.put(url, updatedUser, {
+        params: { oldPassword: updatedValuesRef.current.oldPassword},
+
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         }
       });
-  
+
       if (updatedResponse.status !== 200) {
-        throw new Error("Failed to update user data");
+        return 1;
       }
       
+      //Add alert feature somehow to show that data was successfully inserted
       console.log('User updated successfully', updatedResponse.data);
+
+      return 0;
   
     } catch (error) {
       console.error('Failed to update user', error);
@@ -193,7 +194,7 @@ export default function HomePage() {
         <title>Settings Page</title>
       </Head>
 
-      <TitleBar/>
+      <TitleBar />
 
       <main>
         <Stack sx={{ paddingTop: 4 }} alignItems='center' gap={2}>
@@ -202,7 +203,7 @@ export default function HomePage() {
               <Typography variant='h3' align='center'>Settings</Typography>
             </CardContent>
           </Card>
-          <Paper sx={{ width: 600, height: 50 }} elevation={4}>
+          {updatedValuesRef.current.userType != 'CenterOwner' && <Paper sx={{ width: 600, height: 50 }} elevation={4}>
             <Stack spacing={1} direction="row" alignItems='center'>
               <Typography variant='h5'>First Name</Typography>
               <TextField
@@ -210,14 +211,14 @@ export default function HomePage() {
                 align='center'
                 value={firstNameLabel}
                 onChange={(e) => setFirstNameLabel(e.target.value)}
-                InputProps={{ 
-                  style: { height: '40px', width: '470px' }, 
-                  readOnly: !isEditing 
+                InputProps={{
+                  style: { height: '40px', width: '470px' },
+                  readOnly: !isEditing
                 }}
               />
             </Stack>
-          </Paper>
-          <Paper sx={{ width: 600, height: 50 }} elevation={4}>
+          </Paper>}
+          {updatedValuesRef.current.userType != 'CenterOwner' && <Paper sx={{ width: 600, height: 50 }} elevation={4}>
             <Stack spacing={1} direction="row" alignItems='center'>
               <Typography variant='h5'>Last Name</Typography>
               <TextField
@@ -225,14 +226,14 @@ export default function HomePage() {
                 align='center'
                 value={lastNameLabel}
                 onChange={(e) => setLastNameLabel(e.target.value)}
-                InputProps={{ 
-                  style: { height: '40px', width: '470px' }, 
-                  readOnly: !isEditing 
+                InputProps={{
+                  style: { height: '40px', width: '470px' },
+                  readOnly: !isEditing
                 }}
               />
             </Stack>
-          </Paper>
-          <Paper sx={{ width: 600, height: 50 }} elevation={4}>
+          </Paper>}
+          <Paper sx={{ width: 600, height: invalidPhoneNumber ? 70 : 50 }} elevation={4}>
             <Stack spacing={1} direction="row" alignItems='center'>
               <Typography variant='h5'>Phone Number</Typography>
               <TextField
@@ -240,29 +241,32 @@ export default function HomePage() {
                 align='center'
                 value={phoneNumberLabel}
                 onChange={(e) => setPhoneNumberLabel(e.target.value)}
-                InputProps={{ 
-                  style: { height: '40px', width: '425px' }, 
-                  readOnly: !isEditing 
+                InputProps={{
+                  style: { height: '40px', width: '425px' },
+                  readOnly: !isEditing
                 }}
               />
-              {invalidPhoneNumber && (
+            </Stack>
+            {invalidPhoneNumber && (
                 <Typography color="error" variant="body2">
                   Please enter a valid phone number.
                 </Typography>
               )}
-            </Stack>
           </Paper>
-          <Paper sx={{ width: 600, height: 80 }} elevation={4}>
-            {/*<Stack spacing={1} direction="row" alignItems='center'>
+          <Paper sx={{ width: 600, height: invalidPassword ? 120 : 90 }} elevation={4}>
+            <Stack spacing={1} direction="row" alignItems='center'>
               <Typography variant='h5' width={160}>Old Password</Typography>
               <TextField
                 label="Old Password"
                 align='center'
                 value={oldPasswordLabel}
                 onChange={(e) => setOldPasswordLabel(e.target.value)}
-                InputProps={{ style: { height: '40px', width: '420px' } }}
+                InputProps={{ 
+                  style: { height: '40px', width: '425px' },
+                  readOnly: !isEditing
+                }}
               />
-            </Stack>*/}
+            </Stack>
             <Stack spacing={1} direction="row" alignItems='center'>
               <Typography variant='h5'>New Password</Typography>
               <TextField
@@ -270,38 +274,19 @@ export default function HomePage() {
                 align='center'
                 value={passwordLabel}
                 onChange={(e) => setPasswordLabel(e.target.value)}
-                InputProps={{ 
-                  style: { height: '40px', width: '425px' }, 
+                InputProps={{
+                  style: { height: '40px', width: '425px' },
                   readOnly: !isEditing
                 }}
               />
             </Stack>
             {invalidPassword && (
-              <Typography color="error" variant = "body2" sx={{ marginTop: 1}}>
+              <Typography color="error" variant="body2" sx={{ marginTop: 1 }}>
                 Please enter a valid password.
               </Typography>
             )}
           </Paper>
           <Button onClick={isEditing ? handleSave : handleEdit}>{isEditing ? 'Save' : 'Edit'}</Button>
-          {/*userType != "CenterOwner" && (<Paper sx={{ width: 600 }} elevation={4}>
-            <Stack direction = "row">
-              <FormControl fullWidth>
-                <InputLabel id="Age">Age</InputLabel>
-                <Select
-                  labelId="Age"
-                  value={userAge}
-                  onChange={handleAgeChange}
-                  displayEmpty
-                >
-                  {[...Array(100).keys()].map((num) => (
-                    <MenuItem key={num + 1} value={num + 1}>
-                      {num + 1}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Stack>
-          </Paper>)*/}
         </Stack>
       </main>
     </>

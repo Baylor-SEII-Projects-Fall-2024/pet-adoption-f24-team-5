@@ -1,8 +1,11 @@
 package petadoption.api.user;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import petadoption.api.Event.Event;
 import petadoption.api.user.AdoptionCenter.AdoptionCenter;
@@ -12,8 +15,10 @@ import petadoption.api.user.AdoptionCenter.CenterWorkerRepository;
 import petadoption.api.user.Owner.Owner;
 import petadoption.api.user.Owner.OwnerRepository;
 
+import javax.swing.text.html.Option;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -26,54 +31,83 @@ public class UserService {
     private AdoptionCenterRepository adoptionCenterRepository;
     @Autowired
     private CenterWorkerRepository centerWorkerRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
 
 
     public User findUser(String emailAddress) {
-        Optional<User> user = userRepository.findByEmailAddress(emailAddress);
-        if (user.isEmpty()) {
-            throw new IllegalArgumentException("Invalid username or password");
+        if (userRepository.findByEmailAddress(emailAddress).get().getUserType() == UserType.CenterWorker) {
+            Optional<CenterWorker> worker = centerWorkerRepository.findById(userRepository.findByEmailAddress(emailAddress).get().getId());
+            return worker.get();
         }
-        return user.get();
+        else if (userRepository.findByEmailAddress(emailAddress).get().getUserType() == UserType.CenterOwner) {
+            Optional<AdoptionCenter> adoptionCenter = adoptionCenterRepository.findById(userRepository.findByEmailAddress(emailAddress).get().getId());
+            return adoptionCenter.get();
+        }
+        else{
+            Optional<Owner> owner = ownerRepository.findById(userRepository.findByEmailAddress(emailAddress).get().getId());
+            return owner.get();
+        }
     }
 
     public User saveUser(User user) {return userRepository.save(user);}
 
-    public User updateUser(CenterWorker user) {
-        CenterWorker existingUser = centerWorkerRepository.findById(user.getId())
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + user.getId()));
-
-        existingUser.setPassword(user.getPassword());
-        existingUser.setPhoneNumber(user.getPhoneNumber());
-        existingUser.setAge(user.getAge());
-        return centerWorkerRepository.save(existingUser);
+    public ResponseEntity<Owner> updateOwner(Owner owner, String oldPassword) {
+        if (!passwordEncoder.matches(oldPassword, findUser(owner.getEmailAddress()).getPassword())) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        Owner newUser = (Owner) findUser(owner.getEmailAddress());
+        newUser.setPassword(passwordEncoder.encode(owner.getPassword()));
+        newUser.setPhoneNumber(owner.getPhoneNumber());
+        newUser.setFirstName(owner.getFirstName());
+        newUser.setLastName(owner.getLastName());
+        return new ResponseEntity<>(userRepository.save(newUser), HttpStatus.OK);
     }
 
-    public User updateUser(Owner user) {
-        Owner existingUser = ownerRepository.findById(user.getId())
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + user.getId()));
-
-        existingUser.setPassword(user.getPassword());
-        existingUser.setPhoneNumber(user.getPhoneNumber());
-        existingUser.setAge(user.getAge());
-        return ownerRepository.save(existingUser);
+    public ResponseEntity<CenterWorker> updateCenterWorker(CenterWorker worker, String oldPassword) {
+        if (!passwordEncoder.matches(oldPassword, findUser(worker.getEmailAddress()).getPassword())) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        CenterWorker newUser = (CenterWorker) findUser(worker.getEmailAddress());
+        newUser.setPassword(passwordEncoder.encode(worker.getPassword()));
+        newUser.setPhoneNumber(worker.getPhoneNumber());
+        newUser.setFirstName(worker.getFirstName());
+        newUser.setLastName(worker.getLastName());
+        return new ResponseEntity<>(userRepository.save(newUser), HttpStatus.OK);
     }
 
-    public ResponseEntity<User> updateUser(Long id, User user) {
-        //AdoptionCenter existingUser = adoptionCenterRepository.findById(user.getId())
-        //        .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + user.getId()));
-        System.out.println("User inside update: " + userRepository.findById(id).get());
-        return userRepository.findById(id)
-                .map(event -> {
-                    // Update fields
-                    event.setPassword(user.getPassword());
-                    event.setPhoneNumber(user.getPhoneNumber());
+    public ResponseEntity<AdoptionCenter> updateAdoptionCenter(AdoptionCenter adoptionCenter, String oldPassword) {
+        if (!passwordEncoder.matches(oldPassword, findUser(adoptionCenter.getEmailAddress()).getPassword())) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        AdoptionCenter center = (AdoptionCenter) findUser(adoptionCenter.getEmailAddress());
+        center.setPassword(passwordEncoder.encode(adoptionCenter.getPassword()));
+        center.setPhoneNumber(adoptionCenter.getPhoneNumber());
+        return new ResponseEntity<>(adoptionCenterRepository.save(center), HttpStatus.OK);
+    }
 
-                    // Save updated event
-                    User savedUser = userRepository.save(event);
-                    return ResponseEntity.ok(savedUser);
-                })
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<String> getDisplayName(String email) {
+        String displayName = "";
+        User user = userRepository.findByEmailAddress(email).get();
+        if (user.getUserType() == UserType.CenterWorker){
+            displayName = ((CenterWorker) user).getFirstName();
+            if (displayName == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        }
+        else if (user.getUserType() == UserType.Owner){
+            displayName = ((Owner) user).getFirstName();
+            if (displayName == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        } else if (user.getUserType() == UserType.CenterOwner) {
+            displayName = ((AdoptionCenter) user).getCenterName();
+            if (displayName == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        }
+        return new ResponseEntity<>(displayName, HttpStatus.OK);
     }
 
     public void deleteUser(Long userId) {
