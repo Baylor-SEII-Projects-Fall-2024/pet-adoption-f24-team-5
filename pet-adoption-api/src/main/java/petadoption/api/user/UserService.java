@@ -124,12 +124,18 @@ public class UserService {
         return userRepository.findAllAdoptionCenters();
     }
 
-    public ResponseEntity<Long> findIdByEmail(String email) {
+    public AdoptionCenter findCenterByEmail(String email) throws SQLException {
         if (email == null || email.isEmpty()) {
             throw new IllegalArgumentException("email must be valid");
         }
-        return ResponseEntity.status(HttpStatus.OK).body(userRepository.findIdByEmailAddress(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
+        User user = userRepository.findByEmailAddress(email)
+                .orElseThrow(() -> new SQLException("Adoption Center Not Found"));
+
+        if(user.getUserType() != UserType.CenterWorker){
+            throw new IllegalArgumentException("Email doesn't along to adoption center");
+        } else {
+            return (AdoptionCenter) user;
+        }
 
     }
 
