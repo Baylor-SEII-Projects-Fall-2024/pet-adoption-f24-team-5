@@ -48,9 +48,7 @@ const PetGrid = () => {
     return (
         <Box sx={{ height: '100vh', width: '100vw', display: 'flex', flexDirection: 'column' }}>
             {/* Title bar */}
-            <Box sx={{ height: '8vh', backgroundColor: 'primary.main' }}>
-                <TitleBar />
-            </Box>
+
 
             {/* Pet Grid */}
             <Box sx={{ flexGrow: 1, padding: 4 }}>

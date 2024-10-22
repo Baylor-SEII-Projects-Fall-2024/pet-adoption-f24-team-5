@@ -3,27 +3,7 @@ import PetGrid from '@/components/PetGrid';
 import {Box} from "@mui/material";
 import TitleBar from "@/components/TitleBar";
 
-const petsData = [
-    {
-        petName: 'Buddy',
-        species: 'Dog',
-        breed: 'Golden Retriever',
-        color: 'Golden',
-        age: '3 years',
-        description: 'Friendly and playful.',
-        imageName: 'buddy.jpg',
-    },
-    {
-        petName: 'Whiskers',
-        species: 'Cat',
-        breed: 'Siberian',
-        color: 'Gray',
-        age: '2 years',
-        description: 'Loves cuddles.',
-        imageName: 'whiskers.jpg',
-    },
-    // Add more pets here...
-];
+const petsData = [];
 
 const AvailablePets = () => {
     const [loading, setLoading] = useState(true);
