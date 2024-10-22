@@ -37,28 +37,31 @@ public class UserService {
 
 
 
-    public User findUser(String emailAddress) {
-        if (userRepository.findByEmailAddress(emailAddress).get().getUserType() == UserType.CenterWorker) {
-            Optional<CenterWorker> worker = centerWorkerRepository.findById(userRepository.findByEmailAddress(emailAddress).get().getId());
-            return worker.get();
+    public Optional<?> findUser(String emailAddress) {
+        Optional<User> userOpt = userRepository.findByEmailAddress(emailAddress);
+
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            switch (user.getUserType()) {
+                case CenterWorker:
+                    return centerWorkerRepository.findById(user.getId());
+                case CenterOwner:
+                    return adoptionCenterRepository.findById(user.getId());
+                default: // Assume the default is for Owners
+                    return ownerRepository.findById(user.getId());
+            }
         }
-        else if (userRepository.findByEmailAddress(emailAddress).get().getUserType() == UserType.CenterOwner) {
-            Optional<AdoptionCenter> adoptionCenter = adoptionCenterRepository.findById(userRepository.findByEmailAddress(emailAddress).get().getId());
-            return adoptionCenter.get();
-        }
-        else{
-            Optional<Owner> owner = ownerRepository.findById(userRepository.findByEmailAddress(emailAddress).get().getId());
-            return owner.get();
-        }
+
+        return Optional.empty();
     }
 
     public User saveUser(User user) {return userRepository.save(user);}
 
     public ResponseEntity<Owner> updateOwner(Owner owner, String oldPassword) {
-        if (!passwordEncoder.matches(oldPassword, findUser(owner.getEmailAddress()).getPassword())) {
+        if (!passwordEncoder.matches(oldPassword, ((Owner)findUser(owner.getEmailAddress()).get()).getPassword())) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        Owner newUser = (Owner) findUser(owner.getEmailAddress());
+        Owner newUser = (Owner) findUser(owner.getEmailAddress()).get();
         newUser.setPassword(passwordEncoder.encode(owner.getPassword()));
         newUser.setPhoneNumber(owner.getPhoneNumber());
         newUser.setFirstName(owner.getFirstName());
@@ -68,10 +71,10 @@ public class UserService {
     }
 
     public ResponseEntity<CenterWorker> updateCenterWorker(CenterWorker worker, String oldPassword) {
-        if (!passwordEncoder.matches(oldPassword, findUser(worker.getEmailAddress()).getPassword())) {
+        if (!passwordEncoder.matches(oldPassword, ((CenterWorker) findUser(worker.getEmailAddress()).get()).getPassword())) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        CenterWorker newUser = (CenterWorker) findUser(worker.getEmailAddress());
+        CenterWorker newUser = (CenterWorker) findUser(worker.getEmailAddress()).get();
         newUser.setPassword(passwordEncoder.encode(worker.getPassword()));
         newUser.setPhoneNumber(worker.getPhoneNumber());
         newUser.setFirstName(worker.getFirstName());
@@ -81,10 +84,10 @@ public class UserService {
     }
 
     public ResponseEntity<AdoptionCenter> updateAdoptionCenter(AdoptionCenter adoptionCenter, String oldPassword) {
-        if (!passwordEncoder.matches(oldPassword, findUser(adoptionCenter.getEmailAddress()).getPassword())) {
+        if (!passwordEncoder.matches(oldPassword, ((AdoptionCenter) findUser(adoptionCenter.getEmailAddress()).get()).getPassword())) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        AdoptionCenter center = (AdoptionCenter) findUser(adoptionCenter.getEmailAddress());
+        AdoptionCenter center = (AdoptionCenter) findUser(adoptionCenter.getEmailAddress()).get();
         center.setPassword(passwordEncoder.encode(adoptionCenter.getPassword()));
         center.setPhoneNumber(adoptionCenter.getPhoneNumber());
         center.setCenterName(adoptionCenter.getCenterName());
