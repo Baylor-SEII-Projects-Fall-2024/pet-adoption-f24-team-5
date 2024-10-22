@@ -24,7 +24,6 @@ const Login = () => {
             .post(`${API_URL}/api/auth/authenticate`, loginRequest)
             .then((res) => {
                 if (res.status !== 401) {
-                    localStorage.setItem('token', res.data.token);
                     dispatch(setToken(res.data.token));
                     setEmailAddress('');
                     setPassword('');

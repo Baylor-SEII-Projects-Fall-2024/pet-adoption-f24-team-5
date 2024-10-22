@@ -33,6 +33,7 @@ public class Owner extends User {
     @Column(name = "AGE")
     private int age;
 
+
     @Column(name = "LONGITUDE")
     private Double longitude;
 
@@ -42,31 +43,44 @@ public class Owner extends User {
     @Column(name = "LATITUDE")
     private Double Latitude;
 
+    @Column(name = "FIRST_NAME")
+    protected String firstName;
+
+    @Column(name = "LAST_NAME")
+    protected String lastName;
+
+
     public Owner(){
         super();
     }
+
     public Owner(String firstName, String lastName, String emailAddress, String password, UserType userType, int age, String phoneNumber, String centerZip) {
-        super(firstName, lastName, emailAddress, password, userType, phoneNumber);
+        super(emailAddress, password, userType, phoneNumber);
         this.age=age;
-        this.centerZip = centerZip;
-        getLongAndLat(centerZip);
-
-    }
-    public Owner(String firstName, String lastName, String emailAddress, String password, UserType userType, int age, String phoneNumber, Preference preference, String centerZip) {
-        super(firstName, lastName, emailAddress, password, userType, phoneNumber);
-        this.preference = preference;
-        this.age=age;
+        this.firstName=firstName;
+        this.lastName=lastName;
         this.centerZip = centerZip;
         getLongAndLat(centerZip);
     }
-
-    public Owner(Long id, String firstName, String lastName, String emailAddress, String password, UserType userType, int age, String phoneNumber, Preference preference, String zipCode) {
-        super(id, firstName, lastName, emailAddress, password, userType, phoneNumber);
+    public Owner(String emailAddress, String password, UserType userType, int age, String phoneNumber, Preference preference, String centerZip) {
+        super(emailAddress, password, userType, phoneNumber);
         this.preference = preference;
         this.age=age;
-        getLongAndLat(zipCode);
+        this.firstName=firstName;
+        this.lastName=lastName;
+        this.centerZip = centerZip;
+        getLongAndLat(centerZip);
     }
 
+    public Owner(Long id, String firstName, String lastName, String emailAddress, String password, UserType userType, int age, String phoneNumber, Preference preference, String centerZip) {
+        super(id, emailAddress, password, userType, phoneNumber);
+        this.preference = preference;
+        this.age=age;
+        this.firstName=firstName;
+        this.lastName=lastName;
+        this.centerZip = centerZip;
+        getLongAndLat(centerZip);
+    }
 
     private void getLongAndLat(String centerZip) {
         try {

@@ -25,7 +25,11 @@ public class CenterWorker extends User{
     @Column(name = "AGE")
     private int age;
 
+    @Column(name = "FIRST_NAME")
+    protected String firstName;
 
+    @Column(name = "LAST_NAME")
+    protected String lastName;
 
     public CenterWorker(){
         super();
@@ -33,22 +37,28 @@ public class CenterWorker extends User{
     }
 
     public CenterWorker(String firstName, String lastName, String emailAddress, String password, UserType userType, int age, String phoneNumber) {
-        super(firstName, lastName, emailAddress, password, userType, phoneNumber);
+        super(emailAddress, password, userType, phoneNumber);
         centerID = -1L;
         this.age = age;
+        this.firstName = firstName;
+        this.lastName = lastName;
     }
 
 
     public CenterWorker(String firstName, String lastName, String emailAddress, String password, UserType userType, int age, String phoneNumber, Long centerID) {
-        super(firstName, lastName, emailAddress, password, userType, phoneNumber);
+        super(emailAddress, password, userType, phoneNumber);
         this.centerID = centerID;
         this.age = age;
+        this.firstName = firstName;
+        this.lastName = lastName;
     }
 
     public CenterWorker(String firstName, String lastName, Long id, String emailAddress, String password, UserType userType, int age, String phoneNumber, Long centerID) {
-        super(id, firstName, lastName, emailAddress, password, userType, phoneNumber);
+        super(id, emailAddress, password, userType, phoneNumber);
         this.centerID = centerID;
         this.age = age;
+        this.firstName = firstName;
+        this.lastName = lastName;
     }
 
 

@@ -1,9 +1,9 @@
 import axios from "axios";
-import {API_URL} from "@/constants";
-import {useState} from "react";
+import { API_URL } from "@/constants";
+import { useSelector } from 'react-redux';
 
 export const fetchImage = async (imageName) => {
-    const token = localStorage.getItem('token');
+    const token = useSelector((state) => state.user.token);
 
     try {
         console.log(imageName)

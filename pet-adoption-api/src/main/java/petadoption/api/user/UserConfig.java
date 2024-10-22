@@ -56,8 +56,6 @@ public class UserConfig {
             );
 
             AdoptionCenter adoptionCenter1 = new AdoptionCenter(
-                    "Andrew",
-                    "Parks",
                     "Andrew@gmail.com",
                     "password4",
                     UserType.CenterOwner,

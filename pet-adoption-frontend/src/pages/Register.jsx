@@ -11,6 +11,8 @@ import { API_URL } from "@/constants";
 
 const Register = () => {
     const [emailAddress, setEmailAddress] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
     const [password, setPassword] = useState('');
     const [userType, setUserType] = useState('');
     const [centerName, setCenterName] = useState('');
@@ -39,6 +41,8 @@ const Register = () => {
             centerZip,
             numberOfPets: parseInt(numberOfPets, 10),
         } : {
+            firstName,
+            lastName,
             emailAddress,
             password,
             userType: 'Owner',
@@ -68,7 +72,6 @@ const Register = () => {
             .post(`${API_URL}/api/auth/authenticate`, loginRequest)
             .then((res) => {
                 const { token } = res.data;
-                localStorage.setItem('token', token);
                 dispatch(setToken(token));
                 navigate('/');
             })
@@ -216,14 +219,32 @@ const Register = () => {
                         )}
 
                         {userType === 'user' && (
-                            <TextField
-                                label="Age"
-                                type="number"
-                                value={age}
-                                onChange={(e) => setAge(e.target.value)}
-                                required
-                                fullWidth
-                            />
+                            <>
+                                <TextField
+                                    label="First Name"
+                                    type="text"
+                                    value={firstName}
+                                    onChange={(e) => setFirstName(e.target.value)}
+                                    required
+                                    fullWidth
+                                />
+                                <TextField
+                                    label="Last Name"
+                                    type="text"
+                                    value={lastName}
+                                    onChange={(e) => setLastName(e.target.value)}
+                                    required
+                                    fullWidth
+                                />
+                                <TextField
+                                    label="Age"
+                                    type="number"
+                                    value={age}
+                                    onChange={(e) => setAge(e.target.value)}
+                                    required
+                                    fullWidth
+                                />
+                            </>
                         )}
 
                         <Button
