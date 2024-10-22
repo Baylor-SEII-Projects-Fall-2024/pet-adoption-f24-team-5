@@ -62,6 +62,7 @@ public class UserService {
         newUser.setPhoneNumber(owner.getPhoneNumber());
         newUser.setFirstName(owner.getFirstName());
         newUser.setLastName(owner.getLastName());
+        newUser.setAge(owner.getAge());
         return new ResponseEntity<>(userRepository.save(newUser), HttpStatus.OK);
     }
 
@@ -74,6 +75,7 @@ public class UserService {
         newUser.setPhoneNumber(worker.getPhoneNumber());
         newUser.setFirstName(worker.getFirstName());
         newUser.setLastName(worker.getLastName());
+        newUser.setAge(worker.getAge());
         return new ResponseEntity<>(userRepository.save(newUser), HttpStatus.OK);
     }
 

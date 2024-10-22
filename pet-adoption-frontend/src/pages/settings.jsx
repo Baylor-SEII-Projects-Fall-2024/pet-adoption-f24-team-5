@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Head from 'next/head';
-import { Button, Card, CardContent, Stack, TextField, Typography, Paper } from '@mui/material';
+import { Button, Card, CardContent, Stack, TextField, Typography, Paper, Select, MenuItem } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { getSubjectFromToken } from '../utils/tokenUtils';
@@ -18,6 +18,7 @@ export default function HomePage() {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [phoneNumberLabel, setPhoneNumberLabel] = useState('');
   const [invalidPhoneNumber, setInvalidPhoneNumber] = useState(false);
+  const [userAge, setUserAge] = useState('');
   const [userEmail, setUserEmail] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const token = useSelector((state) => state.user.token);
@@ -56,7 +57,9 @@ export default function HomePage() {
           updatedValuesRef.current.phoneNumber = response.data.phoneNumber;
           updatedValuesRef.current.password = response.data.password;
           updatedValuesRef.current.userType = response.data.userType;
-          console.log("UserType: " + updatedValuesRef.current.userType);
+          if (updatedValuesRef.current.userType === `CenterWorker` || updatedValuesRef.current.userType === `Owner`){
+            setUserAge(response.data.age);
+          }
         }
         catch (error) {
           console.error('Failed to fetch user', error);
@@ -103,6 +106,10 @@ export default function HomePage() {
     }
   };
 
+  const handleAgeChange = (event) => {
+    setUserAge(event.target.value);
+  }
+
   const handleSave = async () => {
     handleFirstNameChange();
     handleLastNameChange();
@@ -148,7 +155,7 @@ export default function HomePage() {
       }
 
       if (updatedValuesRef.current.userType === `Owner` || updatedValuesRef.current.userType === `CenterWorker`){
-        updatedUser.age = updatedValuesRef.current.age;
+        updatedUser.age = userAge;
         updatedUser.firstName = updatedValuesRef.current.firstName;
         updatedUser.lastName = updatedValuesRef.current.lastName;
         if (updatedValuesRef.current.userType === `CenterWorker`){
@@ -163,6 +170,8 @@ export default function HomePage() {
         updatedUser.centerZip = currentUser.centerZip;
         updatedUser.centerPetCount = currentUser.centerPetCount;
       }
+
+      console.log(updatedUser);
   
       const url = `${API_URL}/api/users/update/${updatedValuesRef.current.userType}`
       const updatedResponse = await axios.put(url, updatedUser, {
@@ -286,6 +295,25 @@ export default function HomePage() {
               </Typography>
             )}
           </Paper>
+          {updatedValuesRef.current.userType != `CenterOwner` && <Paper sx={{ width: 600, height: 50 }} elevation={4}>
+            <Stack spacing={1} direction="row" alignItems='center'>
+            <Typography variant='h5'>Age</Typography>
+            <Select
+              labelId="age-label"
+              id="age-select"
+              value={userAge}
+              onChange={handleAgeChange}
+              label="Age"
+              style={{ height: '40px', width: '545px', pointerEvents: !isEditing ? 'none' : 'auto' }}
+            >
+              {Array.from({ length: 101 }, (_, age) => (
+              <MenuItem key={age} value={age}>
+                {age}
+              </MenuItem>
+            ))}
+            </Select>
+            </Stack>
+          </Paper>}
           <Button onClick={isEditing ? handleSave : handleEdit}>{isEditing ? 'Save' : 'Edit'}</Button>
         </Stack>
       </main>
