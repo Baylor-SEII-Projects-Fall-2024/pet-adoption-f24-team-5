@@ -35,8 +35,6 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-
-
     public Optional<?> findUser(String emailAddress) {
         Optional<User> userOpt = userRepository.findByEmailAddress(emailAddress);
 
@@ -99,27 +97,30 @@ public class UserService {
         return new ResponseEntity<>(adoptionCenterRepository.save(center), HttpStatus.OK);
     }
 
-    public ResponseEntity<String> getDisplayName(String email) {
+    public String getDisplayName(String email) {
         String displayName = "";
+        if (userRepository.findByEmailAddress(email).isEmpty()) {
+            throw new EntityNotFoundException("User has no display name");
+        }
         User user = userRepository.findByEmailAddress(email).get();
-        if (user.getUserType() == UserType.CenterWorker){
+        if (userRepository.findByEmailAddress(email).get().getUserType() == UserType.CenterWorker){
             displayName = ((CenterWorker) user).getFirstName();
             if (displayName == null) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                throw new EntityNotFoundException("User not found");
             }
         }
-        else if (user.getUserType() == UserType.Owner){
+        else if (userRepository.findByEmailAddress(email).get().getUserType() == UserType.Owner){
             displayName = ((Owner) user).getFirstName();
             if (displayName == null) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                throw new EntityNotFoundException("User not found");
             }
-        } else if (user.getUserType() == UserType.CenterOwner) {
+        } else if (userRepository.findByEmailAddress(email).get().getUserType() == UserType.CenterOwner) {
             displayName = ((AdoptionCenter) user).getCenterName();
             if (displayName == null) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                throw new EntityNotFoundException("User not found");
             }
         }
-        return new ResponseEntity<>(displayName, HttpStatus.OK);
+        return displayName;
     }
 
     public void deleteUser(Long userId) {

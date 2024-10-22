@@ -60,6 +60,11 @@ public class UserController {
 
     @GetMapping("/getDisplayName")
     public ResponseEntity<String> getDisplayName(@RequestParam("emailAddress") String email) {
-        return userService.getDisplayName(email);
+        try{
+            return new ResponseEntity<>(userService.getDisplayName(email), HttpStatus.OK);
+        }
+        catch (Error e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
     }
 }
