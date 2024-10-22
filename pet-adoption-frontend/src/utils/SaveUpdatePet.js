@@ -1,5 +1,6 @@
 import {API_URL} from "@/constants";
 import axios from "axios";
+import {getSubjectFromToken} from "@/utils/tokenUtils";
 
 export const saveUpdatePet = ({formType, petData, token, resetFields}) => {
 
@@ -11,12 +12,14 @@ export const saveUpdatePet = ({formType, petData, token, resetFields}) => {
         url += `save`;
     }
 
+    url += `?email=${getSubjectFromToken(token)}`
+
     console.log('Pet Data: ', petData);
 
     axios
         .post(url, petData, {
             headers: {
-                Authorization: `Bearer ${token}`, // Pass token in the header
+                Authorization: `Bearer ${token}`,
                 'Content-Type': 'application/json'
             }
         })
