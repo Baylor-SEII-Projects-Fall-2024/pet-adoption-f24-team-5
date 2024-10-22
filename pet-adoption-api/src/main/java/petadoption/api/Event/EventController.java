@@ -21,19 +21,43 @@ public class EventController {
         this.eventService = eventService;
     }
     @GetMapping
-    public List<Event> getEvents() {
-           return eventService.findAllEvents();
+    public ResponseEntity<?> getEvents() {
+        try {
+            List<Event> events = eventService.findAllEvents();
+            return new ResponseEntity<>(events, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
     @PutMapping("/update_event/{id}")
     public ResponseEntity<?> updateEvent(@PathVariable Long id, @RequestBody Event updatedEvent) {
-        return eventService.updateEvent(id, updatedEvent);
+        if(id == null) {return ResponseEntity.badRequest().body("Cannot update event: event ID is null");}
+        try {
+            eventService.updateEvent(id, updatedEvent);
+            return ResponseEntity.ok("Event updated");
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
     @DeleteMapping("/delete_event/{id}")
-    public void deleteEvent(@PathVariable Long id) {
-        eventService.deleteEvent(id);
+    public ResponseEntity<?> deleteEvent(@PathVariable Long id) {
+        if(id == null) {return ResponseEntity.badRequest().body("Cannot delete event: event ID is null");}
+        try {
+            eventService.deleteEvent(id);
+            return ResponseEntity.ok("Event deleted");
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
     @PostMapping("/create_event")
     public ResponseEntity<?> register(@RequestBody Event event) {
+        if(event == null) {return ResponseEntity.badRequest().body("Cannot create event: event not received");}
+        if(event.event_description == null) {return ResponseEntity.badRequest().body("Cannot create event: enter a description");}
+        if(event.event_time == null) {return ResponseEntity.badRequest().body("Cannot create event: enter a time");}
+        if(event.center_id == null) {return ResponseEntity.badRequest().body("Cannot create event: enter a center ID");}
+        if(event.event_name == null) {return ResponseEntity.badRequest().body("Cannot create event: enter an event name");}
+        if(event.event_date == null) {return ResponseEntity.badRequest().body("Cannot create event: enter an event date");}
+
         try{
             Long id = eventService.createEvent(event);
             return new ResponseEntity<>(id, HttpStatus.OK);
@@ -42,7 +66,7 @@ public class EventController {
         }
     }
     @PostMapping("/initialize_events")
-    public ResponseEntity<List<Long>> initialize() {
+    public ResponseEntity<?> initialize() {
         try{
             List<Long> ids = new ArrayList<>();
             List<Event> events;

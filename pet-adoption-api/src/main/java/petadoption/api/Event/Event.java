@@ -36,26 +36,26 @@ public class Event {
     @Convert(converter = LocalTimeConverter.class)
     protected LocalTime event_time;
 
-    @Column(name = "DESCRIPTION")
-    protected String description;
+    @Column(name = "EVENT_DESCRIPTION")
+    protected String event_description;
 
     public Event() {}
 
-    public Event(Long center_id, String event_name, LocalDate event_date, LocalTime event_time, String description) {
+    public Event(Long center_id, String event_name, LocalDate event_date, LocalTime event_time, String event_description) {
         this.center_id = center_id;
         this.event_name = event_name;
         this.event_date = event_date;
         this.event_time = event_time;
-        this.description = description;
+        this.event_description = event_description;
 
     }
-    public Event(Long event_id, Long center_id, String event_name, LocalDate event_date, LocalTime event_time, String description) {
+    public Event(Long event_id, Long center_id, String event_name, LocalDate event_date, LocalTime event_time, String event_description) {
         this.event_id = event_id;
         this.center_id = center_id;
         this.event_name = event_name;
         this.event_date = event_date;
         this.event_time = event_time;
-        this.description = description;
+        this.event_description = event_description;
     }
 
     public Long getEventId() {
@@ -96,6 +96,12 @@ public class Event {
 
     public void setEventTime(LocalTime event_time) {
         this.event_time = event_time;
+    }
+    public String getEventDescription() {
+        return event_description;
+    }
+    public void setEventDescription(String event_description) {
+        this.event_description = event_description;
     }
 
 }

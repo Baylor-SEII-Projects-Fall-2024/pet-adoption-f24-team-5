@@ -26,7 +26,7 @@ public class EventService {
                     event.setCenterId(updatedEvent.getCenterId());
                     event.setEventDate(updatedEvent.getEventDate());
                     event.setEventTime(updatedEvent.getEventTime());
-                    event.setDescription(updatedEvent.getDescription());
+                    event.setEventDescription(updatedEvent.getEventDescription());
 
                     // Save updated event
                     Event savedEvent = eventRepository.save(event);

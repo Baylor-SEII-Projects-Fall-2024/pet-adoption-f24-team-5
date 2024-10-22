@@ -6,6 +6,7 @@ import axios from "axios";
 import {API_URL} from "@/constants";
 import TitleBar from "@/components/TitleBar";
 import {getSubjectFromToken} from "@/utils/tokenUtils";
+import {useSelector} from "react-redux";
 
 const CreateEvent = () => {
     const [event_name, setEventName] = useState('');
@@ -21,7 +22,7 @@ const CreateEvent = () => {
     const [events, setEvents] = useState([]);
     const [noFutureEvents, setNoFutureEvents] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState(null);
-    const token = localStorage.getItem('token');
+    const token = useSelector((state) => state.user.token);
     const [userEmail, setUserEmail] = useState('');
     const [userId, setUserId] = useState('');
 
@@ -351,6 +352,12 @@ const CreateEvent = () => {
             return;
         }
 
+        console.log("Event data being packaged...");
+        console.log("centerID: " + center_id);
+        console.log("eventName: " + event_name);
+        console.log("eventDate: " + event_date);
+        console.log("eventTime: " + event_time);
+        console.log("eventDesc: " + event_description);
         const eventData = {
             center_id,
             event_name,
@@ -358,7 +365,7 @@ const CreateEvent = () => {
             event_time,
             event_description,
         };
-        console.log('Event Data', eventData);
+        console.log('Event Data: ', eventData);
 
         const url = selectedEvent
             ? `${API_URL}/api/events/update_event/${selectedEvent.event_id}`
