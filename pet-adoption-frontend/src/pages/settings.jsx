@@ -20,6 +20,7 @@ export default function HomePage() {
   const [invalidPhoneNumber, setInvalidPhoneNumber] = useState(false);
   const [userAge, setUserAge] = useState('');
   const [userEmail, setUserEmail] = useState('');
+  const [centerName, setCenterName] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const token = useSelector((state) => state.user.token);
 
@@ -59,6 +60,9 @@ export default function HomePage() {
           updatedValuesRef.current.userType = response.data.userType;
           if (updatedValuesRef.current.userType === `CenterWorker` || updatedValuesRef.current.userType === `Owner`){
             setUserAge(response.data.age);
+          }
+          else{
+            setCenterName(response.data.centerName);
           }
         }
         catch (error) {
@@ -163,7 +167,7 @@ export default function HomePage() {
         }
       }
       else if (updatedValuesRef.current.userType === 'CenterOwner'){
-        updatedUser.centerName = currentUser.centerName;
+        updatedUser.centerName = centerName;
         updatedUser.centerAddress = currentUser.centerAddress;
         updatedUser.centerCity = currentUser.centerCity;
         updatedUser.centerState = currentUser.centerState;
@@ -312,6 +316,21 @@ export default function HomePage() {
               </MenuItem>
             ))}
             </Select>
+            </Stack>
+          </Paper>}
+          {updatedValuesRef.current.userType == `CenterOwner` && <Paper sx={{ width: 600, height: 50 }} elevation={4}>
+            <Stack spacing={1} direction="row" alignItems='center'>
+              <Typography variant='h5'>Center Name</Typography>
+              <TextField
+                label="Center Name"
+                align='center'
+                value={centerName}
+                onChange={(e) => setCenterName(e.target.value)}
+                InputProps={{
+                  style: { height: '40px', width: '440px' },
+                  readOnly: !isEditing
+                }}
+              />
             </Stack>
           </Paper>}
           <Button onClick={isEditing ? handleSave : handleEdit}>{isEditing ? 'Save' : 'Edit'}</Button>

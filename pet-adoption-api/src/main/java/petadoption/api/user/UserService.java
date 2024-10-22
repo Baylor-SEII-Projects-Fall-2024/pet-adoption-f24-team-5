@@ -86,6 +86,7 @@ public class UserService {
         AdoptionCenter center = (AdoptionCenter) findUser(adoptionCenter.getEmailAddress());
         center.setPassword(passwordEncoder.encode(adoptionCenter.getPassword()));
         center.setPhoneNumber(adoptionCenter.getPhoneNumber());
+        center.setCenterName(adoptionCenter.getCenterName());
         return new ResponseEntity<>(adoptionCenterRepository.save(center), HttpStatus.OK);
     }
 
