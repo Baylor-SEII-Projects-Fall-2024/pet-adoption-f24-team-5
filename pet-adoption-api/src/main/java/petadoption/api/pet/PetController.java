@@ -58,13 +58,14 @@ public class PetController {
     }
 
     @PostMapping("/update")
-    public ResponseEntity<?> updatePet(@RequestBody Pet pet) {
-        if(pet.getPetId() == null) {
-            return ResponseEntity.badRequest().body("Pet id is required");
-        }
+    public ResponseEntity<?> updatePet(@RequestBody Pet pet, @RequestParam String email) {
+        if(pet.getPetId() == null) { return ResponseEntity.badRequest().body("Pet id is required");}
+
+        if(email.isEmpty()) { return ResponseEntity.badRequest().body("Email is required");}
+
 
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(petService.updatePet(pet));
+            return ResponseEntity.status(HttpStatus.OK).body(petService.savePet(pet, userService.findCenterByWorkerEmail(email)));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }

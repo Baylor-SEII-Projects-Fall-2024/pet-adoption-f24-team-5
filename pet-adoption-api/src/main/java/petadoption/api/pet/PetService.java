@@ -24,13 +24,6 @@ public class PetService {
 
     }
 
-    public Pet updatePet(Pet pet) {
-        if(pet.getPetId() == null) {
-            throw new IllegalArgumentException("Pet Id is required to update pet");
-        }
-        return petRepository.save(pet);
-    }
-
     public List<Pet> getPetByAdoptionCenter(AdoptionCenter adoptionCenter) {
         return petRepository.findByAdoptionCenter(adoptionCenter)
                 .orElse(null);
