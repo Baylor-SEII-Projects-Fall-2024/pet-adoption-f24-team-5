@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import petadoption.api.Event.Event;
 import petadoption.api.user.AdoptionCenter.AdoptionCenter;
 import petadoption.api.user.AdoptionCenter.AdoptionCenterRepository;
@@ -121,6 +122,28 @@ public class UserService {
     // In UserService.java
     public List<AdoptionCenter> findAllAdoptionCenters() {
         return userRepository.findAllAdoptionCenters();
+    }
+
+    public AdoptionCenter findCenterByWorkerEmail(String email) throws SQLException {
+        if (email == null || email.isEmpty()) {
+            throw new IllegalArgumentException("email must be valid");
+        }
+        System.out.println(email);
+
+        Long centerId = centerWorkerRepository.findCenterIdByEmailAddress(email)
+                .orElseThrow(() -> new SQLException("Could not find center "));
+        System.out.println(centerId);
+
+        AdoptionCenter center = adoptionCenterRepository.findById(centerId)
+                .orElseThrow(() -> new SQLException("Adoption Center Not Found"));
+        System.out.println(center);
+
+        if(center.getUserType() != UserType.CenterOwner){
+            throw new IllegalArgumentException("Email doesn't belong to Center worker");
+        } else {
+            return center;
+        }
+
     }
 
 }
