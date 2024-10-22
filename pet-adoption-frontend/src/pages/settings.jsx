@@ -21,6 +21,11 @@ export default function HomePage() {
   const [userAge, setUserAge] = useState('');
   const [userEmail, setUserEmail] = useState('');
   const [centerName, setCenterName] = useState('');
+  const [centerAddress, setCenterAddress] = useState('');
+  const [centerCity, setCenterCity] = useState('');
+  const [centerState, setCenterState] = useState('');
+  const [centerZip, setCenterZip] = useState('');
+  const [invalidZip, setInvalidZip] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const token = useSelector((state) => state.user.token);
 
@@ -63,6 +68,10 @@ export default function HomePage() {
           }
           else{
             setCenterName(response.data.centerName);
+            setCenterAddress(response.data.centerAddress);
+            setCenterCity(response.data.centerCity);
+            setCenterState(response.data.centerState);
+            setCenterZip(response.data.centerZip);
           }
         }
         catch (error) {
@@ -114,13 +123,25 @@ export default function HomePage() {
     setUserAge(event.target.value);
   }
 
+  const handleZipChange = () => {
+    if (centerZip.length === 5){
+      setInvalidZip(false);
+      return true;
+    }
+    else{
+      setInvalidZip(true);
+      return false;
+    }
+  }
+
   const handleSave = async () => {
     handleFirstNameChange();
     handleLastNameChange();
     handlePasswordChange();
-    let invalidInfo = handlePhoneNumberChange();
+    let invalidPhoneNumber = handlePhoneNumberChange();
+    let invalidZip = handleZipChange();
     
-    if (!invalidInfo){
+    if (!invalidPhoneNumber && !invalidZip){
       const updateSuccess = await handleUserUpdate();
       if (updateSuccess === 0){
         setInvalidPassword(false);
@@ -168,10 +189,10 @@ export default function HomePage() {
       }
       else if (updatedValuesRef.current.userType === 'CenterOwner'){
         updatedUser.centerName = centerName;
-        updatedUser.centerAddress = currentUser.centerAddress;
-        updatedUser.centerCity = currentUser.centerCity;
-        updatedUser.centerState = currentUser.centerState;
-        updatedUser.centerZip = currentUser.centerZip;
+        updatedUser.centerAddress = centerAddress;
+        updatedUser.centerCity = centerCity;
+        updatedUser.centerState = centerState;
+        updatedUser.centerZip = centerZip;
         updatedUser.centerPetCount = currentUser.centerPetCount;
       }
 
@@ -318,7 +339,9 @@ export default function HomePage() {
             </Select>
             </Stack>
           </Paper>}
-          {updatedValuesRef.current.userType == `CenterOwner` && <Paper sx={{ width: 600, height: 50 }} elevation={4}>
+          {updatedValuesRef.current.userType == `CenterOwner` && 
+          <>
+          <Paper sx={{ width: 600, height: 50 }} elevation={4}>
             <Stack spacing={1} direction="row" alignItems='center'>
               <Typography variant='h5'>Center Name</Typography>
               <TextField
@@ -332,7 +355,74 @@ export default function HomePage() {
                 }}
               />
             </Stack>
-          </Paper>}
+          </Paper>
+          <Paper sx={{ width: 600, height: 50 }} elevation={4}>
+          <Stack spacing={1} direction="row" alignItems='center'>
+            <Typography variant='h5'>Center Address</Typography>
+            <TextField
+              label="Center Address"
+              align='center'
+              value={centerAddress}
+              onChange={(e) => setCenterAddress(e.target.value)}
+              InputProps={{
+                style: { height: '40px', width: '420px' },
+                readOnly: !isEditing
+              }}
+            />
+          </Stack>
+        </Paper>
+        <Paper sx={{ width: 600, height: 50 }} elevation={4}>
+          <Stack spacing={1} direction="row" alignItems='center'>
+            <Typography variant='h5'>Center City</Typography>
+            <TextField
+              label="Center City"
+              align='center'
+              value={centerCity}
+              onChange={(e) => setCenterCity(e.target.value)}
+              InputProps={{
+                style: { height: '40px', width: '465px' },
+                readOnly: !isEditing
+              }}
+            />
+          </Stack>
+        </Paper>
+        <Paper sx={{ width: 600, height: 50 }} elevation={4}>
+          <Stack spacing={1} direction="row" alignItems='center'>
+            <Typography variant='h5'>Center State</Typography>
+            <TextField
+              label="Center State"
+              align='center'
+              value={centerState}
+              onChange={(e) => setCenterState(e.target.value)}
+              InputProps={{
+                style: { height: '40px', width: '450px' },
+                readOnly: !isEditing
+              }}
+            />
+          </Stack>
+        </Paper>
+        <Paper sx={{ width: 600, height: !invalidZip ? 50 : 70 }} elevation={4}>
+          <Stack spacing={1} direction="row" alignItems='center'>
+            <Typography variant='h5'>Center Zip</Typography>
+            <TextField
+              label="Center Zip"
+              align='center'
+              value={centerZip}
+              onChange={(e) => setCenterZip(e.target.value)}
+              InputProps={{
+                style: { height: '40px', width: '470px' },
+                readOnly: !isEditing
+              }}
+            />
+          </Stack>
+          {invalidZip && (
+                <Typography color="error" variant="body2">
+                  Please enter a valid zip code.
+                </Typography>
+              )}
+        </Paper>
+        </>
+          }
           <Button onClick={isEditing ? handleSave : handleEdit}>{isEditing ? 'Save' : 'Edit'}</Button>
         </Stack>
       </main>

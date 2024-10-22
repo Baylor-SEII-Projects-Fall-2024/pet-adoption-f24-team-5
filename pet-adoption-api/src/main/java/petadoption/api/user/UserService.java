@@ -87,6 +87,11 @@ public class UserService {
         center.setPassword(passwordEncoder.encode(adoptionCenter.getPassword()));
         center.setPhoneNumber(adoptionCenter.getPhoneNumber());
         center.setCenterName(adoptionCenter.getCenterName());
+        center.setCenterAddress(adoptionCenter.getCenterAddress());
+        center.setCenterCity(adoptionCenter.getCenterCity());
+        center.setCenterState(adoptionCenter.getCenterState());
+        center.setCenterZip(adoptionCenter.getCenterZip());
+        center.setNumberOfPets(adoptionCenter.getNumberOfPets());
         return new ResponseEntity<>(adoptionCenterRepository.save(center), HttpStatus.OK);
     }
 
