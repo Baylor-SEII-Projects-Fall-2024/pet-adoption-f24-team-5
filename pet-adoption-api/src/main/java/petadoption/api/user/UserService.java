@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import petadoption.api.Event.Event;
 import petadoption.api.user.AdoptionCenter.AdoptionCenter;
 import petadoption.api.user.AdoptionCenter.AdoptionCenterRepository;
@@ -62,6 +63,7 @@ public class UserService {
         newUser.setPhoneNumber(owner.getPhoneNumber());
         newUser.setFirstName(owner.getFirstName());
         newUser.setLastName(owner.getLastName());
+        newUser.setAge(owner.getAge());
         return new ResponseEntity<>(userRepository.save(newUser), HttpStatus.OK);
     }
 
@@ -74,6 +76,7 @@ public class UserService {
         newUser.setPhoneNumber(worker.getPhoneNumber());
         newUser.setFirstName(worker.getFirstName());
         newUser.setLastName(worker.getLastName());
+        newUser.setAge(worker.getAge());
         return new ResponseEntity<>(userRepository.save(newUser), HttpStatus.OK);
     }
 
@@ -84,6 +87,12 @@ public class UserService {
         AdoptionCenter center = (AdoptionCenter) findUser(adoptionCenter.getEmailAddress());
         center.setPassword(passwordEncoder.encode(adoptionCenter.getPassword()));
         center.setPhoneNumber(adoptionCenter.getPhoneNumber());
+        center.setCenterName(adoptionCenter.getCenterName());
+        center.setCenterAddress(adoptionCenter.getCenterAddress());
+        center.setCenterCity(adoptionCenter.getCenterCity());
+        center.setCenterState(adoptionCenter.getCenterState());
+        center.setCenterZip(adoptionCenter.getCenterZip());
+        center.setNumberOfPets(adoptionCenter.getNumberOfPets());
         return new ResponseEntity<>(adoptionCenterRepository.save(center), HttpStatus.OK);
     }
 
@@ -127,6 +136,28 @@ public class UserService {
     // In UserService.java
     public List<AdoptionCenter> findAllAdoptionCenters() {
         return userRepository.findAllAdoptionCenters();
+    }
+
+    public AdoptionCenter findCenterByWorkerEmail(String email) throws SQLException {
+        if (email == null || email.isEmpty()) {
+            throw new IllegalArgumentException("email must be valid");
+        }
+        System.out.println(email);
+
+        Long centerId = centerWorkerRepository.findCenterIdByEmailAddress(email)
+                .orElseThrow(() -> new SQLException("Could not find center "));
+        System.out.println(centerId);
+
+        AdoptionCenter center = adoptionCenterRepository.findById(centerId)
+                .orElseThrow(() -> new SQLException("Adoption Center Not Found"));
+        System.out.println(center);
+
+        if(center.getUserType() != UserType.CenterOwner){
+            throw new IllegalArgumentException("Email doesn't belong to Center worker");
+        } else {
+            return center;
+        }
+
     }
 
 }

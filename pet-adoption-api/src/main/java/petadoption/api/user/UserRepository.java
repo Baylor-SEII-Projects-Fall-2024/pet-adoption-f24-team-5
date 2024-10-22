@@ -14,6 +14,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByEmailAddressAndPassword(String email, String password);
     Optional<User> findByEmailAddress(String email);
+    Optional<Long> findIdByEmailAddress(String email);
 
     // In UserRepository.java
     @Query("SELECT u FROM User u WHERE TYPE(u) = AdoptionCenter")

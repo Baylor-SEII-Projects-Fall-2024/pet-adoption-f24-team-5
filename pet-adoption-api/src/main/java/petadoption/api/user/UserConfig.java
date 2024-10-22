@@ -30,7 +30,7 @@ public class UserConfig {
                     UserType.CenterWorker,
                     20,
                     "914-282-8870",
-                    1L
+                    5L
             );
 
             CenterWorker user2 = new CenterWorker(
@@ -41,7 +41,18 @@ public class UserConfig {
                     UserType.CenterWorker,
                     21,
                     "631-889-5214",
-                    1L
+                    5L
+            );
+
+            CenterWorker user4 = new CenterWorker(
+                    "Work",
+                    "Hard",
+                    "work@gmail.com",
+                    "password",
+                    UserType.CenterWorker,
+                    43,
+                    "770-586-9987",
+                    6L
             );
 
             Owner user3 = new Owner(
@@ -56,6 +67,7 @@ public class UserConfig {
             );
 
             AdoptionCenter adoptionCenter1 = new AdoptionCenter(
+                    4L,
                     "Andrew@gmail.com",
                     "password4",
                     UserType.CenterOwner,
@@ -82,21 +94,23 @@ public class UserConfig {
             );
 
             AdoptionCenter adoptionCenter3 = new AdoptionCenter(
-                    "peter@example.com",
-                    "pass",
+                    2L,
+                    "adopting@gmail.com",
+                    "password",
                     UserType.CenterOwner,
-                    "832-773-9781",
-                    "Waco shelter",
-                    "bagbe str",
+                    "254-556-7794",
+                    "Waco Pet Adoption",
+                    "1608 Bagby Avenue",
                     "Waco",
-                    "Tx",
-                    "76701",
+                    "Texas",
+                    "76706",
                     12
             );
 
             authenticationController.register(user1);
             authenticationController.register(user2);
             authenticationController.register(user3);
+            authenticationController.register(user4);
             authenticationController.register(adoptionCenter1);
             authenticationController.register(adoptionCenter2);
             authenticationController.register(adoptionCenter3);

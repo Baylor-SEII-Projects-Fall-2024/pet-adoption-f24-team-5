@@ -1,34 +1,8 @@
-import React, { useState, useEffect } from 'react';
 import { Card, CardContent, Typography, CircularProgress } from '@mui/material';
-import { fetchImage } from '@/utils/fetchImage';
+import ImageComponent from "@/components/ImageComponent";
 
 const PetCard = ({ pet, onClick }) => {
-    const [error, setError] = useState(false); // Track fetch errors
-    const [imageType, setImageType] = useState("");
-    const [imageData, setImageData] = useState("");
 
-
-    useEffect(() => {
-
-        const loadImage = async () => {
-            try {
-                const {imageType, imageData} = await fetchImage(pet.imageName); // Fetch image URL
-                setImageType(imageType);
-                setImageData(imageData);
-
-            } catch (err) {
-                console.error('Image fetch failed:', err);
-                setError(true); // Set error state on failure
-            }
-        };
-
-        if (pet.imageName) loadImage(); // Trigger image load if name exists
-
-    }, [pet.imageName]);
-
-    const handleImageError = () => {
-        setError(true); // Handle image load errors
-    };
 
     return (
         <Card onClick={onClick}
@@ -39,18 +13,14 @@ const PetCard = ({ pet, onClick }) => {
                     border: '2px solid blue',
                     },}} elevation={4} key={pet.petName}>
             <CardContent>
-                    <img
-                        src={`data:${imageType};base64,${imageData}`}
-                        alt="Pet"
-                        onError={handleImageError}
-                        style={{
-                            float: 'left',
-                            margin: '0 15px 15px 0',
-                            width: '100%',
-                            maxWidth: '200px',
-                            height: 'auto',
-                        }}
-                    />
+                   <ImageComponent
+                       imageName={pet.imageName}
+                       float='left'
+                       margin='0 15px 15px 0'
+                       width='100%'
+                       maxWidth='200px'
+                       height='auto'
+                   />
                     <>
                         <Typography variant="h4" align="left">
                             {pet.petName}
