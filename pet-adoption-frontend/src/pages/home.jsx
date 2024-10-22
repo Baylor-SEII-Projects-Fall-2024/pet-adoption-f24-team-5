@@ -6,6 +6,7 @@ import axios from 'axios';
 import { API_URL } from "@/constants";
 import { getSubjectFromToken, getAuthorityFromToken } from "@/utils/tokenUtils";
 import TitleBar from "@/components/TitleBar";
+import PetCard from "@/components/PetCard";
 
 
 const HomePage = () => {
@@ -78,31 +79,11 @@ const HomePage = () => {
         </Card>
     );
 
-    const PetCard = ({ pet }) => (
-        <Card sx={{ width: '48%' }} elevation={4} key={pet.name}>
-            <CardContent>
-                <Typography variant='h5' align='center'>{pet.petName}</Typography>
-                <Typography variant='body2' align='center'>{pet.description}</Typography>
-                <CardMedia
-                    component="img"
-                    image={pet.imageName}
-                    alt="Pet"
-                    sx={{
-                        float: 'left',
-                        margin: '0 15px 15px 0',
-                        maxWidth: '200px',
-                        height: 'auto'
-                    }}
-                />
-            </CardContent>
-        </Card>
-    );
+
 
     return (
         <Box sx={{ height: '100vh', width: '100vw', display: 'flex', flexDirection: 'column' }}>
-            <Box sx={{ height: '8vh', width: '100vw', backgroundColor: 'primary.main' }}>
-                <TitleBar />
-            </Box>
+            <TitleBar />
             <Box sx={{ height: '92vh', display: 'flex', flexDirection: 'row' }}>
                 {!isEventsCollapsed && (
                     <Box sx={{ width: '25vw', display: 'flex', flexDirection: 'column', borderRight: '1px solid black', overflowY: 'auto', height: '100%' }}>
@@ -123,7 +104,13 @@ const HomePage = () => {
                         {'>'}
                     </Button>
                 )}
-                <Box sx={{ width: isEventsCollapsed ? '100vw' : '75vw', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 4, padding: 4 }}>
+                <Box sx={{ width: isEventsCollapsed ? '100vw' : '75vw',
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    justifyContent: 'center',
+                    gap: 4,
+                    padding: 4
+                }}>
                     {pets.map((pet) => (
                         <PetCard pet={pet} key={pet.name} />
                     ))}
