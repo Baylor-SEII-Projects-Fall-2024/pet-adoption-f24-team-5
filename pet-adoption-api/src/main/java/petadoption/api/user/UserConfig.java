@@ -65,7 +65,7 @@ public class UserConfig {
                     "1608 James Avenue",
                     "Waco",
                     "Texas",
-                    "76706",
+                    "44730",
                     128
             );
 

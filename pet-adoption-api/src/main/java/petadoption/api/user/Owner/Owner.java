@@ -8,6 +8,16 @@ import petadoption.api.preferences.Preference;
 import petadoption.api.user.User;
 import petadoption.api.user.UserType;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 @Getter
 @Setter
 @Entity
@@ -23,22 +33,96 @@ public class Owner extends User {
     @Column(name = "AGE")
     private int age;
 
+    @Column(name = "LONGITUDE")
+    private Double longitude;
+
+    @Column(name = "ZIPCODE")
+    private String centerZip;
+
+    @Column(name = "LATITUDE")
+    private Double Latitude;
+
     public Owner(){
         super();
     }
-    public Owner(String firstName, String lastName, String emailAddress, String password, UserType userType, int age, String phoneNumber) {
+    public Owner(String firstName, String lastName, String emailAddress, String password, UserType userType, int age, String phoneNumber, String centerZip) {
         super(firstName, lastName, emailAddress, password, userType, phoneNumber);
         this.age=age;
+        this.centerZip = centerZip;
+        getLongAndLat(centerZip);
+
     }
-    public Owner(String firstName, String lastName, String emailAddress, String password, UserType userType, int age, String phoneNumber, Preference preference) {
+    public Owner(String firstName, String lastName, String emailAddress, String password, UserType userType, int age, String phoneNumber, Preference preference, String centerZip) {
         super(firstName, lastName, emailAddress, password, userType, phoneNumber);
         this.preference = preference;
         this.age=age;
+        this.centerZip = centerZip;
+        getLongAndLat(centerZip);
     }
 
-    public Owner(Long id, String firstName, String lastName, String emailAddress, String password, UserType userType, int age, String phoneNumber, Preference preference) {
+    public Owner(Long id, String firstName, String lastName, String emailAddress, String password, UserType userType, int age, String phoneNumber, Preference preference, String zipCode) {
         super(id, firstName, lastName, emailAddress, password, userType, phoneNumber);
         this.preference = preference;
         this.age=age;
+        getLongAndLat(zipCode);
+    }
+
+
+    private void getLongAndLat(String centerZip) {
+        try {
+            // Define the relative path from the current class location to src/main/resources/zipCSV/uszips.csv
+            Path csvFilePath = Paths.get("src", "main", "resources", "zipCSV", "uszips.csv").toAbsolutePath();
+            File csvFile = csvFilePath.toFile();
+
+            // Check if the file exists
+            if (!csvFile.exists()) {
+                System.err.println("uszips.csv file not found at " + csvFilePath);
+                return;
+            }
+
+            // Read the CSV file using BufferedReader
+            try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+                List<String> lines = new ArrayList<>();
+                String line;
+
+                // Read all lines from the CSV file
+                boolean firstLine = true;
+                while ((line = br.readLine()) != null) {
+                    // Skip header line if present
+                    if (firstLine && line.startsWith("zip")) {
+                        firstLine = false;
+                        continue;
+                    }
+                    firstLine = false;
+                    lines.add(line);
+                }
+
+                // Extract ZIP codes into an array for binary search
+                int n = lines.size();
+                String[] zipCodes = new String[n];
+                for (int i = 0; i < n; i++) {
+                    String[] tokens = lines.get(i).split(",", 4); // Limit split to 4 parts
+                    zipCodes[i] = tokens[0].replace("\"", "").trim(); // Clean ZIP code by removing quotes and trimming whitespace
+                }
+
+                // Perform binary search to find the ZIP code
+                int index = Arrays.binarySearch(zipCodes, centerZip);
+
+                if (index >= 0) {
+                    // ZIP code found, extract longitude and latitude
+                    String[] tokens = lines.get(index).split(",", 4);
+                    this.Latitude = Double.parseDouble(tokens[1].replace("\"", "").trim());   // Latitude
+                    this.longitude = Double.parseDouble(tokens[2].replace("\"", "").trim()); // Longitude
+                } else {
+                    System.err.println("ZIP code " + centerZip + " not found in uszips.csv");
+                }
+
+            } catch (IOException | NumberFormatException e) {
+                e.printStackTrace();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
