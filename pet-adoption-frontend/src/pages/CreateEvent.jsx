@@ -137,7 +137,7 @@ const CreateEvent = () => {
                     console.log("Success!");
 
                     console.log("Setting event description...");
-                    setEventDescription(event.description);
+                    setEventDescription(event.event_description);
                     console.log("Success!");
 
                     console.log("Setting create event...");
