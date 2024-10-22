@@ -54,16 +54,16 @@ export default function HomePage() {
             }
           });
 
-          setFirstNameLabel(response.data.firstName);
-          updatedValuesRef.current.firstName = response.data.firstName;
-          setLastNameLabel(response.data.lastName);
-          updatedValuesRef.current.lastName = response.data.lastName;
           setPhoneNumberLabel(response.data.phoneNumber);
           setPhoneNumber(response.data.phoneNumber);
           updatedValuesRef.current.phoneNumber = response.data.phoneNumber;
           updatedValuesRef.current.password = response.data.password;
           updatedValuesRef.current.userType = response.data.userType;
           if (updatedValuesRef.current.userType === `CenterWorker` || updatedValuesRef.current.userType === `Owner`){
+            setFirstNameLabel(response.data.firstName);
+            updatedValuesRef.current.firstName = response.data.firstName;
+            setLastNameLabel(response.data.lastName);
+            updatedValuesRef.current.lastName = response.data.lastName;
             setUserAge(response.data.age);
           }
           else{
@@ -102,7 +102,6 @@ export default function HomePage() {
     setPassword(passwordLabel);
     updatedValuesRef.current.password = passwordLabel;
     updatedValuesRef.current.oldPassword = oldPasswordLabel;
-    handleUserUpdate();
   };
 
   const handlePhoneNumberChange = () => {
@@ -126,11 +125,11 @@ export default function HomePage() {
   const handleZipChange = () => {
     if (centerZip.length === 5){
       setInvalidZip(false);
-      return true;
-    }
-    else{
-      setInvalidZip(true);
       return false;
+    }
+    else {
+      setInvalidZip(true);
+      return true;
     }
   }
 
@@ -138,10 +137,10 @@ export default function HomePage() {
     handleFirstNameChange();
     handleLastNameChange();
     handlePasswordChange();
-    let invalidPhoneNumber = handlePhoneNumberChange();
-    let invalidZip = handleZipChange();
+    let phoneNumber = handlePhoneNumberChange();
+    let zip = handleZipChange();
     
-    if (!invalidPhoneNumber && !invalidZip){
+    if ((!phoneNumber && !zip) || updatedValuesRef.current.userType != `CenterOwner`){
       const updateSuccess = await handleUserUpdate();
       if (updateSuccess === 0){
         setInvalidPassword(false);
@@ -170,6 +169,7 @@ export default function HomePage() {
       });
 
       const currentUser = response.data;
+      console.log("Got user successfully");
 
       const updatedUser = {
         id: currentUser.id,
@@ -180,7 +180,9 @@ export default function HomePage() {
       }
 
       if (updatedValuesRef.current.userType === `Owner` || updatedValuesRef.current.userType === `CenterWorker`){
+        console.log("age: " + userAge);
         updatedUser.age = userAge;
+        console.log("updated age: " + updatedUser.age);
         updatedUser.firstName = updatedValuesRef.current.firstName;
         updatedUser.lastName = updatedValuesRef.current.lastName;
         if (updatedValuesRef.current.userType === `CenterWorker`){
@@ -195,8 +197,6 @@ export default function HomePage() {
         updatedUser.centerZip = centerZip;
         updatedUser.centerPetCount = currentUser.centerPetCount;
       }
-
-      console.log(updatedUser);
   
       const url = `${API_URL}/api/users/update/${updatedValuesRef.current.userType}`
       const updatedResponse = await axios.put(url, updatedUser, {
@@ -219,6 +219,7 @@ export default function HomePage() {
   
     } catch (error) {
       console.error('Failed to update user', error);
+      return 1;
     }
   };
 
