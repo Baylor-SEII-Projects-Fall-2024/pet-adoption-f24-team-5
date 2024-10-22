@@ -32,23 +32,26 @@ public class PetController {
     @GetMapping
     public List<Pet> getPets() { return petService.getAllPets(); }
 
+    @GetMapping("/center")
+    public ResponseEntity<?> getPetsCenter(@RequestParam String email) {
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(petService.getPetByAdoptionCenter(userService.findCenterByEmail(email)));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
     @PostMapping("/save")
-    public ResponseEntity<?> saveUpdatePet(@RequestBody Pet pet, @RequestParam String email) {
+    public ResponseEntity<?> savePet(@RequestBody Pet pet, @RequestParam String email) {
 
         if(pet.getImageName().isEmpty()) { return ResponseEntity.badRequest().body("Image is required");}
 
         if(email.isEmpty()) { return ResponseEntity.badRequest().body("Email is required");}
 
-        try {
-            pet.setAdoptionCenter(userService.findCenterByEmail(email));
+        try{
+            return ResponseEntity.status(HttpStatus.CREATED).body(petService.savePet(pet, userService.findCenterByEmail(email)));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
-
-        try{
-            return ResponseEntity.status(HttpStatus.CREATED).body(petService.savePet(pet));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred, please try again later");
         }
 
     }
@@ -60,9 +63,9 @@ public class PetController {
         }
 
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(petService.savePet(pet));
+            return ResponseEntity.status(HttpStatus.OK).body(petService.updatePet(pet));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred, please try again later");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
