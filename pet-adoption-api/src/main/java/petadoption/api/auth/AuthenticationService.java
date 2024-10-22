@@ -46,7 +46,8 @@ public class AuthenticationService {
                 passwordEncoder.encode(request.getPassword()),
                 UserType.Owner,
                 request.getAge(),
-                request.getPhoneNumber()
+                request.getPhoneNumber(),
+                request.getCenterZip()
         );
 
         ownerRepository.save(Owner);

@@ -68,13 +68,38 @@ public class UserConfig {
                     128
             );
 
+            AdoptionCenter adoptionCenter2 = new AdoptionCenter(
+                    "owner@example.com",
+                    "pass",
+                    UserType.CenterOwner,
+                    "555-1234-7794",
+                    "NY Animal Rescue",
+                    "123 Main St",
+                    "New York",
+                    "NY",
+                    "06390",
+                    123
+            );
+
+            AdoptionCenter adoptionCenter3 = new AdoptionCenter(
+                    "peter@example.com",
+                    "pass",
+                    UserType.CenterOwner,
+                    "832-773-9781",
+                    "Waco shelter",
+                    "bagbe str",
+                    "Waco",
+                    "Tx",
+                    "76701",
+                    12
+            );
+
             authenticationController.register(user1);
             authenticationController.register(user2);
             authenticationController.register(user3);
             authenticationController.register(adoptionCenter1);
-
-
-
+            authenticationController.register(adoptionCenter2);
+            authenticationController.register(adoptionCenter3);
         };
     }
 }
