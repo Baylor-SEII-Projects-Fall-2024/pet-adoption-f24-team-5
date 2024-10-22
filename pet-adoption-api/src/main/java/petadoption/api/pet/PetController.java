@@ -71,6 +71,11 @@ public class PetController {
         }
     }
 
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> deletePet(@RequestBody Pet pet) {
+
+    }
+
 
 
 }
