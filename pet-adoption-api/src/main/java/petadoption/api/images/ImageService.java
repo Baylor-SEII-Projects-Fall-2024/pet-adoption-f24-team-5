@@ -13,7 +13,7 @@ import java.util.*;
 @Service
 public class ImageService {
 
-    public String saveImage (String uploadDirectory, MultipartFile imageFile) throws IOException {
+    public String saveImage(String uploadDirectory, MultipartFile imageFile) throws IOException {
         if (imageFile == null || imageFile.isEmpty() || uploadDirectory == null) {
             throw new IllegalArgumentException("File is empty");
         }
