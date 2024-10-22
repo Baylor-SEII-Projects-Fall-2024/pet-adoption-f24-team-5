@@ -51,7 +51,8 @@ public class UserConfig {
                     "password3",
                     UserType.Owner,
                     21,
-                    "254-556-7794"
+                    "254-556-7794",
+                    "14757"
             );
 
             AdoptionCenter adoptionCenter1 = new AdoptionCenter(
@@ -65,7 +66,7 @@ public class UserConfig {
                     "1608 James Avenue",
                     "Waco",
                     "Texas",
-                    "44730",
+                    "14757",
                     128
             );
 
