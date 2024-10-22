@@ -1,24 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, Typography, CircularProgress } from '@mui/material';
 import { fetchImage } from '@/utils/fetchImage';
+import {useSelector} from "react-redux";
 
 const PetCard = ({ pet, onClick }) => {
-    const [error, setError] = useState(false); // Track fetch errors
     const [imageType, setImageType] = useState("");
     const [imageData, setImageData] = useState("");
+    const token = useSelector((state) => state.user.token);
+
 
 
     useEffect(() => {
 
         const loadImage = async () => {
             try {
-                const {imageType, imageData} = await fetchImage(pet.imageName); // Fetch image URL
-                setImageType(imageType);
-                setImageData(imageData);
+                const {imageType: fetchedImageType, imageData: fetchedImageData} = await fetchImage(pet.imageName, token);
+                setImageType(fetchedImageType);
+                setImageData(fetchedImageData);
+
+                console.log(imageType)
+                console.log(imageData)
 
             } catch (err) {
                 console.error('Image fetch failed:', err);
-                setError(true); // Set error state on failure
             }
         };
 
@@ -26,9 +30,6 @@ const PetCard = ({ pet, onClick }) => {
 
     }, [pet.imageName]);
 
-    const handleImageError = () => {
-        setError(true); // Handle image load errors
-    };
 
     return (
         <Card onClick={onClick}
@@ -42,7 +43,6 @@ const PetCard = ({ pet, onClick }) => {
                     <img
                         src={`data:${imageType};base64,${imageData}`}
                         alt="Pet"
-                        onError={handleImageError}
                         style={{
                             float: 'left',
                             margin: '0 15px 15px 0',
