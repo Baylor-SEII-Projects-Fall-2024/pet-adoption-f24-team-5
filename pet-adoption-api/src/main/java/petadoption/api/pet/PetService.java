@@ -16,6 +16,9 @@ public class PetService {
     public List<Pet> getAllPets() { return petRepository.findAll(); }
 
     public Pet savePet(Pet pet, AdoptionCenter adoptionCenter) {
+        if(adoptionCenter == null) {
+            throw new IllegalArgumentException("Adoption center is null");
+        }
         pet.setAdoptionCenter(adoptionCenter);
         return petRepository.save(pet);
 
@@ -30,7 +33,7 @@ public class PetService {
 
     public List<Pet> getPetByAdoptionCenter(AdoptionCenter adoptionCenter) {
         return petRepository.findByAdoptionCenter(adoptionCenter)
-                .orElseThrow(() -> new IllegalArgumentException("Adoption Center is required to find pets"));
+                .orElse(null);
     }
 
 

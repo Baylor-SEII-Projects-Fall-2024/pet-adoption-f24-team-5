@@ -35,7 +35,7 @@ public class PetController {
     @GetMapping("/center")
     public ResponseEntity<?> getPetsCenter(@RequestParam String email) {
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(petService.getPetByAdoptionCenter(userService.findCenterByEmail(email)));
+            return ResponseEntity.status(HttpStatus.OK).body(petService.getPetByAdoptionCenter(userService.findCenterByWorkerEmail(email)));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
@@ -44,12 +44,13 @@ public class PetController {
     @PostMapping("/save")
     public ResponseEntity<?> savePet(@RequestBody Pet pet, @RequestParam String email) {
 
+
         if(pet.getImageName().isEmpty()) { return ResponseEntity.badRequest().body("Image is required");}
 
         if(email.isEmpty()) { return ResponseEntity.badRequest().body("Email is required");}
 
         try{
-            return ResponseEntity.status(HttpStatus.CREATED).body(petService.savePet(pet, userService.findCenterByEmail(email)));
+            return ResponseEntity.status(HttpStatus.CREATED).body(petService.savePet(pet, userService.findCenterByWorkerEmail(email)));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
