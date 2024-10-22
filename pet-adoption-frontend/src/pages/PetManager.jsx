@@ -13,6 +13,7 @@ import PetFormComponent from "@/components/PetFormComponent";
 import { API_URL } from "@/constants";
 import TitleBar from "@/components/TitleBar";
 import { useSelector } from 'react-redux';
+import {getSubjectFromToken} from "@/utils/tokenUtils";
 const PetManager = () => {
     const [formType, setFormType] = React.useState('');
     const [pets, setPets] = React.useState([]);
@@ -37,7 +38,7 @@ const PetManager = () => {
 
     const getAllPets = () => {
 
-        const url = `${API_URL}/api/pets`;
+        const url = `${API_URL}/api/pets/center?email=${getSubjectFromToken(token)}`;
 
         axios.get(url, {
             headers: {
