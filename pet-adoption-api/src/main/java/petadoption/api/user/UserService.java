@@ -97,33 +97,27 @@ public class UserService {
     }
 
     public ResponseEntity<String> getDisplayName(String email) {
-        Optional<User> optionalUser = userRepository.findByEmailAddress(email);
-
-        // Check if the user exists
-        if (optionalUser.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        User user = optionalUser.get();
         String displayName = "";
-
-        // Determine the display name based on user type
-        if (user.getUserType() == UserType.CenterWorker) {
+        User user = userRepository.findByEmailAddress(email).get();
+        if (user.getUserType() == UserType.CenterWorker){
             displayName = ((CenterWorker) user).getFirstName();
-        } else if (user.getUserType() == UserType.Owner) {
+            if (displayName == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        }
+        else if (user.getUserType() == UserType.Owner){
             displayName = ((Owner) user).getFirstName();
+            if (displayName == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
         } else if (user.getUserType() == UserType.CenterOwner) {
             displayName = ((AdoptionCenter) user).getCenterName();
+            if (displayName == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
         }
-
-        // Check if the displayName is null or empty
-        if (displayName == null || displayName.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
         return new ResponseEntity<>(displayName, HttpStatus.OK);
     }
-
 
     public void deleteUser(Long userId) {
         userRepository.deleteById(userId);
