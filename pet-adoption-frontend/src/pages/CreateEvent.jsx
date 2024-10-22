@@ -23,8 +23,6 @@ const CreateEvent = () => {
     const [noFutureEvents, setNoFutureEvents] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState(null);
     const token = useSelector((state) => state.user.token);
-    const [userEmail, setUserEmail] = useState('');
-    const [userId, setUserId] = useState('');
 
     useEffect(() => {
         const fetchUserInfoAndRelatedData = async () => {
@@ -35,7 +33,6 @@ const CreateEvent = () => {
                 if (token) {
                     const subject = getSubjectFromToken(token); // Use the provided function
                     if (subject) {
-                        setUserEmail(subject);
                         email = subject;
                         console.log("User email = " + email);
                     }
@@ -58,7 +55,6 @@ const CreateEvent = () => {
                             }
                         });
                         const fetchedUserId = response.data.id;
-                        setUserId(fetchedUserId);
                         console.log("User ID: " + fetchedUserId);
                         return fetchedUserId; // Return userId to chain subsequent calls
                     } catch (error) {
