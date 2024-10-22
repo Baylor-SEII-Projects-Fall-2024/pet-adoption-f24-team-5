@@ -23,7 +23,8 @@ public class ImageService {
         Path imagePath = uploadPath.resolve(uniqueImageName);
 
         if (!Files.exists(uploadPath)) {
-            throw new IllegalArgumentException("Directory does not exist");
+            Files.createDirectories(uploadPath);
+            //            throw new IllegalArgumentException("Directory does not exist");
         }
 
         Files.copy(imageFile.getInputStream(), imagePath, StandardCopyOption.REPLACE_EXISTING);
