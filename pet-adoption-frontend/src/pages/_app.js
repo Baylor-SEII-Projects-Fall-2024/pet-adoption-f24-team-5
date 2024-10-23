@@ -29,7 +29,9 @@ import CreateEvent from "@/pages/CreateEvent";
 const reduxStore = buildStore({});
 
 import ProtectedRoute from './protectedRoute';
-import AvailablePets from "@/pages/AvailablePets"; // Ensure the path is correct
+import AvailablePets from "@/pages/AvailablePets";
+import ManageAccounts from "@/pages/ManageAccounts";
+import RegisterCenterWorker from "@/pages/RegisterCenterWorker"; // Ensure the path is correct
 
 function AppRoutes() {
   const token = useSelector((state) => state.user.token);
@@ -45,6 +47,8 @@ function AppRoutes() {
         <Route path="/SearchEngine" element={<ProtectedRoute><SearchEngine /></ProtectedRoute>} />
         <Route path="/Settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
         <Route path="/LocalAdoptionCenter" element={<ProtectedRoute><LocalAdoptionCenter /></ProtectedRoute>} />
+        <Route path="/ManageAccounts" element={<ProtectedRoute><ManageAccounts /></ProtectedRoute>} />
+        <Route path="/RegisterCenterWorker" element={<ProtectedRoute><RegisterCenterWorker /></ProtectedRoute>} />
         <Route path="/AvailablePets" element={<AvailablePets />} />
         <Route path="*" element={<Navigate to="/Login" />} />
       </Routes>

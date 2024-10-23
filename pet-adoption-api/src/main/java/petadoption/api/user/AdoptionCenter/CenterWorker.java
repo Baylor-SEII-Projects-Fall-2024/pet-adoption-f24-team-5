@@ -19,7 +19,7 @@ import petadoption.api.user.UserType;
 public class CenterWorker extends User{
 
 
-    @Column(name = "CENTER_ID", nullable = true)
+    @Column(name = "CENTER_ID", nullable = false)
     private Long centerID;
 
     @Column(name = "AGE")
@@ -36,13 +36,13 @@ public class CenterWorker extends User{
         centerID = -1L;
     }
 
-    public CenterWorker(String firstName, String lastName, String emailAddress, String password, UserType userType, int age, String phoneNumber) {
+    /*public CenterWorker(String firstName, String lastName, String emailAddress, String password, UserType userType, int age, String phoneNumber) {
         super(emailAddress, password, userType, phoneNumber);
         centerID = -1L;
         this.age = age;
         this.firstName = firstName;
         this.lastName = lastName;
-    }
+    }*/
 
 
     public CenterWorker(String firstName, String lastName, String emailAddress, String password, UserType userType, int age, String phoneNumber, Long centerID) {

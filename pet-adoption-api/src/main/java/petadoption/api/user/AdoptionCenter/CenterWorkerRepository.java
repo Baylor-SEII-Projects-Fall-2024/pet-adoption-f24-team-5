@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import petadoption.api.user.User;
 import petadoption.api.user.UserRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -15,4 +16,6 @@ public interface CenterWorkerRepository extends JpaRepository<CenterWorker, Long
 
         @Query("SELECT cw.centerID FROM CenterWorker cw WHERE cw.emailAddress = :email")
         Optional<Long> findCenterIdByEmailAddress(@Param("email") String email);
+
+        Optional<List<CenterWorker>> findAllByCenterID(Long id);
 }
