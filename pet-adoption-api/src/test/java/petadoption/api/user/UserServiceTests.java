@@ -11,6 +11,8 @@ import petadoption.api.user.AdoptionCenter.AdoptionCenter;
 import petadoption.api.user.AdoptionCenter.CenterWorker;
 import petadoption.api.user.Owner.Owner;
 
+import javax.swing.text.html.Option;
+import java.sql.SQLException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,6 +25,8 @@ public class UserServiceTests {
     private UserService userService;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private UserRepository userRepository;
 
     @Test
     void testSaveAndFindUserOwner() {
@@ -310,6 +314,105 @@ public class UserServiceTests {
             assertEquals(((AdoptionCenter)userService.findUser("example@gmail.com").get()).getCenterCity(), updatedAdoptionCenter.getCenterCity());
         }
         catch(Exception e){
+            fail();
+        }
+    }
+
+    @Test
+    void testFindAllAdoptionCenters() {
+        userRepository.deleteAll();
+        assertEquals(0, userService.findAllAdoptionCenters().size());
+        AdoptionCenter center = new AdoptionCenter();
+        center.setEmailAddress("example@gmail.com");
+        center.setPassword(passwordEncoder.encode("password"));
+        center.setUserType(UserType.CenterOwner);
+        center.setPhoneNumber("254-556-7794");
+        center.setCenterAddress("Andrew Boulevard");
+        center.setCenterName("Adoption Center");
+        center.setCenterCity("Plano");
+        center.setCenterState("Oregon");
+        center.setCenterZip("12345");
+        center.setNumberOfPets(100);
+
+        userService.saveUser(center);
+        assertEquals(1, userService.findAllAdoptionCenters().size());
+        assertEquals(center, userService.findAllAdoptionCenters().get(0));
+
+        AdoptionCenter center2 = new AdoptionCenter();
+        center2.setEmailAddress("example@example.com");
+        center2.setPassword(passwordEncoder.encode("password"));
+        center2.setUserType(UserType.CenterOwner);
+        center2.setPhoneNumber("254-556-7794");
+        center2.setCenterAddress("Andrew Boulevard");
+        center2.setCenterName("Adoption Center");
+        center2.setCenterCity("Plano");
+        center2.setCenterState("Oregon");
+        center2.setCenterZip("12345");
+        center2.setNumberOfPets(100);
+
+        userService.saveUser(center2);
+        assertEquals(2, userService.findAllAdoptionCenters().size());
+        assertEquals(center, userService.findAllAdoptionCenters().get(0));
+        assertEquals(center2, userService.findAllAdoptionCenters().get(1));
+
+        AdoptionCenter center3 = new AdoptionCenter();
+        userService.saveUser(center3);
+        AdoptionCenter center4 = new AdoptionCenter();
+        userService.saveUser(center4);
+        AdoptionCenter center5 = new AdoptionCenter();
+        userService.saveUser(center5);
+        assertEquals(5, userService.findAllAdoptionCenters().size());
+    }
+
+    @Test
+    void testFindCenterByWorkerEmail() {
+        assertThrowsExactly(SQLException.class, () -> {
+            userService.findCenterByWorkerEmail("example@example.com");
+        });
+
+        assertThrowsExactly(IllegalArgumentException.class, () -> {
+            userService.findCenterByWorkerEmail("");
+        });
+
+        AdoptionCenter center = new AdoptionCenter();
+        center.setEmailAddress("center@example.com");
+        center.setPassword(passwordEncoder.encode("password"));
+        center.setUserType(UserType.CenterOwner);
+        center.setPhoneNumber("254-556-7794");
+        center.setCenterAddress("Andrew Boulevard");
+        center.setCenterName("Adoption Center");
+        center.setCenterCity("Plano");
+        center.setCenterState("Oregon");
+        center.setCenterZip("12345");
+        center.setNumberOfPets(100);
+        userService.saveUser(center);
+
+        try {
+            assertEquals(center, userService.findCenterByWorkerEmail("example@example.com"));
+        }
+        catch (Exception e) {
+            assertTrue(true);
+        }
+
+        CenterWorker centerWorker = new CenterWorker();
+        centerWorker.setEmailAddress("example@example.com");
+        centerWorker.setPassword(passwordEncoder.encode("password"));
+        centerWorker.setPhoneNumber("254-556-7794");
+        centerWorker.setLastName("Adoption Center");
+        centerWorker.setFirstName("Example");
+        centerWorker.setUserType(UserType.CenterWorker);
+        centerWorker.setAge(21);
+        centerWorker.setCenterID(center.getId());
+        userService.saveUser(centerWorker);
+
+        assertEquals(center.getId(), ((AdoptionCenter)userService.findUser("center@example.com").get()).getId());
+        assertEquals(centerWorker.getId(), ((CenterWorker)userService.findUser("example@example.com").get()).getId());
+        assertEquals(centerWorker.getCenterID(), ((CenterWorker)userService.findUser("example@example.com").get()).getCenterID());
+
+        try {
+            assertEquals(center, userService.findCenterByWorkerEmail("example@example.com"));
+        }
+        catch (Exception e) {
             fail();
         }
     }
