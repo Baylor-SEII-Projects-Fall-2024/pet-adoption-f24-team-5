@@ -69,7 +69,7 @@ const TitleBar = () => {
                     <Button color="inherit" component={Link} to="/">DogPile Solutions</Button>
                 </Typography>
                 <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'center' }}>
-                    Welcome {displayName}
+                    Welcome {displayName}!
                 </Typography>
 
                 {(authority === 'CenterOwner' || authority === 'CenterWorker') && (
