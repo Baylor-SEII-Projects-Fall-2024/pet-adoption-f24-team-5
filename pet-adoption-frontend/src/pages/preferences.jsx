@@ -90,8 +90,20 @@ const PreferencesPage = () => {
                 setPreferenceId(createResponse.data.preferenceId);
                 try {
                     user.preference = createResponse.data.preferenceId;
-                    console.log("user: ", user);
-                    const updateUserResponse = await axios.put(`${API_URL}/api/users/update/Owner/preferenceId`, user, {
+                    const updatedUser = {
+                        id: user.id,
+                        firstName: user.firstName,
+                        lastName: user.lastName,
+                        emailAddress: user.emailAddress,
+                        UserType: user.UserType,
+                        password: user.password,
+                        age: user.age,
+                        phoneNumber: user.phoneNumber,
+                        preference: createResponse.data,
+                        centerZip: user.centerZip,
+                    };
+                    console.log("updatedUser: ", updatedUser);
+                    const updateUserResponse = await axios.put(`${API_URL}/api/users/update/Owner/preferenceId`, updatedUser, {
                         headers: {
                             'Authorization': `Bearer ${token}`,
                             'Content-Type': 'application/json',
@@ -112,7 +124,6 @@ const PreferencesPage = () => {
         }
         else {
             console.log('Updating existing preference');
-            console.log(preferences);
             try {
                 const response = await axios.put(`${API_URL}/api/preferences/update`, preferences, {
                     params: {
