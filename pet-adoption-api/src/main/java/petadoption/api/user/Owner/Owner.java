@@ -85,7 +85,7 @@ public class Owner extends User {
     public void getLongAndLat(String centerZip) {
         try {
             // Define the relative path from the current class location to src/main/resources/zipCSV/uszips.csv
-            Path csvFilePath = Paths.get("src", "main", "resources", "zipCSV", "uszips.csv").toAbsolutePath();
+            Path csvFilePath = Paths.get("resources", "zipCSV", "uszips.csv").toAbsolutePath();
             File csvFile = csvFilePath.toFile();
 
             // Check if the file exists
