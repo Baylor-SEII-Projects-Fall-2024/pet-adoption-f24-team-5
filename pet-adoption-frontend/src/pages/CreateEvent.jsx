@@ -80,7 +80,6 @@ const CreateEvent = () => {
                         setCenterID(fetchedCenterID);
                         console.log("Center ID: " + fetchedCenterID);
                     } catch (error) {
-                        setCenterID(0);
                         console.error("Failed to fetch center ID", error);
                     }
                 };
@@ -88,6 +87,11 @@ const CreateEvent = () => {
                 const userId = await fetchUserInfo();
                 await fetchCenterID(userId); // Fetch center ID only after user ID is available
                 await handleFetchEvents(); // Fetch events
+                if (center_id == null) {
+                    console.error("Center ID not set, cannot create event")
+                    alert("Sorry, cannot create an event. Please try again later")
+
+                }
 
             } catch (error) {
                 console.error("Error fetching user info and related data", error);
