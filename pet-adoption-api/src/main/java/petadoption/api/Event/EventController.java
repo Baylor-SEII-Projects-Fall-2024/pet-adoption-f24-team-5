@@ -61,42 +61,5 @@ public class EventController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @PostMapping("/initialize_events")
-    public ResponseEntity<?> initialize() {
-        try{
-            List<Long> ids = new ArrayList<>();
-            List<Event> events;
-
-            LocalDate localDate = LocalDate.now();
-            LocalTime localTime = LocalTime.of(19, 30); // Use a LocalTime for the event time
-            Event event1 = new Event(
-                    1L,
-                    "Cool event name",
-                    localDate,
-                    localTime,
-                    "This is the description"
-            );
-            localTime = LocalTime.of(20, 30); // Use a LocalTime for the event time
-            Event event2 = new Event(
-                    1L,
-                    "Cooler event name",
-                    localDate,
-                    localTime,
-                    "This is the description but longer"
-            );
-
-            events = List.of(event1, event2);
-            for(Event e : events) {
-                ids.add(eventService.createEvent(e));
-            }
-
-            return new ResponseEntity<>(ids, HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-
-
 }
 
