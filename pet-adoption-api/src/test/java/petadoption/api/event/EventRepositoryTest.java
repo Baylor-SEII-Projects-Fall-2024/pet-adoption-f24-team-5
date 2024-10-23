@@ -38,7 +38,7 @@ public class EventRepositoryTest {
         Event savedEvent = eventRepository.save(newEvent);
         assertNotNull(savedEvent);
 
-        Long eid = savedEvent.getId();
+        Long eid = savedEvent.getEventId();
         assertNotNull(eid);
 
         Optional<Event> foundEventOpt = eventRepository.findById(eid);
@@ -61,7 +61,7 @@ public class EventRepositoryTest {
         Event savedEvent = eventRepository.save(newEvent);
         assertNotNull(savedEvent);
 
-        Long eid = savedEvent.getId();
+        Long eid = savedEvent.getEventId();
         assertNotNull(eid);
 
         Optional<Event> foundEventOptT = eventRepository.findById(eid);
