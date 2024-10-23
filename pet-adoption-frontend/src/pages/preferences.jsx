@@ -14,7 +14,7 @@ const PreferencesPage = () => {
         preferredColor: '',
         preferredAge: '',
     });
-    const [preferenceId, setPreferenceId] = useState(null);
+    const [preferenceObject, setPreferenceObject] = useState(null);
     const [user, setUser] = useState(null);
 
     const token = useSelector((state) => state.user.token);
@@ -34,7 +34,7 @@ const PreferencesPage = () => {
                     setUser(response.data);
                     const fetchedPreferenceId = response.data.preference;
                     if (fetchedPreferenceId) {
-                        setPreferenceId(fetchedPreferenceId);
+                        setPreferenceObject(fetchedPreferenceId);
                     }
                 } catch (error) {
                     console.error('Error fetching preference ID:', error);
@@ -46,11 +46,11 @@ const PreferencesPage = () => {
 
     useEffect(() => {
         const fetchPreferences = async () => {
-            if (!preferenceId) return; // Ensure preferenceId is available
+            if (!preferenceObject) return; // Ensure preferenceId is available
             try {
                 const response = await axios.get(`${API_URL}/api/preferences/get`, {
                     params: {
-                        preferenceId: preferenceId,
+                        preferenceId: preferenceObject.preferenceId,
                     },
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -66,7 +66,7 @@ const PreferencesPage = () => {
         };
 
         fetchPreferences();
-    }, [preferenceId, token]);
+    }, [preferenceObject, token]);
 
     const handleInputChange = (event) => {
         const { name, value } = event.target;
@@ -78,7 +78,7 @@ const PreferencesPage = () => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        if (preferenceId == null) {
+        if (preferenceObject == null) {
             try {
                 // Create a new preference if none exists
                 const createResponse = await axios.post(`${API_URL}/api/preferences/create`, preferences, {
@@ -87,7 +87,7 @@ const PreferencesPage = () => {
                         'Content-Type': 'application/json',
                     },
                 });
-                setPreferenceId(createResponse.data.preferenceId);
+                setPreferenceObject(createResponse.data);
                 try {
                     user.preference = createResponse.data.preferenceId;
                     const updatedUser = {
@@ -127,7 +127,7 @@ const PreferencesPage = () => {
             try {
                 const response = await axios.put(`${API_URL}/api/preferences/update`, preferences, {
                     params: {
-                        preferenceId: preferenceId,
+                        preferenceId: preferenceObject.preferenceId,
                     },
                     headers: {
                         'Authorization': `Bearer ${token}`,
