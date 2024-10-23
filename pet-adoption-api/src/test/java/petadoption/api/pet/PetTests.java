@@ -50,6 +50,24 @@ public class PetTests {
         }
     }
 
+    @Test
+    @DisplayName("save pet fail")
+    void testSavePetFail() {
+        Pet pet = new Pet();
+        AdoptionCenter adoptionCenter = new AdoptionCenter();
+
+        try {
+            when(userService.findCenterByWorkerEmail("center1@gmail.com")).thenReturn(adoptionCenter);
+            when(petService.savePet(pet, adoptionCenter)).thenThrow(new RuntimeException("Save failed"));
+
+            petService.savePet(pet, adoptionCenter);
+            fail("RuntimeException was not thrown");
+        } catch (RuntimeException e) {
+            assertEquals("Save failed", e.getMessage());
+        } catch (SQLException e) {
+            fail("SQLException was thrown: " + e.getMessage());
+        }
+    }
 
     @Test
     @DisplayName("get all pets")
@@ -57,16 +75,14 @@ public class PetTests {
         Pet pet = new Pet();
         pet.setPetId(1L);
 
-
         List<Pet> mockedPets = Collections.singletonList(pet);
         when(petService.getAllPets()).thenReturn(mockedPets);
-
 
         try {
             List<Pet> pets = petService.getAllPets();
             System.out.println(pets.getFirst());
             assertEquals(pets.getFirst().getPetId(), pet.getPetId());
-        } catch(Exception e) {
+        } catch (Exception e) {
             fail("SQLException was thrown: " + e.getMessage());
         }
     }
@@ -77,10 +93,10 @@ public class PetTests {
         List<Pet> mockedPets = Collections.emptyList();
         when(petService.getAllPets()).thenReturn(mockedPets);
 
-        try{
+        try {
             List<Pet> pets = petService.getAllPets();
             assertTrue(pets.isEmpty());
-        } catch(Exception e) {
+        } catch (Exception e) {
             fail("SQLException was thrown: " + e.getMessage());
         }
     }
@@ -99,10 +115,10 @@ public class PetTests {
         when(petService.savePet(pet, adoptionCenter)).thenReturn(pet);
         when(petService.getPetByAdoptionCenter(adoptionCenter)).thenReturn(mockedPets);
 
-        try{
+        try {
             List<Pet> pets = petService.getPetByAdoptionCenter(adoptionCenter);
             assertEquals(pets.getFirst().getPetId(), pet.getPetId());
-        } catch(Exception e) {
+        } catch (Exception e) {
             fail("SQLException was thrown: " + e.getMessage());
         }
 
@@ -126,7 +142,7 @@ public class PetTests {
         try {
             List<Pet> pets = petService.getPetByAdoptionCenter(adoptionCenterFail);
             assertTrue(pets.isEmpty());
-        } catch(Exception e) {
+        } catch (Exception e) {
             fail("SQLException was thrown: " + e.getMessage());
         }
     }
