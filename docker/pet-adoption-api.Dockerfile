@@ -18,5 +18,8 @@ WORKDIR /app
 # Copy the JAR from the previous build stage to the /app directory
 COPY --from=build /build/pet-adoption-api/build/libs/pet-adoption-api-1.0.0-SNAPSHOT.jar app.jar
 
+# Copt the resources folder into the image
+COPY --from=build /build/pet-adoption-api/src/main/resources/ /app/resources/
+
 # Run the application
 ENTRYPOINT exec java $JAVA_OPTS -jar app.jar

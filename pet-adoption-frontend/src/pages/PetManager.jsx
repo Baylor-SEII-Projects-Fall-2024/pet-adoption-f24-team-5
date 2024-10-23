@@ -65,10 +65,8 @@ const PetManager = () => {
 
     return (
         <Box sx={{ height: '100vh', width: '100vw', display: 'flex', flexDirection: 'column' }}>
-            <Box sx={{ height: '8vh', width: '100vw', backgroundColor: 'primary.main' }}>
+            <TitleBar />
 
-                <TitleBar />
-            </Box>
 
 
 

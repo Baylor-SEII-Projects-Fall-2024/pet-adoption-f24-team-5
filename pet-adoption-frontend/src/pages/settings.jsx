@@ -33,62 +33,68 @@ export default function HomePage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    try {
-      let email = '';
-      // Extract user email (subject) from the token
-      if (token) {
-        const subject = getSubjectFromToken(token); // Use the provided function
-        if (subject) {
-          setUserEmail(subject); // Store the user email (subject)
-          email = subject;
-        }
-      }
-
-      const fetchUserInfo = async () => {
-        try {
-          const url = `${API_URL}/api/users/getUser?emailAddress=${email}`;
-          const response = await axios.get(url, {
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`,
-            }
-          });
-
-          setPhoneNumberLabel(response.data.phoneNumber);
-          setPhoneNumber(response.data.phoneNumber);
-          updatedValuesRef.current.phoneNumber = response.data.phoneNumber;
-          updatedValuesRef.current.password = response.data.password;
-          updatedValuesRef.current.userType = response.data.userType;
-          if (updatedValuesRef.current.userType === `CenterWorker` || updatedValuesRef.current.userType === `Owner`){
-            setFirstNameLabel(response.data.firstName);
-            updatedValuesRef.current.firstName = response.data.firstName;
-            setLastNameLabel(response.data.lastName);
-            updatedValuesRef.current.lastName = response.data.lastName;
-            setUserAge(response.data.age);
-          }
-          else{
-            setCenterName(response.data.centerName);
-            setCenterAddress(response.data.centerAddress);
-            setCenterCity(response.data.centerCity);
-            setCenterState(response.data.centerState);
-            setCenterZip(response.data.centerZip);
+    const fetchUserInfo = async () => {
+      try {
+        let email = '';
+        // Extract user email (subject) from the token
+        if (token) {
+          const subject = getSubjectFromToken(token); // Use the provided function
+          if (subject) {
+            setUserEmail(subject); // Store the user email (subject)
+            email = subject;
           }
         }
-        catch (error) {
-          console.error('Failed to fetch user', error);
-        }
-      };
 
-      fetchUserInfo();
-    }
-    catch (error) {
-      console.error('Error fetching user info:', error);
-      if (error.response && error.response.status === 401) {
-        alert('Session expired, please log in again.');
-        navigate('/login');
+        const url = `${API_URL}/api/users/getUser?emailAddress=${email}`;
+        const response = await axios.get(url, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          }
+        });
+
+        // Set phone number, password, and userType regardless of type
+        setPhoneNumberLabel(response.data.phoneNumber);
+        setPhoneNumber(response.data.phoneNumber);
+        updatedValuesRef.current.phoneNumber = response.data.phoneNumber;
+        updatedValuesRef.current.password = response.data.password;
+        updatedValuesRef.current.userType = response.data.userType;
+
+        // Ensure setting First Name, Last Name, and Age for both Owner and CenterOwner
+        setFirstNameLabel(response.data.firstName);
+        updatedValuesRef.current.firstName = response.data.firstName;
+        setLastNameLabel(response.data.lastName);
+        updatedValuesRef.current.lastName = response.data.lastName;
+        setUserAge(response.data.age); // Add Age back to the form
+
+        // Handle Owner-specific fields (like centerZip)
+        if (updatedValuesRef.current.userType === `Owner`) {
+          setCenterZip(response.data.centerZip);  // Set the zip code for the owner
+        }
+
+        // Handle CenterOwner-specific fields
+        if (updatedValuesRef.current.userType === `CenterOwner`) {
+          setCenterName(response.data.centerName);
+          setCenterAddress(response.data.centerAddress);
+          setCenterCity(response.data.centerCity);
+          setCenterState(response.data.centerState);
+          setCenterZip(response.data.centerZip);  // Also set zip for CenterOwner
+        }
+
+      } catch (error) {
+        console.error('Failed to fetch user', error);
+        if (error.response && error.response.status === 401) {
+          alert('Session expired, please log in again.');
+          navigate('/login');
+        }
       }
-    }
-  }, [token]);
+    };
+
+    fetchUserInfo();
+  }, [token, navigate]);
+
+
+
 
   const handleFirstNameChange = () => {
     updatedValuesRef.current.firstName = firstNameLabel;
@@ -109,8 +115,7 @@ export default function HomePage() {
     if (!isValidPhone) {
       setInvalidPhoneNumber(true);
       return true;
-    }
-    else {
+    } else {
       setInvalidPhoneNumber(false);
       updatedValuesRef.current.phoneNumber = phoneNumberLabel;
       setPhoneNumber(phoneNumberLabel);
@@ -123,11 +128,10 @@ export default function HomePage() {
   }
 
   const handleZipChange = () => {
-    if (centerZip.length === 5){
+    if (centerZip.length === 5) {
       setInvalidZip(false);
       return false;
-    }
-    else {
+    } else {
       setInvalidZip(true);
       return true;
     }
@@ -137,18 +141,25 @@ export default function HomePage() {
     handleFirstNameChange();
     handleLastNameChange();
     handlePasswordChange();
-    let phoneNumber = handlePhoneNumberChange();
-    let zip = handleZipChange();
-    
-    if ((!phoneNumber && !zip) || updatedValuesRef.current.userType != `CenterOwner`){
+    let phoneNumberValid = handlePhoneNumberChange();
+    let zipValid = handleZipChange();
+
+    // Only validate zip if userType is Owner
+    if (updatedValuesRef.current.userType === 'Owner') {
+      if (zipValid) {
+        return; // Exit if zip is invalid
+      }
+    }
+
+    if (!phoneNumberValid) {
       const updateSuccess = await handleUserUpdate();
-      if (updateSuccess === 0){
+      if (updateSuccess === 0) {
         setInvalidPassword(false);
         setIsEditing(false);
         setPasswordLabel("");
         setOldPasswordLabel("");
-      }
-      else{
+        setInvalidZip(false); // Reset zip validation
+      } else {
         setInvalidPassword(true);
       }
     }
@@ -179,17 +190,22 @@ export default function HomePage() {
         UserType: updatedValuesRef.current.userType
       }
 
-      if (updatedValuesRef.current.userType === `Owner` || updatedValuesRef.current.userType === `CenterWorker`){
+      if (updatedValuesRef.current.userType === `Owner` || updatedValuesRef.current.userType === `CenterWorker`) {
         console.log("age: " + userAge);
         updatedUser.age = userAge;
         console.log("updated age: " + updatedUser.age);
         updatedUser.firstName = updatedValuesRef.current.firstName;
         updatedUser.lastName = updatedValuesRef.current.lastName;
-        if (updatedValuesRef.current.userType === `CenterWorker`){
+
+        if (updatedValuesRef.current.userType === `Owner`) {
+          // Add centerZip for Owner user type
+          updatedUser.centerZip = centerZip;
+        }
+
+        if (updatedValuesRef.current.userType === `CenterWorker`) {
           updatedUser.centerId = currentUser.centerId;
         }
-      }
-      else if (updatedValuesRef.current.userType === 'CenterOwner'){
+      } else if (updatedValuesRef.current.userType === 'CenterOwner') {
         updatedUser.centerName = centerName;
         updatedUser.centerAddress = centerAddress;
         updatedUser.centerCity = centerCity;
@@ -197,10 +213,13 @@ export default function HomePage() {
         updatedUser.centerZip = centerZip;
         updatedUser.centerPetCount = currentUser.centerPetCount;
       }
-  
+
+      // Log the updatedUser object to verify
+      console.log("Updated User Object: ", updatedUser);
+
       const url = `${API_URL}/api/users/update/${updatedValuesRef.current.userType}`
       const updatedResponse = await axios.put(url, updatedUser, {
-        params: { oldPassword: updatedValuesRef.current.oldPassword},
+        params: { oldPassword: updatedValuesRef.current.oldPassword },
 
         headers: {
           'Content-Type': 'application/json',
@@ -211,12 +230,10 @@ export default function HomePage() {
       if (updatedResponse.status !== 200) {
         return 1;
       }
-      
-      //Add alert feature somehow to show that data was successfully inserted
-      console.log('User updated successfully', updatedResponse.data);
 
+      console.log('User updated successfully', updatedResponse.data);
       return 0;
-  
+
     } catch (error) {
       console.error('Failed to update user', error);
       return 1;
@@ -224,209 +241,240 @@ export default function HomePage() {
   };
 
   return (
-    <>
-      <Head>
-        <title>Settings Page</title>
-      </Head>
+      <>
+        <Head>
+          <title>Settings Page</title>
+        </Head>
 
-      <TitleBar />
+        <TitleBar />
 
-      <main>
-        <Stack sx={{ paddingTop: 4 }} alignItems='center' gap={2}>
-          <Card sx={{ width: 600, height: 80 }} elevation={4}>
-            <CardContent>
-              <Typography variant='h3' align='center'>Settings</Typography>
-            </CardContent>
-          </Card>
-          {updatedValuesRef.current.userType != 'CenterOwner' && <Paper sx={{ width: 600, height: 50 }} elevation={4}>
-            <Stack spacing={1} direction="row" alignItems='center'>
-              <Typography variant='h5'>First Name</Typography>
-              <TextField
-                label="First Name"
-                align='center'
-                value={firstNameLabel}
-                onChange={(e) => setFirstNameLabel(e.target.value)}
-                InputProps={{
-                  style: { height: '40px', width: '470px' },
-                  readOnly: !isEditing
-                }}
-              />
-            </Stack>
-          </Paper>}
-          {updatedValuesRef.current.userType != 'CenterOwner' && <Paper sx={{ width: 600, height: 50 }} elevation={4}>
-            <Stack spacing={1} direction="row" alignItems='center'>
-              <Typography variant='h5'>Last Name</Typography>
-              <TextField
-                label="Last Name"
-                align='center'
-                value={lastNameLabel}
-                onChange={(e) => setLastNameLabel(e.target.value)}
-                InputProps={{
-                  style: { height: '40px', width: '470px' },
-                  readOnly: !isEditing
-                }}
-              />
-            </Stack>
-          </Paper>}
-          <Paper sx={{ width: 600, height: invalidPhoneNumber ? 70 : 50 }} elevation={4}>
-            <Stack spacing={1} direction="row" alignItems='center'>
-              <Typography variant='h5'>Phone Number</Typography>
-              <TextField
-                label="Phone Number"
-                align='center'
-                value={phoneNumberLabel}
-                onChange={(e) => setPhoneNumberLabel(e.target.value)}
-                InputProps={{
-                  style: { height: '40px', width: '425px' },
-                  readOnly: !isEditing
-                }}
-              />
-            </Stack>
-            {invalidPhoneNumber && (
-                <Typography color="error" variant="body2">
-                  Please enter a valid phone number.
-                </Typography>
-              )}
-          </Paper>
-          <Paper sx={{ width: 600, height: invalidPassword ? 120 : 90 }} elevation={4}>
-            <Stack spacing={1} direction="row" alignItems='center'>
-              <Typography variant='h5' width={160}>Old Password</Typography>
-              <TextField
-                label="Old Password"
-                align='center'
-                value={oldPasswordLabel}
-                onChange={(e) => setOldPasswordLabel(e.target.value)}
-                InputProps={{ 
-                  style: { height: '40px', width: '425px' },
-                  readOnly: !isEditing
-                }}
-              />
-            </Stack>
-            <Stack spacing={1} direction="row" alignItems='center'>
-              <Typography variant='h5'>New Password</Typography>
-              <TextField
-                label="New Password"
-                align='center'
-                value={passwordLabel}
-                onChange={(e) => setPasswordLabel(e.target.value)}
-                InputProps={{
-                  style: { height: '40px', width: '425px' },
-                  readOnly: !isEditing
-                }}
-              />
-            </Stack>
-            {invalidPassword && (
-              <Typography color="error" variant="body2" sx={{ marginTop: 1 }}>
-                Please enter a valid password.
-              </Typography>
+        <main>
+          <Stack sx={{ paddingTop: 4 }} alignItems='center' gap={2}>
+            <Card sx={{ width: 600, height: 80 }} elevation={4}>
+              <CardContent>
+                <Typography variant='h3' align='center'>Settings</Typography>
+              </CardContent>
+            </Card>
+            {updatedValuesRef.current.userType !== 'CenterOwner' && (
+                <>
+                  <Paper sx={{ width: 600, height: 50 }} elevation={4}>
+                    <Stack spacing={1} direction="row" alignItems='center'>
+                      <Typography variant='h5'>First Name</Typography>
+                      <TextField
+                          label="First Name"
+                          align='center'
+                          value={firstNameLabel}
+                          onChange={(e) => setFirstNameLabel(e.target.value)}
+                          InputProps={{
+                            style: { height: '40px', width: '470px' },
+                            readOnly: !isEditing
+                          }}
+                      />
+                    </Stack>
+                  </Paper>
+                  <Paper sx={{ width: 600, height: 50 }} elevation={4}>
+                    <Stack spacing={1} direction="row" alignItems='center'>
+                      <Typography variant='h5'>Last Name</Typography>
+                      <TextField
+                          label="Last Name"
+                          align='center'
+                          value={lastNameLabel}
+                          onChange={(e) => setLastNameLabel(e.target.value)}
+                          InputProps={{
+                            style: { height: '40px', width: '470px' },
+                            readOnly: !isEditing
+                          }}
+                      />
+                    </Stack>
+                  </Paper>
+                </>
             )}
-          </Paper>
-          {updatedValuesRef.current.userType != `CenterOwner` && <Paper sx={{ width: 600, height: 50 }} elevation={4}>
-            <Stack spacing={1} direction="row" alignItems='center'>
-            <Typography variant='h5'>Age</Typography>
-            <Select
-              labelId="age-label"
-              id="age-select"
-              value={userAge}
-              onChange={handleAgeChange}
-              label="Age"
-              style={{ height: '40px', width: '545px', pointerEvents: !isEditing ? 'none' : 'auto' }}
-            >
-              {Array.from({ length: 101 }, (_, age) => (
-              <MenuItem key={age} value={age}>
-                {age}
-              </MenuItem>
-            ))}
-            </Select>
-            </Stack>
-          </Paper>}
-          {updatedValuesRef.current.userType == `CenterOwner` && 
-          <>
-          <Paper sx={{ width: 600, height: 50 }} elevation={4}>
-            <Stack spacing={1} direction="row" alignItems='center'>
-              <Typography variant='h5'>Center Name</Typography>
-              <TextField
-                label="Center Name"
-                align='center'
-                value={centerName}
-                onChange={(e) => setCenterName(e.target.value)}
-                InputProps={{
-                  style: { height: '40px', width: '440px' },
-                  readOnly: !isEditing
-                }}
-              />
-            </Stack>
-          </Paper>
-          <Paper sx={{ width: 600, height: 50 }} elevation={4}>
-          <Stack spacing={1} direction="row" alignItems='center'>
-            <Typography variant='h5'>Center Address</Typography>
-            <TextField
-              label="Center Address"
-              align='center'
-              value={centerAddress}
-              onChange={(e) => setCenterAddress(e.target.value)}
-              InputProps={{
-                style: { height: '40px', width: '420px' },
-                readOnly: !isEditing
-              }}
-            />
-          </Stack>
-        </Paper>
-        <Paper sx={{ width: 600, height: 50 }} elevation={4}>
-          <Stack spacing={1} direction="row" alignItems='center'>
-            <Typography variant='h5'>Center City</Typography>
-            <TextField
-              label="Center City"
-              align='center'
-              value={centerCity}
-              onChange={(e) => setCenterCity(e.target.value)}
-              InputProps={{
-                style: { height: '40px', width: '465px' },
-                readOnly: !isEditing
-              }}
-            />
-          </Stack>
-        </Paper>
-        <Paper sx={{ width: 600, height: 50 }} elevation={4}>
-          <Stack spacing={1} direction="row" alignItems='center'>
-            <Typography variant='h5'>Center State</Typography>
-            <TextField
-              label="Center State"
-              align='center'
-              value={centerState}
-              onChange={(e) => setCenterState(e.target.value)}
-              InputProps={{
-                style: { height: '40px', width: '450px' },
-                readOnly: !isEditing
-              }}
-            />
-          </Stack>
-        </Paper>
-        <Paper sx={{ width: 600, height: !invalidZip ? 50 : 70 }} elevation={4}>
-          <Stack spacing={1} direction="row" alignItems='center'>
-            <Typography variant='h5'>Center Zip</Typography>
-            <TextField
-              label="Center Zip"
-              align='center'
-              value={centerZip}
-              onChange={(e) => setCenterZip(e.target.value)}
-              InputProps={{
-                style: { height: '40px', width: '470px' },
-                readOnly: !isEditing
-              }}
-            />
-          </Stack>
-          {invalidZip && (
-                <Typography color="error" variant="body2">
-                  Please enter a valid zip code.
-                </Typography>
+            <Paper sx={{ width: 600, height: invalidPhoneNumber ? 70 : 50 }} elevation={4}>
+              <Stack spacing={1} direction="row" alignItems='center'>
+                <Typography variant='h5'>Phone Number</Typography>
+                <TextField
+                    label="Phone Number"
+                    align='center'
+                    value={phoneNumberLabel}
+                    onChange={(e) => setPhoneNumberLabel(e.target.value)}
+                    InputProps={{
+                      style: { height: '40px', width: '425px' },
+                      readOnly: !isEditing
+                    }}
+                />
+              </Stack>
+              {invalidPhoneNumber && (
+                  <Typography color="error" variant="body2">
+                    Please enter a valid phone number.
+                  </Typography>
               )}
-        </Paper>
-        </>
-          }
-          <Button onClick={isEditing ? handleSave : handleEdit}>{isEditing ? 'Save' : 'Edit'}</Button>
-        </Stack>
-      </main>
-    </>
+            </Paper>
+            <Paper sx={{ width: 600, height: invalidPassword ? 120 : 90 }} elevation={4}>
+              <Stack spacing={1} direction="row" alignItems='center'>
+                <Typography variant='h5' width={160}>Old Password</Typography>
+                <TextField
+                    label="Old Password"
+                    align='center'
+                    value={oldPasswordLabel}
+                    onChange={(e) => setOldPasswordLabel(e.target.value)}
+                    InputProps={{
+                      style: { height: '40px', width: '425px' },
+                      readOnly: !isEditing
+                    }}
+                />
+              </Stack>
+              <Stack spacing={1} direction="row" alignItems='center'>
+                <Typography variant='h5'>New Password</Typography>
+                <TextField
+                    label="New Password"
+                    align='center'
+                    value={passwordLabel}
+                    onChange={(e) => setPasswordLabel(e.target.value)}
+                    InputProps={{
+                      style: { height: '40px', width: '425px' },
+                      readOnly: !isEditing
+                    }}
+                />
+              </Stack>
+              {invalidPassword && (
+                  <Typography color="error" variant="body2" sx={{ marginTop: 1 }}>
+                    Please enter a valid password.
+                  </Typography>
+              )}
+            </Paper>
+            {updatedValuesRef.current.userType !== 'CenterOwner' && (
+                <Paper sx={{ width: 600, height: 50 }} elevation={4}>
+                  <Stack spacing={1} direction="row" alignItems='center'>
+                    <Typography variant='h5'>Age</Typography>
+                    <Select
+                        labelId="age-label"
+                        id="age-select"
+                        value={userAge}
+                        onChange={handleAgeChange}
+                        label="Age"
+                        style={{ height: '40px', width: '545px', pointerEvents: !isEditing ? 'none' : 'auto' }}
+                    >
+                      {Array.from({ length: 101 }, (_, age) => (
+                          <MenuItem key={age} value={age}>
+                            {age}
+                          </MenuItem>
+                      ))}
+                    </Select>
+                  </Stack>
+                </Paper>
+            )}
+            {updatedValuesRef.current.userType === 'CenterOwner' && (
+                <>
+                  <Paper sx={{ width: 600, height: 50 }} elevation={4}>
+                    <Stack spacing={1} direction="row" alignItems='center'>
+                      <Typography variant='h5'>Center Name</Typography>
+                      <TextField
+                          label="Center Name"
+                          align='center'
+                          value={centerName}
+                          onChange={(e) => setCenterName(e.target.value)}
+                          InputProps={{
+                            style: { height: '40px', width: '440px' },
+                            readOnly: !isEditing
+                          }}
+                      />
+                    </Stack>
+                  </Paper>
+                  <Paper sx={{ width: 600, height: 50 }} elevation={4}>
+                    <Stack spacing={1} direction="row" alignItems='center'>
+                      <Typography variant='h5'>Center Address</Typography>
+                      <TextField
+                          label="Center Address"
+                          align='center'
+                          value={centerAddress}
+                          onChange={(e) => setCenterAddress(e.target.value)}
+                          InputProps={{
+                            style: { height: '40px', width: '420px' },
+                            readOnly: !isEditing
+                          }}
+                      />
+                    </Stack>
+                  </Paper>
+                  <Paper sx={{ width: 600, height: 50 }} elevation={4}>
+                    <Stack spacing={1} direction="row" alignItems='center'>
+                      <Typography variant='h5'>Center City</Typography>
+                      <TextField
+                          label="Center City"
+                          align='center'
+                          value={centerCity}
+                          onChange={(e) => setCenterCity(e.target.value)}
+                          InputProps={{
+                            style: { height: '40px', width: '465px' },
+                            readOnly: !isEditing
+                          }}
+                      />
+                    </Stack>
+                  </Paper>
+                  <Paper sx={{ width: 600, height: 50 }} elevation={4}>
+                    <Stack spacing={1} direction="row" alignItems='center'>
+                      <Typography variant='h5'>Center State</Typography>
+                      <TextField
+                          label="Center State"
+                          align='center'
+                          value={centerState}
+                          onChange={(e) => setCenterState(e.target.value)}
+                          InputProps={{
+                            style: { height: '40px', width: '450px' },
+                            readOnly: !isEditing
+                          }}
+                      />
+                    </Stack>
+                  </Paper>
+                  <Paper sx={{ width: 600, height: !invalidZip ? 50 : 70 }} elevation={4}>
+                    <Stack spacing={1} direction="row" alignItems='center'>
+                      <Typography variant='h5'>Center Zip</Typography>
+                      <TextField
+                          label="Center Zip"
+                          align='center'
+                          value={centerZip}
+                          onChange={(e) => setCenterZip(e.target.value)}
+                          InputProps={{
+                            style: { height: '40px', width: '470px' },
+                            readOnly: !isEditing
+                          }}
+                      />
+                    </Stack>
+                    {invalidZip && (
+                        <Typography color="error" variant="body2">
+                          Please enter a valid zip code.
+                        </Typography>
+                    )}
+                  </Paper>
+                </>
+            )}
+            {updatedValuesRef.current.userType === 'Owner' && (
+                <Paper sx={{ width: 600, height: !invalidZip ? 50 : 70 }} elevation={4}>
+                  <Stack spacing={1} direction="row" alignItems='center'>
+                    <Typography variant='h5'>Center Zip</Typography>
+                    <TextField
+                        label="Center Zip"
+                        align='center'
+                        value={centerZip}  // Bind the current centerZip value here
+                        onChange={(e) => setCenterZip(e.target.value)}  // Allow user to change zip
+                        InputProps={{
+                          style: { height: '40px', width: '470px' },
+                          readOnly: !isEditing,  // Read-only until the user clicks Edit
+                        }}
+                    />
+                  </Stack>
+                  {invalidZip && (
+                      <Typography color="error" variant="body2">
+                        Please enter a valid zip code.
+                      </Typography>
+                  )}
+                </Paper>
+            )}
+
+
+
+            <Button onClick={isEditing ? handleSave : handleEdit}>{isEditing ? 'Save' : 'Edit'}</Button>
+          </Stack>
+        </main>
+      </>
   );
 }

@@ -5,12 +5,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import petadoption.api.Event.Event;
 import petadoption.api.user.AdoptionCenter.AdoptionCenter;
+import petadoption.api.user.AdoptionCenter.AdoptionCenterRepository;
 import petadoption.api.user.AdoptionCenter.CenterWorker;
 import petadoption.api.user.Owner.Owner;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 @RequestMapping("/api/users")
 @RestController
@@ -35,6 +38,31 @@ public class UserController {
             return new ResponseEntity<>(centers, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @GetMapping("/getCenterID/{id}")
+    public ResponseEntity<?> getCenterID(@PathVariable("id") String id) {
+        try {
+            // Convert the string ID to a Long
+            long workerId = Long.parseLong(id);
+
+            // Find the CenterWorker by the workerId
+            CenterWorker centerWorker = userService.findCenterWorker(workerId);
+
+            // If CenterWorker is not found, return a 404 response
+            if (centerWorker == null) {
+                return new ResponseEntity<>("CenterWorker not found", HttpStatus.NOT_FOUND);
+            }
+
+            // Return the centerID if the worker is found
+            return new ResponseEntity<>(centerWorker.getCenterID(), HttpStatus.OK);
+
+        } catch (NumberFormatException e) {
+            // Return a 400 response if the ID is not a valid Long
+            return new ResponseEntity<>("Invalid ID format", HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            // Handle any other exceptions
+            return new ResponseEntity<>("Error retrieving center ID", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -81,5 +109,19 @@ public class UserController {
         catch (Error e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
+    }
+
+    @GetMapping("/getAdoptionCenter/{id}")
+    public ResponseEntity<?> getAdoptionCenter(@PathVariable("id") Long id) {
+        try {
+            Optional<AdoptionCenter> optionalAdoptionCenter = userService.findAdoptionCenterById(id);
+            if (optionalAdoptionCenter.isPresent()) {
+                return new ResponseEntity<>(optionalAdoptionCenter.get(), HttpStatus.OK);
+            }
+            return new ResponseEntity<>("AdoptionCenter not found", HttpStatus.NOT_FOUND);
+        } catch (SQLException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 }

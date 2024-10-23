@@ -1,6 +1,7 @@
 import React from 'react'
 import Head from "next/head";
 import {Button, Stack} from "@mui/material";
+import TitleBar from "@/components/TitleBar";
 
 const DogPress = () => {
     alert('You Like DOGS!');
@@ -36,6 +37,7 @@ const SearchEngine = () => {
 
     return (
         <div>
+            <TitleBar/>
             <h1>Welcome to the Search Engine Page!</h1>
             <h3 >Please select your preference:</h3>
             <Stack direction={"row"} spacing={2}>

@@ -25,7 +25,9 @@ export const saveUpdatePet = ({formType, petData, token, resetFields}) => {
         })
         .then((res) => {
             alert('Pet Saved!');
-            resetFields();
+            if(formType !== "update") {
+                resetFields();
+            }
         })
         .catch((err) => {
             console.error('An error occurred during registration:', err);
