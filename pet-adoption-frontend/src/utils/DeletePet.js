@@ -2,7 +2,7 @@ import {API_URL} from "@/constants";
 import axios from "axios";
 
 
-export const deletePet = ({petData, token, resetFields}) => {
+export const deletePet = ({petData, token, resetFields, handlePostNewPet}) => {
 
     const url = `${API_URL}/api/pets/delete`
 
@@ -20,6 +20,7 @@ export const deletePet = ({petData, token, resetFields}) => {
             console.log(res.data);
             alert("Pet deleted successfully!");
             resetFields();
+            handlePostNewPet();
 
         })
         .catch(error => {
