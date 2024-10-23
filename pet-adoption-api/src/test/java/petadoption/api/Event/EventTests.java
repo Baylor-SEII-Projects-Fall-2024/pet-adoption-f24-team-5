@@ -1,4 +1,4 @@
-package petadoption.api.Event;
+package petadoption.api.event;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
