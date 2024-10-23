@@ -60,7 +60,6 @@ public class UserService {
             throw new IllegalAccessException("User not found");
         }
         if (!passwordEncoder.matches(oldPassword, ((Owner)findUser(owner.getEmailAddress()).get()).getPassword())) {
-            System.out.println("Old password: " + oldPassword);
             throw new IllegalAccessException("Invalid credentials");
         }
         Owner newUser = (Owner) findUser(owner.getEmailAddress()).get();
@@ -73,6 +72,9 @@ public class UserService {
     }
 
     public CenterWorker updateCenterWorker(CenterWorker worker, String oldPassword) throws IllegalAccessException {
+        if (findUser(worker.getEmailAddress()).isEmpty()){
+            throw new IllegalAccessException("User not found");
+        }
         if (!passwordEncoder.matches(oldPassword, ((CenterWorker) findUser(worker.getEmailAddress()).get()).getPassword())) {
             throw new IllegalAccessException("Invalid credentials");
         }
@@ -86,6 +88,9 @@ public class UserService {
     }
 
     public AdoptionCenter updateAdoptionCenter(AdoptionCenter adoptionCenter, String oldPassword) throws IllegalAccessException {
+        if (findUser(adoptionCenter.getEmailAddress()).isEmpty()){
+            throw new IllegalAccessException("User not found");
+        }
         if (!passwordEncoder.matches(oldPassword, ((AdoptionCenter) findUser(adoptionCenter.getEmailAddress()).get()).getPassword())) {
             throw new IllegalAccessException("Invalid credentials");
         }

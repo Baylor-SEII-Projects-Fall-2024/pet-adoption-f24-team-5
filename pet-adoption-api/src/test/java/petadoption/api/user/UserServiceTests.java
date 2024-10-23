@@ -200,18 +200,6 @@ public class UserServiceTests {
         owner.setLastName("Doe");
         userService.saveUser(owner);
 
-        Owner newOwner = new Owner();
-        newOwner.setUserType(UserType.Owner);
-        newOwner.setEmailAddress("bademail@example.com");
-        newOwner.setPassword("newPassword");
-        newOwner.setPhoneNumber("098-765-4321");
-        newOwner.setAge(33);
-        newOwner.setFirstName("Andrew");
-        newOwner.setLastName("Parks");
-        userService.saveUser(newOwner);
-
-        assertNotEquals(userService.findUser("example@example.com"), userService.findUser("bademail@example.com"));
-
         assertThrowsExactly(IllegalAccessException.class, () -> {
             userService.updateOwner(new Owner(), "password");
         });
@@ -234,6 +222,92 @@ public class UserServiceTests {
             assertEquals(((Owner)userService.findUser("example@example.com").get()).getPassword(), updatedOwner.getPassword());
             assertEquals(((Owner)userService.findUser("example@example.com").get()).getPhoneNumber(), updatedOwner.getPhoneNumber());
             assertEquals(((Owner)userService.findUser("example@example.com").get()).getLastName(), updatedOwner.getLastName());
+        }
+        catch(Exception e){
+            fail();
+        }
+    }
+
+    @Test
+    void testUpdateUserCenterWorker(){
+        CenterWorker worker = new CenterWorker();
+        worker.setUserType(UserType.CenterWorker);
+        worker.setEmailAddress("example@example.com");
+        worker.setPassword(passwordEncoder.encode("password"));
+        worker.setPhoneNumber("123-456-7890");
+        worker.setAge(21);
+        worker.setFirstName("John");
+        worker.setLastName("Doe");
+        userService.saveUser(worker);
+
+        assertThrowsExactly(IllegalAccessException.class, () -> {
+            userService.updateCenterWorker(new CenterWorker(), "password");
+        });
+
+        assertThrowsExactly(IllegalAccessException.class, () -> {
+            userService.updateCenterWorker(worker, "newPassword");
+        });
+
+        Optional<?> optionalUpdatedUser = userService.findUser("example@example.com");
+        assertTrue(optionalUpdatedUser.isPresent());
+        CenterWorker updatedCenterWorker = (CenterWorker) optionalUpdatedUser.get();
+        updatedCenterWorker.setAge(33);
+        updatedCenterWorker.setFirstName("Andrew");
+
+        try{
+            userService.updateCenterWorker(updatedCenterWorker, "password");
+            assertEquals(((CenterWorker)userService.findUser("example@example.com").get()).getFirstName(), updatedCenterWorker.getFirstName());
+            assertEquals(((CenterWorker)userService.findUser("example@example.com").get()).getAge(), updatedCenterWorker.getAge());
+            assertEquals(((CenterWorker)userService.findUser("example@example.com").get()).getEmailAddress(), updatedCenterWorker.getEmailAddress());
+            assertEquals(((CenterWorker)userService.findUser("example@example.com").get()).getPassword(), updatedCenterWorker.getPassword());
+            assertEquals(((CenterWorker)userService.findUser("example@example.com").get()).getPhoneNumber(), updatedCenterWorker.getPhoneNumber());
+            assertEquals(((CenterWorker)userService.findUser("example@example.com").get()).getLastName(), updatedCenterWorker.getLastName());
+        }
+        catch(Exception e){
+            fail();
+        }
+    }
+
+    @Test
+    void testUpdateUserCenterOwner(){
+        AdoptionCenter center = new AdoptionCenter();
+        center.setEmailAddress("example@gmail.com");
+        center.setPassword(passwordEncoder.encode("password"));
+        center.setUserType(UserType.CenterOwner);
+        center.setPhoneNumber("254-556-7794");
+        center.setCenterAddress("Andrew Boulevard");
+        center.setCenterName("Adoption Center");
+        center.setCenterCity("Plano");
+        center.setCenterState("Oregon");
+        center.setCenterZip("12345");
+        center.setNumberOfPets(100);
+        userService.saveUser(center);
+
+        assertThrowsExactly(IllegalAccessException.class, () -> {
+            userService.updateAdoptionCenter(new AdoptionCenter(), "password");
+        });
+
+        assertThrowsExactly(IllegalAccessException.class, () -> {
+            userService.updateAdoptionCenter(center, "newPassword");
+        });
+
+        Optional<?> optionalUpdatedUser = userService.findUser("example@gmail.com");
+        assertTrue(optionalUpdatedUser.isPresent());
+        AdoptionCenter updatedAdoptionCenter = (AdoptionCenter) optionalUpdatedUser.get();
+        updatedAdoptionCenter.setCenterName("NEW CENTER NAME");
+        updatedAdoptionCenter.setCenterCity("Waco");
+
+        try{
+            userService.updateAdoptionCenter(updatedAdoptionCenter, "password");
+            assertEquals(((AdoptionCenter)userService.findUser("example@gmail.com").get()).getCenterZip(), updatedAdoptionCenter.getCenterZip());
+            assertEquals(((AdoptionCenter)userService.findUser("example@gmail.com").get()).getCenterState(), updatedAdoptionCenter.getCenterState());
+            assertEquals(((AdoptionCenter)userService.findUser("example@gmail.com").get()).getEmailAddress(), updatedAdoptionCenter.getEmailAddress());
+            assertEquals(((AdoptionCenter)userService.findUser("example@gmail.com").get()).getPassword(), updatedAdoptionCenter.getPassword());
+            assertEquals(((AdoptionCenter)userService.findUser("example@gmail.com").get()).getPhoneNumber(), updatedAdoptionCenter.getPhoneNumber());
+            assertEquals(((AdoptionCenter)userService.findUser("example@gmail.com").get()).getCenterAddress(), updatedAdoptionCenter.getCenterAddress());
+            assertEquals(((AdoptionCenter)userService.findUser("example@gmail.com").get()).getNumberOfPets(), updatedAdoptionCenter.getNumberOfPets());
+            assertEquals(((AdoptionCenter)userService.findUser("example@gmail.com").get()).getCenterName(), updatedAdoptionCenter.getCenterName());
+            assertEquals(((AdoptionCenter)userService.findUser("example@gmail.com").get()).getCenterCity(), updatedAdoptionCenter.getCenterCity());
         }
         catch(Exception e){
             fail();
