@@ -1,12 +1,15 @@
 package petadoption.api.user;
 
 import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 import petadoption.api.Event.Event;
 import petadoption.api.user.AdoptionCenter.AdoptionCenter;
@@ -23,17 +26,20 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private OwnerRepository ownerRepository;
-    @Autowired
-    private AdoptionCenterRepository adoptionCenterRepository;
-    @Autowired
-    private CenterWorkerRepository centerWorkerRepository;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+
+    private final UserRepository userRepository;
+
+    private final OwnerRepository ownerRepository;
+
+    private final AdoptionCenterRepository adoptionCenterRepository;
+
+    private final CenterWorkerRepository centerWorkerRepository;
+
+    private final PasswordEncoder passwordEncoder;
+
+
 
 
 
@@ -50,6 +56,14 @@ public class UserService {
             Optional<Owner> owner = ownerRepository.findById(userRepository.findByEmailAddress(emailAddress).get().getId());
             return owner.get();
         }
+    }
+
+    public CenterWorker findCenterWorker(long userID) {
+        Optional<CenterWorker> centerWorker = centerWorkerRepository.findById(userID);
+        if(centerWorker.isEmpty()) {
+            throw new IllegalArgumentException("Invalid ID");
+        }
+        return centerWorker.get();
     }
 
     public User saveUser(User user) {return userRepository.save(user);}
@@ -142,7 +156,7 @@ public class UserService {
         System.out.println(email);
 
         Long centerId = centerWorkerRepository.findCenterIdByEmailAddress(email)
-                .orElseThrow(() -> new SQLException("Could not find center "));
+                .orElseThrow(() -> new SQLException("Could not find center"));
         System.out.println(centerId);
 
         AdoptionCenter center = adoptionCenterRepository.findById(centerId)
@@ -155,6 +169,23 @@ public class UserService {
             return center;
         }
 
+    }
+
+    public Optional<AdoptionCenter> findAdoptionCenterByEmail(String email) throws SQLException {
+        if (email == null || email.isEmpty()) {
+            throw new IllegalArgumentException("email must be valid");
+        }
+        Optional<User> response = userRepository.findByEmailAddress(email);
+        if(response.isPresent()){
+            if(response.get().getUserType() == UserType.CenterOwner){
+                return adoptionCenterRepository.findById(response.get().getId());
+            }
+        }
+        return Optional.empty();
+    }
+
+    public Optional<AdoptionCenter> findAdoptionCenterById(Long id) throws SQLException {
+        return adoptionCenterRepository.findById(id);
     }
 
 }
