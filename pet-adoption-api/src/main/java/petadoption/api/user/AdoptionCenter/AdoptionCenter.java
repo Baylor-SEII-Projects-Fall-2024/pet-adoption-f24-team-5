@@ -77,15 +77,26 @@ public class AdoptionCenter extends User {
 
     public void getLongAndLat(String centerZip) {
         try {
+            //////////////////////////////////////////////////////////////
             // Define the relative path from the current class location to src/main/resources/zipCSV/uszips.csv
-            Path csvFilePath = Paths.get("src", "main", "resources", "zipCSV", "uszips.csv").toAbsolutePath();
+            Path csvFilePath = Paths.get("resources", "zipCSV", "uszips.csv").toAbsolutePath();
             File csvFile = csvFilePath.toFile();
 
             // Check if the file exists
             if (!csvFile.exists()) {
-                System.err.println("uszips.csv file not found at " + csvFilePath);
-                return;
+                System.out.println("uszips.csv file not found at " + csvFilePath);
+                System.out.println("going to try the second path option ...");
+                csvFilePath = Paths.get("src", "main", "resources", "zipCSV", "uszips.csv").toAbsolutePath();
+                csvFile = csvFilePath.toFile();
+                if(!csvFile.exists())
+                {
+                    System.err.println("uszips.csv file not found at " + csvFilePath);
+                    System.err.println("The file is not found at either path, Error exit..");
+                    return;
+                }
+                System.out.println("The local host path works");
             }
+            //////////////////////////////////////////////////////////////
 
             // Read the CSV file using BufferedReader
             try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
