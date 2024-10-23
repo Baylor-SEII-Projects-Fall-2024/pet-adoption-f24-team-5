@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class EventService {
@@ -43,6 +44,10 @@ public class EventService {
     }
     public List<Event> findAllEvents() {
         return eventRepository.findAll();
+    }
+
+    public Optional<List<Event>> findEventsByCenterId(Long center_id) {
+        return eventRepository.findEventByCenter_id(center_id);
     }
 }
 

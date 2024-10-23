@@ -5,7 +5,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import axios from "axios";
 import {API_URL} from "@/constants";
 import TitleBar from "@/components/TitleBar";
-import {getSubjectFromToken} from "@/utils/tokenUtils";
+import {getAuthorityFromToken, getSubjectFromToken} from "@/utils/tokenUtils";
 import {useSelector} from "react-redux";
 
 const CreateEvent = () => {
@@ -19,9 +19,10 @@ const CreateEvent = () => {
     }));
     const [event_description, setEventDescription] = useState('');
     const [createEvent, setCreateEvent] = useState(false);
-    const [events, setEvents] = useState([]);
+    const [events,  setEvents] = useState([]);
     const [noFutureEvents, setNoFutureEvents] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState(null);
+    const [adoptionCenterName, setAdoptionCenterName] = useState(null);
     const token = useSelector((state) => state.user.token);
 
     useEffect(() => {
@@ -97,61 +98,47 @@ const CreateEvent = () => {
     const EventCard = ({ event }) => {
         console.log("Creating event card...");
         const [day, month, year] = event.event_date.split('/');
+
         return (
             <Card
                 sx={{
-                    flexBasis: '45%', // Takes about half the row space
+                    flexBasis: '45%',
                     flexGrow: 1,
-                    maxWidth: '600px', // Controls maximum card width
+                    maxWidth: '600px',
                     backgroundColor: 'white',
                     transition: 'border 0.3s',
-                    '&:hover': {
-                        border: '2px solid blue',
-                    },
+                    '&:hover': { border: '2px solid blue' },
                 }}
                 elevation={4}
                 key={event.event_id}
                 onClick={() => {
-                    console.log("Setting event...");
-                    setSelectedEvent(event);
-                    console.log("Success!");
-
-                    console.log("Setting event name...");
-                    setEventName(event.event_name);
-                    console.log("Success!");
-
-                    console.log("Setting center ID...");
-                    setCenterID(event.center_id);
-                    console.log("Success!");
-
-                    console.log("Setting event date...");
-                    setEventDate(handleDateStringToDate(event.event_date));
-                    console.log("Success!");
-
-                    console.log("Setting event time...");
-                    setEventTime(event.event_time);
-                    console.log("Success!");
-
-                    console.log("Setting event description...");
-                    setEventDescription(event.event_description);
-                    console.log("Success!");
-
-                    console.log("Setting create event...");
-                    setCreateEvent(true);
-                    console.log("Success!");
+                    if (getAuthorityFromToken(token) !== "Owner") {
+                        setSelectedEvent(event);
+                        setEventName(event.event_name);
+                        setCenterID(event.center_id);
+                        setEventDate(handleDateStringToDate(event.event_date));
+                        setEventTime(event.event_time);
+                        setEventDescription(event.event_description);
+                        setCreateEvent(true);
+                    }
                 }}
             >
                 <CardContent>
-                    <Typography variant='h5' align='center'>
+                    {getAuthorityFromToken(token) === "Owner" && (
+                        <Typography variant="h4" align="center">
+                            {event.center_name || "Unknown Center"}
+                        </Typography>
+                    )}
+                    <Typography variant="h5" align="center">
                         {event.event_name}
                     </Typography>
-                    <Typography variant='body1' align='center'>
+                    <Typography variant="body1" align="center">
                         {event.description}
                     </Typography>
-                    <Typography variant='body2' align='center'>
+                    <Typography variant="body2" align="center">
                         {`${day}/${month}/${year}`}
                     </Typography>
-                    <Typography variant='body2' align='center' color="textSecondary">
+                    <Typography variant="body2" align="center" color="textSecondary">
                         {`Time: ${event.event_time ? event.event_time : "N/A"}`}
                     </Typography>
                 </CardContent>
@@ -165,76 +152,57 @@ const CreateEvent = () => {
         setEventDescription('');
         setSelectedEvent(null);
     };
+
+    const fetchAdoptionCenterName = async (centerId) => {
+        try {
+            const response = await axios.get(`${API_URL}/api/users/getAdoptionCenter/${centerId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+            return response.data.centerName; // Assuming the response contains the name
+        } catch (error) {
+            console.error("Failed to fetch adoption center name:", error);
+            return "Unknown Center"; // Default value in case of an error
+        }
+    };
     const handleFetchEvents = async () => {
         try {
             console.log("Fetching events...");
-            const response = await axios.get(`${API_URL}/api/events`, {
-                headers: {
-                    Authorization: `Bearer ${token}`, // Pass token in the header
-                    'Content-Type': 'application/json',
-                }
-            });
+            let response;
+            if (getAuthorityFromToken(token) === "Owner") {
+                response = await axios.get(`${API_URL}/api/events`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+            } else {
+                response = await axios.get(`${API_URL}/api/events/getCenterEvents/${getSubjectFromToken(token)}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+            }
             console.log("Fetched Events...", response.data);
 
-            const filteredEvents = response.data.filter((event) => {
-                console.log("Filtering event...");
+            // Fetch adoption center names and attach them to events
+            const eventsWithCenterNames = await Promise.all(
+                response.data.map(async (event) => {
+                    const centerName = await fetchAdoptionCenterName(event.center_id);
+                    return { ...event, center_name: centerName };
+                })
+            );
 
-                console.log("Validating event_date...");
-                if (!event.event_date) {
-                    console.log("Error: " + event.event_date + " is not a date");
-                    return false;
-                }
-                console.log("Success!");
-
-                console.log("Validating event_time...");
-                if (!event.event_time) {
-                    console.log("Error: " + event.event_time + " is not a time");
-                    return false;
-                }
-                console.log("Success!");
-
-                console.log("Validating event is >= today date...");
-                const today = new Date();
-                today.setHours(0, 0, 0, 0); // Normalize today's date to midnight
-
-                if (handleDateStringToDate(event.event_date) < today) {
-                    console.log("The event date is before today");
-                    return false;
-                } else {
-                    console.log("The event date is today or in the future");
-                }
-                console.log("Success!");
-
-                console.log("Validating event time is after current time...");
-                const eventDate = handleDateStringToDate(event.event_date);
-
-                if (eventDate.getTime() === today.getTime()) {
-                    console.log("Event is today...");
-
-                    const eventTime = handleTimeStringToTime(event.event_time);
-                    const currentTime = handleTimeStringToTime(handleDateToTimeString(new Date()));
-
-                    if (eventTime.getTime() < currentTime.getTime()) {
-                        console.log("Event time is before the current time");
-                        return false;
-                    }
-                }
-                console.log("Success!");
-
-                console.log("Returning event validation");
-                return true;
-            });
-
-            const sortedEvents = filteredEvents.sort((a, b) => {
-                return handleDateStringToDate(a.event_date) - handleDateStringToDate(b.event_date);
-            });
-
-            setEvents(sortedEvents); // list of events that occur after current date and time
-            setNoFutureEvents(sortedEvents.length === 0); // if no events, none will be displayed
+            setEvents(eventsWithCenterNames);
+            setNoFutureEvents(eventsWithCenterNames.length === 0);
         } catch (error) {
             console.error("Error fetching events:", error);
         }
     };
+
     const handleValidateSetEvent = (displayAlert) => {
         if(event_name && !isNaN(center_id) && event_date && event_time && event_description) {
             return true;
@@ -385,9 +353,8 @@ const CreateEvent = () => {
 
     return (
         <Box sx={{ height: '100vh', width: '100vw', display: 'flex', flexDirection: 'column' }}>
-            <Box sx={{ height: '8vh', width: '100vw', backgroundColor: 'primary.main' }}>
-                <TitleBar/>
-            </Box>
+            <TitleBar/>
+
 
             {createEvent && (
                 <Box component="form" onSubmit={handleSubmit}>
@@ -411,12 +378,17 @@ const CreateEvent = () => {
 
             {!createEvent && (
                 <Stack sx={{ paddingTop: 4, maxWidth: '1200px', margin: '0 auto' }} alignItems='center' gap={5}>
-                    <Button onClick={handleCreateEvent} color='inherit' variant='contained'>Create Event</Button>
+                    {getAuthorityFromToken(token) !== "Owner" && (
+                        <Button onClick={handleCreateEvent} color='inherit' variant='contained'>
+                            Create Event
+                        </Button>
+                    )}
                     {noFutureEvents ? (
                         <Typography variant="h6" color="error">No future events</Typography>
                     ) : (
                         <Stack spacing={2} direction='row' flexWrap='wrap' justifyContent='center'>
                             {events.map(event => (
+
                                 <EventCard key={event.event_id} event={event} />
                             ))}
                         </Stack>

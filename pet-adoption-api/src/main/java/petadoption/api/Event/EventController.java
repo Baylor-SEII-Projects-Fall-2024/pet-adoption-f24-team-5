@@ -1,24 +1,62 @@
 package petadoption.api.Event;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import petadoption.api.user.AdoptionCenter.AdoptionCenter;
+import petadoption.api.user.UserService;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RequestMapping("/api/events")
 @RestController
+@RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:3000")
 public class EventController {
-    @Autowired
-    private final EventService eventService;
 
-    public EventController(EventService eventService) {
-        this.eventService = eventService;
+    private final EventService eventService;
+    private final UserService userService;
+
+
+    @GetMapping("/getCenterEvents/{email}")
+    public ResponseEntity<?> getCenterWorkerEvents(@PathVariable("email") String email) {
+        boolean checkIfAdoptionCenter = false;
+        AdoptionCenter center = null;
+        try{
+            center = userService.findCenterByWorkerEmail(email);
+
+        } catch (SQLException e ){
+            String message = e.getMessage();
+            if(!message.equals("Could not find center")){
+                return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+            }
+            checkIfAdoptionCenter = true;
+        }
+
+        try {
+            if(checkIfAdoptionCenter){
+                Optional<AdoptionCenter> centerOptional = userService.findAdoptionCenterByEmail(email);
+                if(centerOptional.isEmpty()){
+                    return new ResponseEntity<>("Could not find adoption center",HttpStatus.NOT_FOUND);
+                }
+                center = centerOptional.get();
+            }
+
+            Optional<List<Event>> events = eventService.findEventsByCenterId(center.getId());
+            if(events.isEmpty()){
+                List<Event> eventList = new ArrayList<>();
+                return new ResponseEntity<>(eventList,HttpStatus.OK);
+            }
+            return new ResponseEntity<>(events, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
     @GetMapping
     public ResponseEntity<?> getEvents() {
@@ -68,18 +106,18 @@ public class EventController {
             List<Event> events;
 
             LocalDate localDate = LocalDate.now();
-            LocalTime localTime = LocalTime.of(19, 30); // Use a LocalTime for the event time
+            LocalTime localTime = LocalTime.of(22, 30); // Use a LocalTime for the event time
             Event event1 = new Event(
-                    1L,
-                    "Cool event name",
+                    5L,
+                    "Sick event, lots of pets",
                     localDate,
                     localTime,
                     "This is the description"
             );
-            localTime = LocalTime.of(20, 30); // Use a LocalTime for the event time
+            localTime = LocalTime.of(23, 30); // Use a LocalTime for the event time
             Event event2 = new Event(
-                    1L,
-                    "Cooler event name",
+                    6L,
+                    "Sicker event, even more pets",
                     localDate,
                     localTime,
                     "This is the description but longer"
@@ -95,6 +133,8 @@ public class EventController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+
 
 
 
