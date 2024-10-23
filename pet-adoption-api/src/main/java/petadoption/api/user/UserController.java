@@ -37,6 +37,31 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    @GetMapping("/getCenterID/{id}")
+    public ResponseEntity<?> getCenterID(@PathVariable("id") String id) {
+        try {
+            // Convert the string ID to a Long
+            long workerId = Long.parseLong(id);
+
+            // Find the CenterWorker by the workerId
+            CenterWorker centerWorker = userService.findCenterWorker(workerId);
+
+            // If CenterWorker is not found, return a 404 response
+            if (centerWorker == null) {
+                return new ResponseEntity<>("CenterWorker not found", HttpStatus.NOT_FOUND);
+            }
+
+            // Return the centerID if the worker is found
+            return new ResponseEntity<>(centerWorker.getCenterID(), HttpStatus.OK);
+
+        } catch (NumberFormatException e) {
+            // Return a 400 response if the ID is not a valid Long
+            return new ResponseEntity<>("Invalid ID format", HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            // Handle any other exceptions
+            return new ResponseEntity<>("Error retrieving center ID", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     @PutMapping("/update/Owner")
     public ResponseEntity<Owner> updateOwner(@RequestBody Owner user, @RequestParam("oldPassword") String oldPassword) {

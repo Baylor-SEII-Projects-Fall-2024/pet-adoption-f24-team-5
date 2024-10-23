@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 import petadoption.api.Event.Event;
 import petadoption.api.user.AdoptionCenter.AdoptionCenter;
@@ -50,6 +52,14 @@ public class UserService {
             Optional<Owner> owner = ownerRepository.findById(userRepository.findByEmailAddress(emailAddress).get().getId());
             return owner.get();
         }
+    }
+
+    public CenterWorker findCenterWorker(long userID) {
+        Optional<CenterWorker> centerWorker = centerWorkerRepository.findById(userID);
+        if(centerWorker.isEmpty()) {
+            throw new IllegalArgumentException("Invalid ID");
+        }
+        return centerWorker.get();
     }
 
     public User saveUser(User user) {return userRepository.save(user);}
