@@ -9,6 +9,8 @@ import petadoption.api.Event.EventService;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -149,7 +151,6 @@ public class EventServiceTest {
         eventService.deleteAllEvents();
         assertTrue(eventService.findAllEvents().isEmpty());
     }
-
     @Test
     public void testDeleteEvent() {
         assertNotNull(newEvent);
@@ -160,6 +161,42 @@ public class EventServiceTest {
 
         Optional<Event> foundEventOptT = eventService.findEvent(eid);
         assertTrue(foundEventOptT.isEmpty());
+
+        eventService.deleteAllEvents();
+        assertTrue(eventService.findAllEvents().isEmpty());
+    }
+    @Test
+    public void testFindAllEvents() {
+        assertNotNull(newEvent);
+        Long eidNew = eventService.createEvent(newEvent);
+        Event coolerEvent = new Event(
+                2L,
+                "Cool event name",
+                localDate,
+                localTime,
+                "Cool Event description"
+        );
+        Long eidCooler = eventService.createEvent(coolerEvent);
+        Event coolestEvent = new Event(
+                3L,
+                "Coolest event name",
+                localDate,
+                localTime,
+                "Coolest Event description"
+        );
+        Long eidCoolest = eventService.createEvent(coolestEvent);
+        List<Event> events = eventService.findAllEvents();
+        boolean eidNewfound = false, eidCoolerFound = false, eidCoolestFound = false;
+        for(Event event : events) {
+            if(event.getEventId().equals(eidNew)) eidNewfound = true;
+            if(event.getEventId().equals(eidCooler)) eidCoolerFound = true;
+            if(event.getEventId().equals(eidCoolest)) eidCoolestFound = true;
+        }
+
+        assertEquals(3, events.size());
+        assertTrue(eidNewfound);
+        assertTrue(eidCoolerFound);
+        assertTrue(eidCoolestFound);
 
         eventService.deleteAllEvents();
         assertTrue(eventService.findAllEvents().isEmpty());
