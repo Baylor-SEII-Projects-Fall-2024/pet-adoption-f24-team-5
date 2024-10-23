@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import petadoption.api.images.ImageController;
+import petadoption.api.images.ImageService;
 import petadoption.api.user.AdoptionCenter.AdoptionCenter;
 import petadoption.api.user.UserRepository;
 import petadoption.api.user.UserService;
@@ -21,12 +23,14 @@ public class PetController {
 
     @Autowired
     private final UserService userService;
-    @Autowired
-    private UserRepository userRepository;
 
-    PetController(PetService petService, UserService userService) {
+    @Autowired
+    private final ImageService imageService;
+
+    PetController(PetService petService, UserService userService, ImageService imageService) {
         this.petService = petService;
         this.userService = userService;
+        this.imageService = imageService;
     }
 
     @GetMapping
@@ -74,9 +78,15 @@ public class PetController {
     @DeleteMapping("/delete")
     public ResponseEntity<?> deletePet(@RequestBody Pet pet) {
 
-        System.out.println(pet.getPetId());
-
         if(pet.getPetId() == null) { return ResponseEntity.badRequest().body("Pet id is required");}
+
+        try {
+            if (!pet.getImageName().isEmpty()) {
+                imageService.deleteImage(ImageController.UPLOAD_DIRECTORY, pet.getImageName());
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
 
         try {
             petService.deletePet(pet);
