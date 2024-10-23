@@ -5,12 +5,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import petadoption.api.Event.Event;
 import petadoption.api.user.AdoptionCenter.AdoptionCenter;
+import petadoption.api.user.AdoptionCenter.AdoptionCenterRepository;
 import petadoption.api.user.AdoptionCenter.CenterWorker;
 import petadoption.api.user.Owner.Owner;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 @RequestMapping("/api/users")
 @RestController
@@ -86,5 +89,19 @@ public class UserController {
     @GetMapping("/getDisplayName")
     public ResponseEntity<String> getDisplayName(@RequestParam("emailAddress") String email) {
         return userService.getDisplayName(email);
+    }
+
+    @GetMapping("/getAdoptionCenter/{id}")
+    public ResponseEntity<?> getAdoptionCenter(@PathVariable("id") Long id) {
+        try {
+            Optional<AdoptionCenter> optionalAdoptionCenter = userService.findAdoptionCenterById(id);
+            if (optionalAdoptionCenter.isPresent()) {
+                return new ResponseEntity<>(optionalAdoptionCenter.get(), HttpStatus.OK);
+            }
+            return new ResponseEntity<>("AdoptionCenter not found", HttpStatus.NOT_FOUND);
+        } catch (SQLException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 }

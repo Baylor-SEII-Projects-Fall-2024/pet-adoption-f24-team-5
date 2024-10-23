@@ -50,5 +50,9 @@ public class EventService {
         return eventRepository.findAll();
     }
     public void deleteAllEvents() { eventRepository.deleteAll(); }
+
+    public Optional<List<Event>> findEventsByCenterId(Long center_id) {
+        return eventRepository.findEventByCenter_id(center_id);
+    }
 }
 

@@ -48,6 +48,7 @@ const Register = () => {
             userType: 'Owner',
             age: parseInt(age, 10),
             phoneNumber,
+            centerZip
         };
 
         const url = userType === 'owner'
@@ -233,6 +234,14 @@ const Register = () => {
                                     type="text"
                                     value={lastName}
                                     onChange={(e) => setLastName(e.target.value)}
+                                    required
+                                    fullWidth
+                                />
+                                <TextField
+                                    label="Zip Code"
+                                    type="text"
+                                    value={centerZip}
+                                    onChange={(e) => setCenterZip(e.target.value)}
                                     required
                                     fullWidth
                                 />
