@@ -28,7 +28,8 @@ import CreateEvent from "@/pages/CreateEvent";
 
 const reduxStore = buildStore({});
 
-import ProtectedRoute from './protectedRoute'; // Ensure the path is correct
+import ProtectedRoute from './protectedRoute';
+import AvailablePets from "@/pages/AvailablePets"; // Ensure the path is correct
 
 function AppRoutes() {
   const token = useSelector((state) => state.user.token);
@@ -44,6 +45,7 @@ function AppRoutes() {
         <Route path="/SearchEngine" element={<ProtectedRoute><SearchEngine /></ProtectedRoute>} />
         <Route path="/Settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
         <Route path="/LocalAdoptionCenter" element={<ProtectedRoute><LocalAdoptionCenter /></ProtectedRoute>} />
+        <Route path="/AvailablePets" element={<AvailablePets />} />
         <Route path="*" element={<Navigate to="/Login" />} />
       </Routes>
     </BrowserRouter>

@@ -73,6 +73,7 @@ public class UserService {
         newUser.setPhoneNumber(owner.getPhoneNumber());
         newUser.setFirstName(owner.getFirstName());
         newUser.setLastName(owner.getLastName());
+        newUser.setAge(owner.getAge());
         return new ResponseEntity<>(userRepository.save(newUser), HttpStatus.OK);
     }
 
@@ -85,6 +86,7 @@ public class UserService {
         newUser.setPhoneNumber(worker.getPhoneNumber());
         newUser.setFirstName(worker.getFirstName());
         newUser.setLastName(worker.getLastName());
+        newUser.setAge(worker.getAge());
         return new ResponseEntity<>(userRepository.save(newUser), HttpStatus.OK);
     }
 
@@ -95,6 +97,12 @@ public class UserService {
         AdoptionCenter center = (AdoptionCenter) findUser(adoptionCenter.getEmailAddress());
         center.setPassword(passwordEncoder.encode(adoptionCenter.getPassword()));
         center.setPhoneNumber(adoptionCenter.getPhoneNumber());
+        center.setCenterName(adoptionCenter.getCenterName());
+        center.setCenterAddress(adoptionCenter.getCenterAddress());
+        center.setCenterCity(adoptionCenter.getCenterCity());
+        center.setCenterState(adoptionCenter.getCenterState());
+        center.setCenterZip(adoptionCenter.getCenterZip());
+        center.setNumberOfPets(adoptionCenter.getNumberOfPets());
         return new ResponseEntity<>(adoptionCenterRepository.save(center), HttpStatus.OK);
     }
 
