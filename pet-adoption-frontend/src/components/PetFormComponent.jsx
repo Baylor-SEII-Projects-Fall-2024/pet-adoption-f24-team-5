@@ -93,9 +93,12 @@ const PetFormComponent = (props) => {
             imageName,
         }
 
-        deletePet({petData, token, resetFields});
-
-        props.handlePostNewPet();
+        deletePet({
+            petData,
+            token,
+            resetFields,
+            handlePostNewPet: props.handlePostNewPet
+        });
 
     }
 
