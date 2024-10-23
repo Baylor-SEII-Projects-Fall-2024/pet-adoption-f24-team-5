@@ -68,17 +68,32 @@ public class UserController {
 
     @PutMapping("/update/Owner")
     public ResponseEntity<Owner> updateOwner(@RequestBody Owner user, @RequestParam("oldPassword") String oldPassword) {
-        return userService.updateOwner(user, oldPassword);
+        try{
+            return new ResponseEntity<>(userService.updateOwner(user, oldPassword), HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
     }
 
     @PutMapping("/update/CenterWorker")
     public ResponseEntity<CenterWorker> updateCenterWorker(@RequestBody CenterWorker user, @RequestParam("oldPassword") String oldPassword) {
-        return userService.updateCenterWorker(user, oldPassword);
+        try {
+            return new ResponseEntity<>(userService.updateCenterWorker(user, oldPassword), HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
     }
 
     @PutMapping("/update/CenterOwner")
     public ResponseEntity<AdoptionCenter> updateAdoptionCenter(@RequestBody AdoptionCenter user, @RequestParam("oldPassword") String oldPassword) {
-        return userService.updateAdoptionCenter(user, oldPassword);
+        try {
+            return new ResponseEntity<>(userService.updateAdoptionCenter(user, oldPassword), HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
     }
 
     @GetMapping("/getUser")
@@ -88,7 +103,12 @@ public class UserController {
 
     @GetMapping("/getDisplayName")
     public ResponseEntity<String> getDisplayName(@RequestParam("emailAddress") String email) {
-        return userService.getDisplayName(email);
+        try{
+            return new ResponseEntity<>(userService.getDisplayName(email), HttpStatus.OK);
+        }
+        catch (Error e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
     }
 
     @GetMapping("/getAdoptionCenter/{id}")
