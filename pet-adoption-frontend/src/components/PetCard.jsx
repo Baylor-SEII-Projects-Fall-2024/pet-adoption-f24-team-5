@@ -11,13 +11,12 @@ const PetCard = ({ pet, onClick }) => {
 
     return (
         <Card onClick={onClick}
-              sx={{ width: '48%',
-                    backgroundColor: 'white',
-                    transition: 'border 0.3s',
+              sx={{
+                    width: '48%',
                     '&:hover': {
                     border: '2px solid blue',
                     },}}
-              elevation={4}
+              elevation={2}
               key={pet.petName}>
 
             <CardContent>
