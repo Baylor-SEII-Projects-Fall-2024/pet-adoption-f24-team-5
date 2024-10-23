@@ -1,12 +1,15 @@
 package petadoption.api.user;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import petadoption.api.user.Owner.Owner;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -20,26 +23,56 @@ public class UserTests {
 
     @Test
     void testUserCreate() {
-        /*User newUser = new Owner();
-        newUser.userType = UserType.Owner;
-        newUser.emailAddress = "example@example.com";
-        newUser.password = "password";
+        User newUser = new Owner();
+        newUser.setUserType(UserType.Owner);
+        newUser.setEmailAddress("example@example.com");
+        newUser.setPassword("password");
 
         User savedUser = userService.saveUser(newUser);
-        assertNotNull(savedUser.id);
+        assertNotNull(savedUser.getId());
 
-        Optional<User> foundUserOpt = userService.findUser(savedUser.id);
-        assertTrue(foundUserOpt.isPresent());
-        User foundUser = foundUserOpt.get();
+        User foundUser = userService.findUser(savedUser.getEmailAddress());
+        assertNotNull(foundUser);
 
-        assertEquals(newUser.userType, foundUser.userType);
-        assertEquals(newUser.emailAddress, foundUser.emailAddress);
-        assertEquals(newUser.password, foundUser.password);*/
+        assertEquals(newUser.getUserType(), foundUser.getUserType());
+        assertEquals(newUser.getEmailAddress(), foundUser.getEmailAddress());
+        assertEquals(newUser.getPassword(), foundUser.getPassword());
     }
 
     @Test
     void testUserFind() {
-        /*Optional<User> user1 = userService.findUser(1L);
-        assertTrue(user1.isEmpty());*/
+        /*
+         * Optional<User> user1 = userService.findUser(1L);
+         * assertTrue(user1.isEmpty());
+         */
+    }
+
+    @Test
+    void testDeleteUser() {
+        // Create and save a user to ensure it exists before deletion
+        User newUser = new Owner();
+        newUser.setUserType(UserType.Owner);
+        newUser.setEmailAddress("example@example.com");
+        newUser.setPassword("password");
+        User savedUser = userService.saveUser(newUser);
+
+        // Ensure the user exists before deletion
+        User userBeforeDeletion = userService.findUser(savedUser.getEmailAddress());
+        assertNotNull(userBeforeDeletion, "User should exist before deletion");
+
+        // Delete the user
+        userService.deleteUser(savedUser.getId());
+
+        // Check if the user is deleted
+
+        assertThrows(Exception.class, () -> {
+            userService.findUser(savedUser.getEmailAddress());
+        });
+    }
+
+    @Test
+    void testFindAllUsers() {
+        List<User> users = userService.findAllUsers();
+        assertEquals(6, users.size());
     }
 }
