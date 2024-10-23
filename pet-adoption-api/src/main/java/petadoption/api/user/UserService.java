@@ -59,6 +59,14 @@ public class UserService {
         return Optional.empty();
     }
 
+    public CenterWorker findCenterWorker(long userID) {
+        Optional<CenterWorker> centerWorker = centerWorkerRepository.findById(userID);
+        if(centerWorker.isEmpty()) {
+            throw new IllegalArgumentException("Invalid ID");
+        }
+        return centerWorker.get();
+    }
+
     public User saveUser(User user) {return userRepository.save(user);}
 
     public Owner updateOwner(Owner owner, String oldPassword) throws IllegalAccessException {

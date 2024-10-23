@@ -13,6 +13,7 @@ import petadoption.api.user.Owner.Owner;
 
 import javax.swing.text.html.Option;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -415,5 +416,53 @@ public class UserServiceTests {
         catch (Exception e) {
             fail();
         }
+    }
+
+    @Test
+    void testUserCreate() {
+        User newUser = new Owner();
+        newUser.setUserType(UserType.Owner);
+        newUser.setEmailAddress("example@example.com");
+        newUser.setPassword("password");
+
+        User savedUser = userService.saveUser(newUser);
+        assertNotNull(savedUser.getId());
+
+        Optional<?> optionalFoundUser = userService.findUser(savedUser.getEmailAddress());
+        assertTrue(optionalFoundUser.isPresent());
+        User foundUser = (User) optionalFoundUser.get();
+
+        assertEquals(newUser.getUserType(), foundUser.getUserType());
+        assertEquals(newUser.getEmailAddress(), foundUser.getEmailAddress());
+        assertEquals(newUser.getPassword(), foundUser.getPassword());
+    }
+
+    @Test
+    void testDeleteUser() {
+        // Create and save a user to ensure it exists before deletion
+        User newUser = new Owner();
+        newUser.setUserType(UserType.Owner);
+        newUser.setEmailAddress("example@example.com");
+        newUser.setPassword("password");
+        User savedUser = userService.saveUser(newUser);
+
+        // Ensure the user exists before deletion
+        Optional<?> optionalUserBeforeDeletion = userService.findUser(savedUser.getEmailAddress());
+        assertTrue(optionalUserBeforeDeletion.isPresent());
+        User userBeforeDeletion = (User) optionalUserBeforeDeletion.get();
+
+        // Delete the user
+        userService.deleteUser(savedUser.getId());
+
+        // Check if the user is deleted
+        if (userService.findUser(userBeforeDeletion.getEmailAddress()).isPresent()) {
+            fail();
+        }
+    }
+
+    @Test
+    void testFindAllUsers() {
+        List<User> users = userService.findAllUsers();
+        assertEquals(7, users.size());
     }
 }
