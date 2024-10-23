@@ -40,6 +40,7 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @GetMapping("/getCenterID/{id}")
     public ResponseEntity<?> getCenterID(@PathVariable("id") String id) {
         try {
@@ -68,30 +69,35 @@ public class UserController {
 
     @PutMapping("/update/Owner")
     public ResponseEntity<Owner> updateOwner(@RequestBody Owner user, @RequestParam("oldPassword") String oldPassword) {
-        try{
+        try {
             return new ResponseEntity<>(userService.updateOwner(user, oldPassword), HttpStatus.OK);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
     }
 
+    @PutMapping("/update/Owner/preferenceId")
+    public ResponseEntity<Owner> updateOwnerPreferenceId(@RequestBody Owner user) {
+
+        return userService.updateOwnerPreferenceId(user);
+    }
+
     @PutMapping("/update/CenterWorker")
-    public ResponseEntity<CenterWorker> updateCenterWorker(@RequestBody CenterWorker user, @RequestParam("oldPassword") String oldPassword) {
+    public ResponseEntity<CenterWorker> updateCenterWorker(@RequestBody CenterWorker user,
+            @RequestParam("oldPassword") String oldPassword) {
         try {
             return new ResponseEntity<>(userService.updateCenterWorker(user, oldPassword), HttpStatus.OK);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
     }
 
     @PutMapping("/update/CenterOwner")
-    public ResponseEntity<AdoptionCenter> updateAdoptionCenter(@RequestBody AdoptionCenter user, @RequestParam("oldPassword") String oldPassword) {
+    public ResponseEntity<AdoptionCenter> updateAdoptionCenter(@RequestBody AdoptionCenter user,
+            @RequestParam("oldPassword") String oldPassword) {
         try {
             return new ResponseEntity<>(userService.updateAdoptionCenter(user, oldPassword), HttpStatus.OK);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
     }
@@ -103,10 +109,9 @@ public class UserController {
 
     @GetMapping("/getDisplayName")
     public ResponseEntity<String> getDisplayName(@RequestParam("emailAddress") String email) {
-        try{
+        try {
             return new ResponseEntity<>(userService.getDisplayName(email), HttpStatus.OK);
-        }
-        catch (Error e){
+        } catch (Error e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
     }

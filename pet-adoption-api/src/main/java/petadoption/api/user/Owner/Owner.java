@@ -22,8 +22,8 @@ import java.util.List;
 @Setter
 @Entity
 @DiscriminatorValue("OWNER")
-@PrimaryKeyJoinColumn(name="USER_ID")
-@EqualsAndHashCode(callSuper=true)
+@PrimaryKeyJoinColumn(name = "USER_ID")
+@EqualsAndHashCode(callSuper = true)
 public class Owner extends User {
 
     @OneToOne
@@ -32,7 +32,6 @@ public class Owner extends User {
 
     @Column(name = "AGE")
     private int age;
-
 
     @Column(name = "LONGITUDE")
     private Double longitude;
@@ -49,42 +48,46 @@ public class Owner extends User {
     @Column(name = "LAST_NAME")
     protected String lastName;
 
-
-    public Owner(){
+    public Owner() {
         super();
     }
 
-    public Owner(String firstName, String lastName, String emailAddress, String password, UserType userType, int age, String phoneNumber, String centerZip) {
+    public Owner(String firstName, String lastName, String emailAddress, String password, UserType userType, int age,
+            String phoneNumber, String centerZip) {
         super(emailAddress, password, userType, phoneNumber);
-        this.age=age;
-        this.firstName=firstName;
-        this.lastName=lastName;
-        this.centerZip = centerZip;
-        getLongAndLat(centerZip);
-    }
-    public Owner(String emailAddress, String password, UserType userType, int age, String phoneNumber, Preference preference, String centerZip) {
-        super(emailAddress, password, userType, phoneNumber);
-        this.preference = preference;
-        this.age=age;
-        this.firstName=firstName;
-        this.lastName=lastName;
+        this.age = age;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.centerZip = centerZip;
         getLongAndLat(centerZip);
     }
 
-    public Owner(Long id, String firstName, String lastName, String emailAddress, String password, UserType userType, int age, String phoneNumber, Preference preference, String centerZip) {
+    public Owner(String emailAddress, String password, UserType userType, int age, String phoneNumber,
+            Preference preference, String centerZip) {
+        super(emailAddress, password, userType, phoneNumber);
+        this.preference = preference;
+        this.age = age;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.centerZip = centerZip;
+        getLongAndLat(centerZip);
+    }
+
+    public Owner(Long id, String firstName, String lastName, String emailAddress, String password, UserType userType,
+            int age, String phoneNumber, Preference preference, String centerZip) {
         super(id, emailAddress, password, userType, phoneNumber);
         this.preference = preference;
-        this.age=age;
-        this.firstName=firstName;
-        this.lastName=lastName;
+        this.age = age;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.centerZip = centerZip;
         getLongAndLat(centerZip);
     }
 
     public void getLongAndLat(String centerZip) {
         try {
-            // Define the relative path from the current class location to src/main/resources/zipCSV/uszips.csv
+            // Define the relative path from the current class location to
+            // src/main/resources/zipCSV/uszips.csv
             Path csvFilePath = Paths.get("resources", "zipCSV", "uszips.csv").toAbsolutePath();
             File csvFile = csvFilePath.toFile();
 
@@ -116,7 +119,8 @@ public class Owner extends User {
                 String[] zipCodes = new String[n];
                 for (int i = 0; i < n; i++) {
                     String[] tokens = lines.get(i).split(",", 4); // Limit split to 4 parts
-                    zipCodes[i] = tokens[0].replace("\"", "").trim(); // Clean ZIP code by removing quotes and trimming whitespace
+                    zipCodes[i] = tokens[0].replace("\"", "").trim(); // Clean ZIP code by removing quotes and trimming
+                                                                      // whitespace
                 }
 
                 // Perform binary search to find the ZIP code
@@ -125,7 +129,7 @@ public class Owner extends User {
                 if (index >= 0) {
                     // ZIP code found, extract longitude and latitude
                     String[] tokens = lines.get(index).split(",", 4);
-                    this.Latitude = Double.parseDouble(tokens[1].replace("\"", "").trim());   // Latitude
+                    this.Latitude = Double.parseDouble(tokens[1].replace("\"", "").trim()); // Latitude
                     this.longitude = Double.parseDouble(tokens[2].replace("\"", "").trim()); // Longitude
                 } else {
                     System.err.println("ZIP code " + centerZip + " not found in uszips.csv");
@@ -138,5 +142,9 @@ public class Owner extends User {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void setPreferenceId(Long preferenceId) {
+        this.preference.setPreferenceId(preferenceId);
     }
 }

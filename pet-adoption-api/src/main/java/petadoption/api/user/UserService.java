@@ -39,8 +39,6 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
 
-
-
     public Optional<?> findUser(String emailAddress) {
         Optional<User> userOpt = userRepository.findByEmailAddress(emailAddress);
 
@@ -61,19 +59,21 @@ public class UserService {
 
     public CenterWorker findCenterWorker(long userID) {
         Optional<CenterWorker> centerWorker = centerWorkerRepository.findById(userID);
-        if(centerWorker.isEmpty()) {
+        if (centerWorker.isEmpty()) {
             throw new IllegalArgumentException("Invalid ID");
         }
         return centerWorker.get();
     }
 
-    public User saveUser(User user) {return userRepository.save(user);}
+    public User saveUser(User user) {
+        return userRepository.save(user);
+    }
 
     public Owner updateOwner(Owner owner, String oldPassword) throws IllegalAccessException {
-        if (findUser(owner.getEmailAddress()).isEmpty()){
+        if (findUser(owner.getEmailAddress()).isEmpty()) {
             throw new IllegalAccessException("User not found");
         }
-        if (!passwordEncoder.matches(oldPassword, ((Owner)findUser(owner.getEmailAddress()).get()).getPassword())) {
+        if (!passwordEncoder.matches(oldPassword, ((Owner) findUser(owner.getEmailAddress()).get()).getPassword())) {
             throw new IllegalAccessException("Invalid credentials");
         }
         Owner newUser = (Owner) findUser(owner.getEmailAddress()).get();
@@ -88,10 +88,11 @@ public class UserService {
     }
 
     public CenterWorker updateCenterWorker(CenterWorker worker, String oldPassword) throws IllegalAccessException {
-        if (findUser(worker.getEmailAddress()).isEmpty()){
+        if (findUser(worker.getEmailAddress()).isEmpty()) {
             throw new IllegalAccessException("User not found");
         }
-        if (!passwordEncoder.matches(oldPassword, ((CenterWorker) findUser(worker.getEmailAddress()).get()).getPassword())) {
+        if (!passwordEncoder.matches(oldPassword,
+                ((CenterWorker) findUser(worker.getEmailAddress()).get()).getPassword())) {
             throw new IllegalAccessException("Invalid credentials");
         }
         CenterWorker newUser = (CenterWorker) findUser(worker.getEmailAddress()).get();
@@ -103,11 +104,19 @@ public class UserService {
         return userRepository.save(newUser);
     }
 
-    public AdoptionCenter updateAdoptionCenter(AdoptionCenter adoptionCenter, String oldPassword) throws IllegalAccessException {
-        if (findUser(adoptionCenter.getEmailAddress()).isEmpty()){
+    public ResponseEntity<Owner> updateOwnerPreferenceId(Owner owner) {
+        Owner newUser = (Owner) findUser(owner.getEmailAddress()).get();
+        newUser.setPreference(owner.getPreference());
+        return new ResponseEntity<>(userRepository.save(newUser), HttpStatus.OK);
+    }
+
+    public AdoptionCenter updateAdoptionCenter(AdoptionCenter adoptionCenter, String oldPassword)
+            throws IllegalAccessException {
+        if (findUser(adoptionCenter.getEmailAddress()).isEmpty()) {
             throw new IllegalAccessException("User not found");
         }
-        if (!passwordEncoder.matches(oldPassword, ((AdoptionCenter) findUser(adoptionCenter.getEmailAddress()).get()).getPassword())) {
+        if (!passwordEncoder.matches(oldPassword,
+                ((AdoptionCenter) findUser(adoptionCenter.getEmailAddress()).get()).getPassword())) {
             throw new IllegalAccessException("Invalid credentials");
         }
         AdoptionCenter center = (AdoptionCenter) findUser(adoptionCenter.getEmailAddress()).get();
@@ -129,13 +138,12 @@ public class UserService {
             throw new EntityNotFoundException("User has no display name");
         }
         User user = userRepository.findByEmailAddress(email).get();
-        if (user.getUserType() == UserType.CenterWorker){
+        if (user.getUserType() == UserType.CenterWorker) {
             displayName = ((CenterWorker) user).getFirstName();
             if (displayName == null) {
                 throw new EntityNotFoundException("User not found");
             }
-        }
-        else if (user.getUserType() == UserType.Owner){
+        } else if (user.getUserType() == UserType.Owner) {
             displayName = ((Owner) user).getFirstName();
             if (displayName == null) {
                 throw new EntityNotFoundException("User not found");
@@ -182,7 +190,7 @@ public class UserService {
                     .orElseThrow(() -> new SQLException("Adoption Center Not Found"));
         }
 
-        if(center.getUserType() != UserType.CenterOwner){
+        if (center.getUserType() != UserType.CenterOwner) {
             throw new IllegalArgumentException("Email doesn't belong to Center worker");
         } else {
             return center;
@@ -195,8 +203,8 @@ public class UserService {
             throw new IllegalArgumentException("email must be valid");
         }
         Optional<User> response = userRepository.findByEmailAddress(email);
-        if(response.isPresent()){
-            if(response.get().getUserType() == UserType.CenterOwner){
+        if (response.isPresent()) {
+            if (response.get().getUserType() == UserType.CenterOwner) {
                 return adoptionCenterRepository.findById(response.get().getId());
             }
         }
