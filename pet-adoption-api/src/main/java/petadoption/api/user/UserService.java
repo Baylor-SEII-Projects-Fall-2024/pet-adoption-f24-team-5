@@ -64,6 +64,7 @@ public class UserService {
         newUser.setFirstName(owner.getFirstName());
         newUser.setLastName(owner.getLastName());
         newUser.setAge(owner.getAge());
+        newUser.setCenterZip(owner.getCenterZip());
         return new ResponseEntity<>(userRepository.save(newUser), HttpStatus.OK);
     }
 
