@@ -158,15 +158,21 @@ public class UserService {
         if (email == null || email.isEmpty()) {
             throw new IllegalArgumentException("email must be valid");
         }
-        System.out.println(email);
 
-        Long centerId = centerWorkerRepository.findCenterIdByEmailAddress(email)
-                .orElseThrow(() -> new SQLException("Could not find center"));
-        System.out.println(centerId);
+        AdoptionCenter center;
 
-        AdoptionCenter center = adoptionCenterRepository.findById(centerId)
-                .orElseThrow(() -> new SQLException("Adoption Center Not Found"));
-        System.out.println(center);
+        User user = userRepository.findByEmailAddress(email).orElse(null);
+        if (user == null) {
+            throw new SQLException("User not found");
+        } else if (user.getUserType() == UserType.CenterOwner) {
+            center = (AdoptionCenter) user;
+        } else {
+            Long centerId = centerWorkerRepository.findCenterIdByEmailAddress(email)
+                    .orElseThrow(() -> new SQLException("Could not find center"));
+
+            center = adoptionCenterRepository.findById(centerId)
+                    .orElseThrow(() -> new SQLException("Adoption Center Not Found"));
+        }
 
         if(center.getUserType() != UserType.CenterOwner){
             throw new IllegalArgumentException("Email doesn't belong to Center worker");
