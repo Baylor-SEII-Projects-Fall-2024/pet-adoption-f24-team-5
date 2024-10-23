@@ -53,6 +53,8 @@ export default function HomePage() {
           }
         });
 
+        console.log("response.data: ", response.data);
+
         // Set phone number, password, and userType regardless of type
         setPhoneNumberLabel(response.data.phoneNumber);
         setPhoneNumber(response.data.phoneNumber);
@@ -241,240 +243,240 @@ export default function HomePage() {
   };
 
   return (
-      <>
-        <Head>
-          <title>Settings Page</title>
-        </Head>
+    <>
+      <Head>
+        <title>Settings Page</title>
+      </Head>
 
-        <TitleBar />
+      <TitleBar />
 
-        <main>
-          <Stack sx={{ paddingTop: 4 }} alignItems='center' gap={2}>
-            <Card sx={{ width: 600, height: 80 }} elevation={4}>
-              <CardContent>
-                <Typography variant='h3' align='center'>Settings</Typography>
-              </CardContent>
-            </Card>
-            {updatedValuesRef.current.userType !== 'CenterOwner' && (
-                <>
-                  <Paper sx={{ width: 600, height: 50 }} elevation={4}>
-                    <Stack spacing={1} direction="row" alignItems='center'>
-                      <Typography variant='h5'>First Name</Typography>
-                      <TextField
-                          label="First Name"
-                          align='center'
-                          value={firstNameLabel}
-                          onChange={(e) => setFirstNameLabel(e.target.value)}
-                          InputProps={{
-                            style: { height: '40px', width: '470px' },
-                            readOnly: !isEditing
-                          }}
-                      />
-                    </Stack>
-                  </Paper>
-                  <Paper sx={{ width: 600, height: 50 }} elevation={4}>
-                    <Stack spacing={1} direction="row" alignItems='center'>
-                      <Typography variant='h5'>Last Name</Typography>
-                      <TextField
-                          label="Last Name"
-                          align='center'
-                          value={lastNameLabel}
-                          onChange={(e) => setLastNameLabel(e.target.value)}
-                          InputProps={{
-                            style: { height: '40px', width: '470px' },
-                            readOnly: !isEditing
-                          }}
-                      />
-                    </Stack>
-                  </Paper>
-                </>
-            )}
-            <Paper sx={{ width: 600, height: invalidPhoneNumber ? 70 : 50 }} elevation={4}>
-              <Stack spacing={1} direction="row" alignItems='center'>
-                <Typography variant='h5'>Phone Number</Typography>
-                <TextField
-                    label="Phone Number"
+      <main>
+        <Stack sx={{ paddingTop: 4 }} alignItems='center' gap={2}>
+          <Card sx={{ width: 600, height: 80 }} elevation={4}>
+            <CardContent>
+              <Typography variant='h3' align='center'>Settings</Typography>
+            </CardContent>
+          </Card>
+          {updatedValuesRef.current.userType !== 'CenterOwner' && (
+            <>
+              <Paper sx={{ width: 600, height: 50 }} elevation={4}>
+                <Stack spacing={1} direction="row" alignItems='center'>
+                  <Typography variant='h5'>First Name</Typography>
+                  <TextField
+                    label="First Name"
                     align='center'
-                    value={phoneNumberLabel}
-                    onChange={(e) => setPhoneNumberLabel(e.target.value)}
+                    value={firstNameLabel}
+                    onChange={(e) => setFirstNameLabel(e.target.value)}
                     InputProps={{
-                      style: { height: '40px', width: '425px' },
+                      style: { height: '40px', width: '470px' },
                       readOnly: !isEditing
                     }}
-                />
+                  />
+                </Stack>
+              </Paper>
+              <Paper sx={{ width: 600, height: 50 }} elevation={4}>
+                <Stack spacing={1} direction="row" alignItems='center'>
+                  <Typography variant='h5'>Last Name</Typography>
+                  <TextField
+                    label="Last Name"
+                    align='center'
+                    value={lastNameLabel}
+                    onChange={(e) => setLastNameLabel(e.target.value)}
+                    InputProps={{
+                      style: { height: '40px', width: '470px' },
+                      readOnly: !isEditing
+                    }}
+                  />
+                </Stack>
+              </Paper>
+            </>
+          )}
+          <Paper sx={{ width: 600, height: invalidPhoneNumber ? 70 : 50 }} elevation={4}>
+            <Stack spacing={1} direction="row" alignItems='center'>
+              <Typography variant='h5'>Phone Number</Typography>
+              <TextField
+                label="Phone Number"
+                align='center'
+                value={phoneNumberLabel}
+                onChange={(e) => setPhoneNumberLabel(e.target.value)}
+                InputProps={{
+                  style: { height: '40px', width: '425px' },
+                  readOnly: !isEditing
+                }}
+              />
+            </Stack>
+            {invalidPhoneNumber && (
+              <Typography color="error" variant="body2">
+                Please enter a valid phone number.
+              </Typography>
+            )}
+          </Paper>
+          <Paper sx={{ width: 600, height: invalidPassword ? 120 : 90 }} elevation={4}>
+            <Stack spacing={1} direction="row" alignItems='center'>
+              <Typography variant='h5' width={160}>Old Password</Typography>
+              <TextField
+                label="Old Password"
+                align='center'
+                value={oldPasswordLabel}
+                onChange={(e) => setOldPasswordLabel(e.target.value)}
+                InputProps={{
+                  style: { height: '40px', width: '425px' },
+                  readOnly: !isEditing
+                }}
+              />
+            </Stack>
+            <Stack spacing={1} direction="row" alignItems='center'>
+              <Typography variant='h5'>New Password</Typography>
+              <TextField
+                label="New Password"
+                align='center'
+                value={passwordLabel}
+                onChange={(e) => setPasswordLabel(e.target.value)}
+                InputProps={{
+                  style: { height: '40px', width: '425px' },
+                  readOnly: !isEditing
+                }}
+              />
+            </Stack>
+            {invalidPassword && (
+              <Typography color="error" variant="body2" sx={{ marginTop: 1 }}>
+                Please enter a valid password.
+              </Typography>
+            )}
+          </Paper>
+          {updatedValuesRef.current.userType !== 'CenterOwner' && (
+            <Paper sx={{ width: 600, height: 50 }} elevation={4}>
+              <Stack spacing={1} direction="row" alignItems='center'>
+                <Typography variant='h5'>Age</Typography>
+                <Select
+                  labelId="age-label"
+                  id="age-select"
+                  value={userAge}
+                  onChange={handleAgeChange}
+                  label="Age"
+                  style={{ height: '40px', width: '545px', pointerEvents: !isEditing ? 'none' : 'auto' }}
+                >
+                  {Array.from({ length: 101 }, (_, age) => (
+                    <MenuItem key={age} value={age}>
+                      {age}
+                    </MenuItem>
+                  ))}
+                </Select>
               </Stack>
-              {invalidPhoneNumber && (
+            </Paper>
+          )}
+          {updatedValuesRef.current.userType === 'CenterOwner' && (
+            <>
+              <Paper sx={{ width: 600, height: 50 }} elevation={4}>
+                <Stack spacing={1} direction="row" alignItems='center'>
+                  <Typography variant='h5'>Center Name</Typography>
+                  <TextField
+                    label="Center Name"
+                    align='center'
+                    value={centerName}
+                    onChange={(e) => setCenterName(e.target.value)}
+                    InputProps={{
+                      style: { height: '40px', width: '440px' },
+                      readOnly: !isEditing
+                    }}
+                  />
+                </Stack>
+              </Paper>
+              <Paper sx={{ width: 600, height: 50 }} elevation={4}>
+                <Stack spacing={1} direction="row" alignItems='center'>
+                  <Typography variant='h5'>Center Address</Typography>
+                  <TextField
+                    label="Center Address"
+                    align='center'
+                    value={centerAddress}
+                    onChange={(e) => setCenterAddress(e.target.value)}
+                    InputProps={{
+                      style: { height: '40px', width: '420px' },
+                      readOnly: !isEditing
+                    }}
+                  />
+                </Stack>
+              </Paper>
+              <Paper sx={{ width: 600, height: 50 }} elevation={4}>
+                <Stack spacing={1} direction="row" alignItems='center'>
+                  <Typography variant='h5'>Center City</Typography>
+                  <TextField
+                    label="Center City"
+                    align='center'
+                    value={centerCity}
+                    onChange={(e) => setCenterCity(e.target.value)}
+                    InputProps={{
+                      style: { height: '40px', width: '465px' },
+                      readOnly: !isEditing
+                    }}
+                  />
+                </Stack>
+              </Paper>
+              <Paper sx={{ width: 600, height: 50 }} elevation={4}>
+                <Stack spacing={1} direction="row" alignItems='center'>
+                  <Typography variant='h5'>Center State</Typography>
+                  <TextField
+                    label="Center State"
+                    align='center'
+                    value={centerState}
+                    onChange={(e) => setCenterState(e.target.value)}
+                    InputProps={{
+                      style: { height: '40px', width: '450px' },
+                      readOnly: !isEditing
+                    }}
+                  />
+                </Stack>
+              </Paper>
+              <Paper sx={{ width: 600, height: !invalidZip ? 50 : 70 }} elevation={4}>
+                <Stack spacing={1} direction="row" alignItems='center'>
+                  <Typography variant='h5'>Center Zip</Typography>
+                  <TextField
+                    label="Center Zip"
+                    align='center'
+                    value={centerZip}
+                    onChange={(e) => setCenterZip(e.target.value)}
+                    InputProps={{
+                      style: { height: '40px', width: '470px' },
+                      readOnly: !isEditing
+                    }}
+                  />
+                </Stack>
+                {invalidZip && (
                   <Typography color="error" variant="body2">
-                    Please enter a valid phone number.
+                    Please enter a valid zip code.
                   </Typography>
-              )}
-            </Paper>
-            <Paper sx={{ width: 600, height: invalidPassword ? 120 : 90 }} elevation={4}>
+                )}
+              </Paper>
+            </>
+          )}
+          {updatedValuesRef.current.userType === 'Owner' && (
+            <Paper sx={{ width: 600, height: !invalidZip ? 50 : 70 }} elevation={4}>
               <Stack spacing={1} direction="row" alignItems='center'>
-                <Typography variant='h5' width={160}>Old Password</Typography>
+                <Typography variant='h5'>Center Zip</Typography>
                 <TextField
-                    label="Old Password"
-                    align='center'
-                    value={oldPasswordLabel}
-                    onChange={(e) => setOldPasswordLabel(e.target.value)}
-                    InputProps={{
-                      style: { height: '40px', width: '425px' },
-                      readOnly: !isEditing
-                    }}
+                  label="Center Zip"
+                  align='center'
+                  value={centerZip}  // Bind the current centerZip value here
+                  onChange={(e) => setCenterZip(e.target.value)}  // Allow user to change zip
+                  InputProps={{
+                    style: { height: '40px', width: '470px' },
+                    readOnly: !isEditing,  // Read-only until the user clicks Edit
+                  }}
                 />
               </Stack>
-              <Stack spacing={1} direction="row" alignItems='center'>
-                <Typography variant='h5'>New Password</Typography>
-                <TextField
-                    label="New Password"
-                    align='center'
-                    value={passwordLabel}
-                    onChange={(e) => setPasswordLabel(e.target.value)}
-                    InputProps={{
-                      style: { height: '40px', width: '425px' },
-                      readOnly: !isEditing
-                    }}
-                />
-              </Stack>
-              {invalidPassword && (
-                  <Typography color="error" variant="body2" sx={{ marginTop: 1 }}>
-                    Please enter a valid password.
-                  </Typography>
+              {invalidZip && (
+                <Typography color="error" variant="body2">
+                  Please enter a valid zip code.
+                </Typography>
               )}
             </Paper>
-            {updatedValuesRef.current.userType !== 'CenterOwner' && (
-                <Paper sx={{ width: 600, height: 50 }} elevation={4}>
-                  <Stack spacing={1} direction="row" alignItems='center'>
-                    <Typography variant='h5'>Age</Typography>
-                    <Select
-                        labelId="age-label"
-                        id="age-select"
-                        value={userAge}
-                        onChange={handleAgeChange}
-                        label="Age"
-                        style={{ height: '40px', width: '545px', pointerEvents: !isEditing ? 'none' : 'auto' }}
-                    >
-                      {Array.from({ length: 101 }, (_, age) => (
-                          <MenuItem key={age} value={age}>
-                            {age}
-                          </MenuItem>
-                      ))}
-                    </Select>
-                  </Stack>
-                </Paper>
-            )}
-            {updatedValuesRef.current.userType === 'CenterOwner' && (
-                <>
-                  <Paper sx={{ width: 600, height: 50 }} elevation={4}>
-                    <Stack spacing={1} direction="row" alignItems='center'>
-                      <Typography variant='h5'>Center Name</Typography>
-                      <TextField
-                          label="Center Name"
-                          align='center'
-                          value={centerName}
-                          onChange={(e) => setCenterName(e.target.value)}
-                          InputProps={{
-                            style: { height: '40px', width: '440px' },
-                            readOnly: !isEditing
-                          }}
-                      />
-                    </Stack>
-                  </Paper>
-                  <Paper sx={{ width: 600, height: 50 }} elevation={4}>
-                    <Stack spacing={1} direction="row" alignItems='center'>
-                      <Typography variant='h5'>Center Address</Typography>
-                      <TextField
-                          label="Center Address"
-                          align='center'
-                          value={centerAddress}
-                          onChange={(e) => setCenterAddress(e.target.value)}
-                          InputProps={{
-                            style: { height: '40px', width: '420px' },
-                            readOnly: !isEditing
-                          }}
-                      />
-                    </Stack>
-                  </Paper>
-                  <Paper sx={{ width: 600, height: 50 }} elevation={4}>
-                    <Stack spacing={1} direction="row" alignItems='center'>
-                      <Typography variant='h5'>Center City</Typography>
-                      <TextField
-                          label="Center City"
-                          align='center'
-                          value={centerCity}
-                          onChange={(e) => setCenterCity(e.target.value)}
-                          InputProps={{
-                            style: { height: '40px', width: '465px' },
-                            readOnly: !isEditing
-                          }}
-                      />
-                    </Stack>
-                  </Paper>
-                  <Paper sx={{ width: 600, height: 50 }} elevation={4}>
-                    <Stack spacing={1} direction="row" alignItems='center'>
-                      <Typography variant='h5'>Center State</Typography>
-                      <TextField
-                          label="Center State"
-                          align='center'
-                          value={centerState}
-                          onChange={(e) => setCenterState(e.target.value)}
-                          InputProps={{
-                            style: { height: '40px', width: '450px' },
-                            readOnly: !isEditing
-                          }}
-                      />
-                    </Stack>
-                  </Paper>
-                  <Paper sx={{ width: 600, height: !invalidZip ? 50 : 70 }} elevation={4}>
-                    <Stack spacing={1} direction="row" alignItems='center'>
-                      <Typography variant='h5'>Center Zip</Typography>
-                      <TextField
-                          label="Center Zip"
-                          align='center'
-                          value={centerZip}
-                          onChange={(e) => setCenterZip(e.target.value)}
-                          InputProps={{
-                            style: { height: '40px', width: '470px' },
-                            readOnly: !isEditing
-                          }}
-                      />
-                    </Stack>
-                    {invalidZip && (
-                        <Typography color="error" variant="body2">
-                          Please enter a valid zip code.
-                        </Typography>
-                    )}
-                  </Paper>
-                </>
-            )}
-            {updatedValuesRef.current.userType === 'Owner' && (
-                <Paper sx={{ width: 600, height: !invalidZip ? 50 : 70 }} elevation={4}>
-                  <Stack spacing={1} direction="row" alignItems='center'>
-                    <Typography variant='h5'>Center Zip</Typography>
-                    <TextField
-                        label="Center Zip"
-                        align='center'
-                        value={centerZip}  // Bind the current centerZip value here
-                        onChange={(e) => setCenterZip(e.target.value)}  // Allow user to change zip
-                        InputProps={{
-                          style: { height: '40px', width: '470px' },
-                          readOnly: !isEditing,  // Read-only until the user clicks Edit
-                        }}
-                    />
-                  </Stack>
-                  {invalidZip && (
-                      <Typography color="error" variant="body2">
-                        Please enter a valid zip code.
-                      </Typography>
-                  )}
-                </Paper>
-            )}
+          )}
 
 
 
-            <Button onClick={isEditing ? handleSave : handleEdit}>{isEditing ? 'Save' : 'Edit'}</Button>
-          </Stack>
-        </main>
-      </>
+          <Button onClick={isEditing ? handleSave : handleEdit}>{isEditing ? 'Save' : 'Edit'}</Button>
+        </Stack>
+      </main>
+    </>
   );
 }

@@ -2,7 +2,7 @@ import {API_URL} from "@/constants";
 import axios from "axios";
 import {getSubjectFromToken} from "@/utils/tokenUtils";
 
-export const saveUpdatePet = ({formType, petData, token, resetFields}) => {
+export const saveUpdatePet = ({formType, petData, token, resetFields, handlePostNewPet}) => {
 
     let url = `${API_URL}/api/pets/`
 
@@ -27,6 +27,7 @@ export const saveUpdatePet = ({formType, petData, token, resetFields}) => {
             alert('Pet Saved!');
             if(formType !== "update") {
                 resetFields();
+                handlePostNewPet();
             }
         })
         .catch((err) => {

@@ -1,11 +1,9 @@
 package petadoption.api.preferences;
 
-
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import petadoption.api.user.User;
 
 @Data
 @Entity
@@ -18,7 +16,7 @@ public class Preference {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "PREFERENCE_ID")
-    private Long id;
+    private Long preferenceId;
 
     @Column(name = "PREFERRED_SPECIES")
     private String preferredSpecies;
@@ -42,8 +40,9 @@ public class Preference {
         this.preferredAge = preferredAge;
     }
 
-    public Preference(Long id, String preferredSpecies, String preferredBreed, String preferredColor, int preferredAge) {
-        this.id = id;
+    public Preference(Long preferenceId, String preferredSpecies, String preferredBreed, String preferredColor,
+            int preferredAge) {
+        this.preferenceId = preferenceId;
         this.preferredSpecies = preferredSpecies;
         this.preferredBreed = preferredBreed;
         this.preferredColor = preferredColor;

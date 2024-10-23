@@ -1,9 +1,9 @@
 import { clearToken } from '../utils/userSlice'; // Adjust the path as necessary
 import { getAuthorityFromToken, getSubjectFromToken } from "@/utils/tokenUtils";
 import { useSelector, useDispatch } from "react-redux";
-import { Button, Toolbar, Typography, AppBar} from "@mui/material";
-import {Link, useNavigate} from "react-router-dom";
-import React, {useEffect, useState} from "react";
+import { Button, Toolbar, Typography, AppBar } from "@mui/material";
+import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import { API_URL } from "../constants";
 import axios from 'axios';
 
@@ -31,10 +31,10 @@ const TitleBar = () => {
 
     useEffect(() => {
         const fetchDisplayName = async () => {
-            try{
+            try {
                 console.log("Email: " + emailAddress);
                 const response = await axios.get(`${API_URL}/api/users/getDisplayName`, {
-                    params: {emailAddress: emailAddress},
+                    params: { emailAddress: emailAddress },
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`,
@@ -94,6 +94,7 @@ const TitleBar = () => {
                         <Button color="inherit" component={Link} to="/AvailablePets">All Pets</Button>
                         <Button color="inherit" component={Link} to="/LocalAdoptionCenter">Local Adoption Center</Button>
                         <Button color="inherit" component={Link} to="/CreateEvent">All Events</Button>
+                        <Button color="inherit" component={Link} to="/preferences">Preferences</Button>
                     </>
                 )}
 

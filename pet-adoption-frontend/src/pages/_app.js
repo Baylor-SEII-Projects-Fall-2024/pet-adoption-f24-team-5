@@ -25,6 +25,7 @@ import SearchEngine from './SearchEngine';
 import Settings from './settings';
 import LocalAdoptionCenter from './LocalAdoptionCenter';
 import CreateEvent from "@/pages/CreateEvent";
+import PreferencesPage from "@/pages/preferences";
 
 const reduxStore = buildStore({});
 
@@ -50,6 +51,7 @@ function AppRoutes() {
         <Route path="/ManageAccounts" element={<ProtectedRoute><ManageAccounts /></ProtectedRoute>} />
         <Route path="/RegisterCenterWorker" element={<ProtectedRoute><RegisterCenterWorker /></ProtectedRoute>} />
         <Route path="/AvailablePets" element={<AvailablePets />} />
+        <Route path="/preferences" element={<ProtectedRoute><PreferencesPage /></ProtectedRoute>} />
         <Route path="*" element={<Navigate to="/Login" />} />
       </Routes>
     </BrowserRouter>
