@@ -78,6 +78,8 @@ public class UserService {
         newUser.setFirstName(owner.getFirstName());
         newUser.setLastName(owner.getLastName());
         newUser.setAge(owner.getAge());
+        newUser.setCenterZip(owner.getCenterZip());
+        newUser.getLongAndLat(owner.getCenterZip());
         return new ResponseEntity<>(userRepository.save(newUser), HttpStatus.OK);
     }
 
@@ -106,6 +108,7 @@ public class UserService {
         center.setCenterCity(adoptionCenter.getCenterCity());
         center.setCenterState(adoptionCenter.getCenterState());
         center.setCenterZip(adoptionCenter.getCenterZip());
+        center.getLongAndLat(adoptionCenter.getCenterZip());
         center.setNumberOfPets(adoptionCenter.getNumberOfPets());
         return new ResponseEntity<>(adoptionCenterRepository.save(center), HttpStatus.OK);
     }

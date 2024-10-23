@@ -71,6 +71,21 @@ public class PetController {
         }
     }
 
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> deletePet(@RequestBody Pet pet) {
+
+        System.out.println(pet.getPetId());
+
+        if(pet.getPetId() == null) { return ResponseEntity.badRequest().body("Pet id is required");}
+
+        try {
+            petService.deletePet(pet);
+            return ResponseEntity.status(HttpStatus.OK).body("Pet deleted successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
 
 
 }

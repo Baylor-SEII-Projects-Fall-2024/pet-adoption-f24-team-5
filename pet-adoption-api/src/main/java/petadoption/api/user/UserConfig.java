@@ -62,7 +62,8 @@ public class UserConfig {
                     "password3",
                     UserType.Owner,
                     21,
-                    "254-556-7794"
+                    "254-556-7794",
+                    "14757"
             );
 
             AdoptionCenter adoptionCenter1 = new AdoptionCenter(
@@ -75,11 +76,24 @@ public class UserConfig {
                     "1608 James Avenue",
                     "Waco",
                     "Texas",
-                    "76706",
+                    "14757",
                     128
             );
 
             AdoptionCenter adoptionCenter2 = new AdoptionCenter(
+                    "owner@example.com",
+                    "pass",
+                    UserType.CenterOwner,
+                    "555-1234-7794",
+                    "NY Animal Rescue",
+                    "123 Main St",
+                    "New York",
+                    "NY",
+                    "06390",
+                    123
+            );
+
+            AdoptionCenter adoptionCenter3 = new AdoptionCenter(
                     2L,
                     "adopting@gmail.com",
                     "password",
@@ -90,7 +104,7 @@ public class UserConfig {
                     "Waco",
                     "Texas",
                     "76706",
-                    0
+                    12
             );
 
             authenticationController.register(user1);
@@ -99,9 +113,7 @@ public class UserConfig {
             authenticationController.register(user4);
             authenticationController.register(adoptionCenter1);
             authenticationController.register(adoptionCenter2);
-
-
-
+            authenticationController.register(adoptionCenter3);
         };
     }
 }

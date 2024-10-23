@@ -4,6 +4,7 @@ import ImageUploadComponent from "@/components/ImageUploadComponent";
 import React, { useEffect, useState } from "react";
 import { saveUpdatePet } from "@/utils/SaveUpdatePet";
 import { useSelector } from 'react-redux';
+import {deletePet} from "@/utils/DeletePet";
 
 
 const PetFormComponent = (props) => {
@@ -75,6 +76,27 @@ const PetFormComponent = (props) => {
         event.preventDefault();
 
         handleSaveOrUpdatePet();
+    }
+
+    const handleDelete = (event) => {
+        event.preventDefault();
+
+        const petData = {
+            petId,
+            species,
+            petName,
+            breed,
+            color,
+            age,
+            adoptionStatus,
+            description,
+            imageName,
+        }
+
+        deletePet({petData, token, resetFields});
+
+        props.handlePostNewPet();
+
     }
 
 
@@ -163,7 +185,11 @@ const PetFormComponent = (props) => {
                 </Select>
                 <ImageUploadComponent onImageUpload={handleImageUpload} />
                 <Button type="submit" variant="contained">{buttonText}</Button>
+                {(props.type === "update") &&
+                    <Button type="delete" variant="contained" onClick={handleDelete}>Delete Pet</Button>
+                }
             </Stack>
+
         </Box>
     )
 
