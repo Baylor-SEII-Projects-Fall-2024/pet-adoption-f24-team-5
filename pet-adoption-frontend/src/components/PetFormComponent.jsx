@@ -1,9 +1,9 @@
-import {Box, Button, Select, Stack, TextField} from "@mui/material";
+import { Box, Button, Select, Stack, TextField } from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
 import ImageUploadComponent from "@/components/ImageUploadComponent";
-import React, {useEffect, useState} from "react";
-import {saveUpdatePet} from "@/utils/SaveUpdatePet";
-
+import React, { useEffect, useState } from "react";
+import { saveUpdatePet } from "@/utils/SaveUpdatePet";
+import { useSelector } from 'react-redux';
 
 
 const PetFormComponent = (props) => {
@@ -18,7 +18,7 @@ const PetFormComponent = (props) => {
     const [adoptionStatus, setStatus] = React.useState(false);
     const [imageName, setImageName] = React.useState('');
     const [buttonText, setButtonText] = React.useState('');
-    const token = localStorage.getItem('token');
+    const token = useSelector((state) => state.user.token);
 
 
     useEffect(() => {
@@ -98,7 +98,7 @@ const PetFormComponent = (props) => {
             }
             : basePetData;
 
-        saveUpdatePet({formType, petData, token, resetFields});
+        saveUpdatePet({ formType, petData, token, resetFields });
 
     }
 
@@ -161,7 +161,7 @@ const PetFormComponent = (props) => {
                     <MenuItem value={'false'}>Up For Adoption</MenuItem>
                     <MenuItem value={'true'}>Owned</MenuItem>
                 </Select>
-                <ImageUploadComponent onImageUpload={handleImageUpload}/>
+                <ImageUploadComponent onImageUpload={handleImageUpload} />
                 <Button type="submit" variant="contained">{buttonText}</Button>
             </Stack>
         </Box>

@@ -1,0 +1,9 @@
+/* styles.css */
+.pet-card:hover {
+    transform: scale(1.05);
+    transition: transform 0.3s ease;
+}
+
+.pet-card img {
+    border-radius: 8px;
+}

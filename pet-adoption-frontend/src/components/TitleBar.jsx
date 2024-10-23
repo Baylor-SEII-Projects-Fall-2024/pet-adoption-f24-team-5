@@ -1,13 +1,19 @@
+import { clearToken } from '../utils/userSlice'; // Adjust the path as necessary
+import { getAuthorityFromToken, getSubjectFromToken } from "@/utils/tokenUtils";
+import { useSelector, useDispatch } from "react-redux";
 import { Button, Toolbar, Typography, AppBar} from "@mui/material";
 import {Link, useNavigate} from "react-router-dom";
 import React, {useEffect, useState} from "react";
-import {getAuthorityFromToken, getSubjectFromToken} from "@/utils/tokenUtils";
-import {useSelector} from "react-redux";
+import { API_URL } from "../constants";
+import axios from 'axios';
+
 
 const TitleBar = () => {
     const [emailAddress, setEmailAddress] = useState('');
+    const [displayName, setDisplayName] = useState('');
     const [authority, setAuthority] = useState('');
     const token = useSelector((state) => state.user.token);
+    const dispatch = useDispatch();
     const navigate = useNavigate(); // Hook for navigation
 
     useEffect(() => {
@@ -23,10 +29,32 @@ const TitleBar = () => {
         fetchEmailAddress();
     }, []);
 
+    useEffect(() => {
+        const fetchDisplayName = async () => {
+            try{
+                console.log("Email: " + emailAddress);
+                const response = await axios.get(`${API_URL}/api/users/getDisplayName`, {
+                    params: {emailAddress: emailAddress},
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    }
+                });
+                setDisplayName(response.data);
+            }
+            catch (error) {
+                console.error("Error fetching first name: ", error);
+            }
+        }
+
+        fetchDisplayName();
+    }, [emailAddress])
+
     const handleLogout = () => {
-        localStorage.removeItem('token'); // Remove token from local storage
+        dispatch(clearToken()); // Clear token in Redux
         navigate('/Login'); // Redirect to login page
     };
+
     return (
         <AppBar
             position="static"
@@ -34,14 +62,14 @@ const TitleBar = () => {
                 background: 'linear-gradient(135deg, #4b6cb7 30%, #182848 90%)',
                 boxShadow: 'none',
             }}
-        > {}
+        > { }
 
             <Toolbar>
                 <Typography variant="h6" sx={{ flexGrow: 1 }}>
                     <Button color="inherit" component={Link} to="/">DogPile Solutions</Button>
                 </Typography>
-                <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'center' }}>
-                    Welcome {emailAddress}
+                <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'left' }}>
+                    Welcome {displayName}
                 </Typography>
 
                 {(authority === 'CenterOwner' || authority === 'CenterWorker') && (
@@ -54,6 +82,7 @@ const TitleBar = () => {
                 {(authority === 'Owner') && (
                     <>
                         <Button color="inherit" component={Link} to="/SearchEngine">Search Engine</Button>
+                        <Button color="inherit" component={Link} to="/AvailablePets">All Pets</Button>
                         <Button color="inherit" component={Link} to="/LocalAdoptionCenter">Local Adoption Center</Button>
                     </>
                 )}

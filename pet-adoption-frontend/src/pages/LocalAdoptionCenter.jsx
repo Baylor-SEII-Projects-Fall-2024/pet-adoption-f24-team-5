@@ -4,14 +4,15 @@ import { Card, CardContent, Stack, Typography } from '@mui/material';
 import AdoptionCenterCard from '../components/AdoptionCenterCard';
 import axios from 'axios';
 import { getSubjectFromToken } from '../utils/tokenUtils'; // Import the function
-import {API_URL, FRONTEND_URL} from "@/constants";
+import { API_URL, FRONTEND_URL } from "@/constants";
 import TitleBar from "@/components/TitleBar";
+import { useSelector } from 'react-redux';
 
 export default function AdoptionCenterPage() {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [userEmail, setUserEmail] = useState(null); // State to store the user email
-    const token = localStorage.getItem('token');
+    const token = useSelector((state) => state.user.token);
 
 
     useEffect(() => {
@@ -50,7 +51,7 @@ export default function AdoptionCenterPage() {
 
     return (
         <>
-            <TitleBar/>
+            <TitleBar />
             <Head>
                 <title>Local Adoption Centers</title>
             </Head>
