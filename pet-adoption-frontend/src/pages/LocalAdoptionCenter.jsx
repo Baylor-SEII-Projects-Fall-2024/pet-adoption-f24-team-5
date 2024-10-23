@@ -3,17 +3,40 @@ import Head from 'next/head';
 import { Card, CardContent, Stack, Typography } from '@mui/material';
 import AdoptionCenterCard from '../components/AdoptionCenterCard';
 import axios from 'axios';
-import { getSubjectFromToken } from '../utils/tokenUtils'; // Import the function
+import { getSubjectFromToken } from '../utils/tokenUtils';
 import { API_URL, FRONTEND_URL } from "@/constants";
 import TitleBar from "@/components/TitleBar";
 import { useSelector } from 'react-redux';
 
+// Haversine formula to calculate distance between two points
+const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    const toRad = (value) => (value * Math.PI) / 180;
+
+    const R = 6371; // Radius of Earth in kilometers
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c; // Distance in kilometers
+
+    return distance;
+};
+
 export default function AdoptionCenterPage() {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [userEmail, setUserEmail] = useState(null); // State to store the user email
+    const [userEmail, setUserEmail] = useState(null);
+    const [ownerLat, setOwnerLat] = useState(null); // Owner's latitude
+    const [ownerLng, setOwnerLng] = useState(null); // Owner's longitude
     const token = useSelector((state) => state.user.token);
 
+    console.log("owner lat:" + ownerLat);
+    console.log("ownerLng:" + ownerLng);
 
     useEffect(() => {
         // Extract user email (subject) from the token
@@ -24,7 +47,28 @@ export default function AdoptionCenterPage() {
             }
         }
 
-        // Fetch adoption centers
+        // Fetch the owner user information
+        const fetchUserInfo = async () => {
+            try {
+                const url = `${API_URL}/api/users/getUser?emailAddress=${userEmail}`;
+                const response = await axios.get(url, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                const user = response.data;
+                if (user.userType === 'Owner') {
+                    // Use the owner's latitude and longitude
+                    setOwnerLat(user.latitude);
+                    setOwnerLng(user.longitude);
+                }
+            } catch (error) {
+                console.error('Error fetching owner data:', error);
+            }
+        };
+
         const fetchAdoptionCenters = async () => {
             try {
                 const response = await axios.get(`${API_URL}/api/users/adoptioncenters`, {
@@ -33,17 +77,30 @@ export default function AdoptionCenterPage() {
                         'Content-Type': 'application/json',
                     },
                 });
-                setData(response.data); // Store fetched data in state
-                console.log(data);
+                let centers = response.data;
+
+                // Sort the centers by distance from the owner (or default to Waco if not found)
+                if (ownerLat && ownerLng) {
+                    centers = centers.sort((a, b) => {
+                        const distanceA = calculateDistance(ownerLat, ownerLng, a.latitude, a.longitude);
+                        const distanceB = calculateDistance(ownerLat, ownerLng, b.latitude, b.longitude);
+                        return distanceA - distanceB;
+                    });
+                }
+
+                setData(centers); // Store sorted data in state
             } catch (error) {
                 console.error('Error fetching adoption centers:', error);
             } finally {
-                setLoading(false); // Stop loading once data is fetched or an error occurs
+                setLoading(false);
             }
         };
 
-        fetchAdoptionCenters(); // Fetch data on mount
-    }, [token]);
+        if (userEmail) {
+            fetchUserInfo(); // Fetch user info first
+            fetchAdoptionCenters(); // Then fetch adoption centers
+        }
+    }, [token, userEmail, ownerLat, ownerLng]);
 
     if (loading) {
         return <Typography>Loading adoption centers...</Typography>;
@@ -61,7 +118,7 @@ export default function AdoptionCenterPage() {
                     sx={{
                         paddingTop: 4,
                         alignItems: 'center',
-                        overflow: 'hidden', // Prevents scroll bars
+                        overflow: 'hidden',
                     }}
                 >
                     {/* Display user email if available */}
@@ -74,7 +131,7 @@ export default function AdoptionCenterPage() {
                     <Stack
                         direction="row"
                         gap={2}
-                        flexWrap="wrap" // Ensure the cards wrap instead of causing overflow
+                        flexWrap="wrap"
                         justifyContent="center"
                     >
                         {data && data.map((center) => (

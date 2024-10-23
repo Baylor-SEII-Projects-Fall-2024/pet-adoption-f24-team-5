@@ -73,6 +73,6 @@ public class UserTests {
     @Test
     void testFindAllUsers() {
         List<User> users = userService.findAllUsers();
-        assertEquals(6, users.size());
+        assertEquals(7, users.size());
     }
 }

@@ -64,7 +64,7 @@ public class AuthenticationServiceTest {
         // Arrange: Create the Owner entity to register
         Owner owner = new Owner(
                 "John", "Doe", "john.doe@gmail.com",
-                "password", UserType.Owner, 30, "123-456-7890"
+                "password", UserType.Owner, 30, "123-456-7890", "11768"
         );
 
         // Assert: Verify that the save() method was called with the right entity
@@ -75,7 +75,7 @@ public class AuthenticationServiceTest {
 
     @Test
     public void RegisterOwnerTest_Fail_DuplicateEmail() {
-        Owner owner = new Owner("John", "Doe", "duplicate@gmail.com", "password", UserType.Owner, 30, "123-456-7890");
+        Owner owner = new Owner("John", "Doe", "duplicate@gmail.com", "password", UserType.Owner, 30, "123-456-7890", "77429");
 
         // Mock the scenario where the email already exists
         when(userRepository.findByEmailAddress(owner.getEmailAddress())).thenReturn(Optional.of(owner));
