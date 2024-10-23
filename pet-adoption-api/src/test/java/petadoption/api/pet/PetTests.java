@@ -127,7 +127,7 @@ public class PetTests {
             List<Pet> pets = petService.getPetByAdoptionCenter(adoptionCenterFail);
             assertTrue(pets.isEmpty());
         } catch(Exception e) {
-            fail("SQLException was thrown: " + e.getMessage())
+            fail("SQLException was thrown: " + e.getMessage());
         }
     }
 
