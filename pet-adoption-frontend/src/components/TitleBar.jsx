@@ -68,7 +68,7 @@ const TitleBar = () => {
                 <Typography variant="h6" sx={{ flexGrow: 1 }}>
                     <Button color="inherit" component={Link} to="/">DogPile Solutions</Button>
                 </Typography>
-                <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'left' }}>
+                <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'center' }}>
                     Welcome {displayName}
                 </Typography>
 
@@ -76,6 +76,14 @@ const TitleBar = () => {
                     <>
                         <Button color="inherit" component={Link} to="/CreateEvent">Create Event</Button>
                         <Button color="inherit" component={Link} to="/PetManager">Pet Manager</Button>
+
+                    </>
+                )}
+
+                {(authority === 'CenterOwner') && (
+                    <>
+                        <Button color="inherit" component={Link} to="/ManageAccounts">Manage Worker Accounts</Button>
+
 
                     </>
                 )}

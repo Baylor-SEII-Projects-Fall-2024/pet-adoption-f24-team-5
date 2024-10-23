@@ -121,7 +121,7 @@ public class AuthenticationServiceTest {
         // Arrange: Create the CenterWorker entity to register
         CenterWorker worker = new CenterWorker(
                 "Bob", "Johnson", "worker1@gmail.com", "password",
-                UserType.CenterWorker, 25, "987-654-3210"
+                UserType.CenterWorker, 25, "987-654-3210", -1L
         );
 
         // Assert: Verify that the save() method was called with the right entity
@@ -135,7 +135,7 @@ public class AuthenticationServiceTest {
         // Arrange: Create a CenterWorker entity with a duplicate email
         CenterWorker worker = new CenterWorker(
                 "Bob", "Johnson", "duplicate@gmail.com", "password",
-                UserType.CenterWorker, 25, "987-654-3210"
+                UserType.CenterWorker, 25, "987-654-3210", -1L
         );
 
         // Mock the scenario where the email already exists
