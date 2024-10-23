@@ -123,7 +123,10 @@ const PetFormComponent = (props) => {
             }
             : basePetData;
 
-        saveUpdatePet({ formType, petData, token, resetFields });
+        saveUpdatePet({
+            formType, petData, token, resetFields,
+            handlePostNewPet: props.handlePostNewPet}
+        );
 
     }
 
