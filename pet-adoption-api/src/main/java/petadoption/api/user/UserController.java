@@ -40,6 +40,7 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @GetMapping("/getCenterID/{id}")
     public ResponseEntity<?> getCenterID(@PathVariable("id") String id) {
         try {
@@ -71,13 +72,21 @@ public class UserController {
         return userService.updateOwner(user, oldPassword);
     }
 
+    @PutMapping("/update/Owner/preferenceId")
+    public ResponseEntity<Owner> updateOwnerPreferenceId(@RequestBody Owner user) {
+
+        return userService.updateOwnerPreferenceId(user);
+    }
+
     @PutMapping("/update/CenterWorker")
-    public ResponseEntity<CenterWorker> updateCenterWorker(@RequestBody CenterWorker user, @RequestParam("oldPassword") String oldPassword) {
+    public ResponseEntity<CenterWorker> updateCenterWorker(@RequestBody CenterWorker user,
+            @RequestParam("oldPassword") String oldPassword) {
         return userService.updateCenterWorker(user, oldPassword);
     }
 
     @PutMapping("/update/CenterOwner")
-    public ResponseEntity<AdoptionCenter> updateAdoptionCenter(@RequestBody AdoptionCenter user, @RequestParam("oldPassword") String oldPassword) {
+    public ResponseEntity<AdoptionCenter> updateAdoptionCenter(@RequestBody AdoptionCenter user,
+            @RequestParam("oldPassword") String oldPassword) {
         return userService.updateAdoptionCenter(user, oldPassword);
     }
 
