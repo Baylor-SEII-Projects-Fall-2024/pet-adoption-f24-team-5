@@ -102,9 +102,9 @@ export default function AdoptionCenterPage() {
         }
     }, [token, userEmail, ownerLat, ownerLng]);
 
-    if (loading) {
+    /*if (loading) {
         return <Typography>Loading adoption centers...</Typography>;
-    }
+    }*/
 
     return (
         <>

@@ -74,7 +74,7 @@ const HomePage = () => {
         <Card sx={{ width: '100%', height: '20vh' }} elevation={4} key={event.name}>
             <CardContent>
                 <Typography variant='h5' align='center'>{event.event_name}</Typography>
-                <Typography variant='body2' align='center'>{event.description}</Typography>
+                <Typography variant='body2' align='center'>{event.event_description}</Typography>
             </CardContent>
         </Card>
     );

@@ -1,35 +1,26 @@
-import React, {useEffect, useState} from "react";
-import {useSelector} from "react-redux";
-import {fetchImage} from "@/utils/fetchImage";
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { fetchImage } from "@/utils/fetchImage";
 
 const ImageComponent = (props) => {
     const [imageType, setImageType] = useState("");
     const [imageData, setImageData] = useState("");
     const token = useSelector((state) => state.user.token);
 
-
     useEffect(() => {
-
         const loadImage = async () => {
             try {
-                const {
-                    imageType: fetchedImageType,
-                    imageData: fetchedImageData
-                } = await fetchImage(props.imageName, token);
+                const { imageType: fetchedImageType, imageData: fetchedImageData } =
+                    await fetchImage(props.imageName, token);
                 setImageType(fetchedImageType);
                 setImageData(fetchedImageData);
-
-                console.log(imageType)
-                console.log(imageData)
-
             } catch (err) {
-                console.error('Image fetch failed:', err);
+                console.error("Image fetch failed:", err);
             }
         };
 
         if (props.imageName) loadImage();
-
-    }, [props.imageName]);
+    }, [props.imageName, token]);
 
     return (
         <img
@@ -42,9 +33,9 @@ const ImageComponent = (props) => {
                 maxWidth: props.maxWidth,
                 height: props.height,
             }}
+            onLoad={props.onLoad}
         />
-    )
-
-}
+    );
+};
 
 export default ImageComponent;
