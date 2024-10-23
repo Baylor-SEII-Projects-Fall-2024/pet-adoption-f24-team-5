@@ -55,9 +55,13 @@ public class UserService {
 
     public User saveUser(User user) {return userRepository.save(user);}
 
-    public ResponseEntity<Owner> updateOwner(Owner owner, String oldPassword) {
+    public Owner updateOwner(Owner owner, String oldPassword) throws IllegalAccessException {
+        if (findUser(owner.getEmailAddress()).isEmpty()){
+            throw new IllegalAccessException("User not found");
+        }
         if (!passwordEncoder.matches(oldPassword, ((Owner)findUser(owner.getEmailAddress()).get()).getPassword())) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            System.out.println("Old password: " + oldPassword);
+            throw new IllegalAccessException("Invalid credentials");
         }
         Owner newUser = (Owner) findUser(owner.getEmailAddress()).get();
         newUser.setPassword(passwordEncoder.encode(owner.getPassword()));
@@ -65,12 +69,12 @@ public class UserService {
         newUser.setFirstName(owner.getFirstName());
         newUser.setLastName(owner.getLastName());
         newUser.setAge(owner.getAge());
-        return new ResponseEntity<>(userRepository.save(newUser), HttpStatus.OK);
+        return userRepository.save(newUser);
     }
 
-    public ResponseEntity<CenterWorker> updateCenterWorker(CenterWorker worker, String oldPassword) {
+    public CenterWorker updateCenterWorker(CenterWorker worker, String oldPassword) throws IllegalAccessException {
         if (!passwordEncoder.matches(oldPassword, ((CenterWorker) findUser(worker.getEmailAddress()).get()).getPassword())) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            throw new IllegalAccessException("Invalid credentials");
         }
         CenterWorker newUser = (CenterWorker) findUser(worker.getEmailAddress()).get();
         newUser.setPassword(passwordEncoder.encode(worker.getPassword()));
@@ -78,12 +82,12 @@ public class UserService {
         newUser.setFirstName(worker.getFirstName());
         newUser.setLastName(worker.getLastName());
         newUser.setAge(worker.getAge());
-        return new ResponseEntity<>(userRepository.save(newUser), HttpStatus.OK);
+        return userRepository.save(newUser);
     }
 
-    public ResponseEntity<AdoptionCenter> updateAdoptionCenter(AdoptionCenter adoptionCenter, String oldPassword) {
+    public AdoptionCenter updateAdoptionCenter(AdoptionCenter adoptionCenter, String oldPassword) throws IllegalAccessException {
         if (!passwordEncoder.matches(oldPassword, ((AdoptionCenter) findUser(adoptionCenter.getEmailAddress()).get()).getPassword())) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            throw new IllegalAccessException("Invalid credentials");
         }
         AdoptionCenter center = (AdoptionCenter) findUser(adoptionCenter.getEmailAddress()).get();
         center.setPassword(passwordEncoder.encode(adoptionCenter.getPassword()));
@@ -94,7 +98,7 @@ public class UserService {
         center.setCenterState(adoptionCenter.getCenterState());
         center.setCenterZip(adoptionCenter.getCenterZip());
         center.setNumberOfPets(adoptionCenter.getNumberOfPets());
-        return new ResponseEntity<>(adoptionCenterRepository.save(center), HttpStatus.OK);
+        return adoptionCenterRepository.save(center);
     }
 
     public String getDisplayName(String email) {

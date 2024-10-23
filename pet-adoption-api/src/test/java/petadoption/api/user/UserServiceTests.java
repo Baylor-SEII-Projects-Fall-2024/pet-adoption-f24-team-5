@@ -5,6 +5,7 @@ import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import petadoption.api.user.AdoptionCenter.AdoptionCenter;
 import petadoption.api.user.AdoptionCenter.CenterWorker;
@@ -20,6 +21,8 @@ import static org.junit.jupiter.api.Assertions.*;
 public class UserServiceTests {
     @Autowired
     private UserService userService;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Test
     void testSaveAndFindUserOwner() {
@@ -183,5 +186,57 @@ public class UserServiceTests {
         adoptionCenter.setEmailAddress("example3@example.com");
         userService.saveUser(adoptionCenter);
         assertThrows(EntityNotFoundException.class, () -> userService.getDisplayName(adoptionCenter.getEmailAddress()));
+    }
+
+    @Test
+    void testUpdateUserOwner(){
+        Owner owner = new Owner();
+        owner.setUserType(UserType.Owner);
+        owner.setEmailAddress("example@example.com");
+        owner.setPassword(passwordEncoder.encode("password"));
+        owner.setPhoneNumber("123-456-7890");
+        owner.setAge(21);
+        owner.setFirstName("John");
+        owner.setLastName("Doe");
+        userService.saveUser(owner);
+
+        Owner newOwner = new Owner();
+        newOwner.setUserType(UserType.Owner);
+        newOwner.setEmailAddress("bademail@example.com");
+        newOwner.setPassword("newPassword");
+        newOwner.setPhoneNumber("098-765-4321");
+        newOwner.setAge(33);
+        newOwner.setFirstName("Andrew");
+        newOwner.setLastName("Parks");
+        userService.saveUser(newOwner);
+
+        assertNotEquals(userService.findUser("example@example.com"), userService.findUser("bademail@example.com"));
+
+        assertThrowsExactly(IllegalAccessException.class, () -> {
+            userService.updateOwner(new Owner(), "password");
+        });
+
+        assertThrowsExactly(IllegalAccessException.class, () -> {
+            userService.updateOwner(owner, "newPassword");
+        });
+
+        Optional<?> optionalUpdatedUser = userService.findUser("example@example.com");
+        assertTrue(optionalUpdatedUser.isPresent());
+        Owner updatedOwner = (Owner) optionalUpdatedUser.get();
+        updatedOwner.setAge(33);
+        updatedOwner.setFirstName("Andrew");
+
+        try{
+            userService.updateOwner(updatedOwner, "password");
+            assertEquals(((Owner)userService.findUser("example@example.com").get()).getFirstName(), updatedOwner.getFirstName());
+            assertEquals(((Owner)userService.findUser("example@example.com").get()).getAge(), updatedOwner.getAge());
+            assertEquals(((Owner)userService.findUser("example@example.com").get()).getEmailAddress(), updatedOwner.getEmailAddress());
+            assertEquals(((Owner)userService.findUser("example@example.com").get()).getPassword(), updatedOwner.getPassword());
+            assertEquals(((Owner)userService.findUser("example@example.com").get()).getPhoneNumber(), updatedOwner.getPhoneNumber());
+            assertEquals(((Owner)userService.findUser("example@example.com").get()).getLastName(), updatedOwner.getLastName());
+        }
+        catch(Exception e){
+            fail();
+        }
     }
 }

@@ -40,17 +40,32 @@ public class UserController {
 
     @PutMapping("/update/Owner")
     public ResponseEntity<Owner> updateOwner(@RequestBody Owner user, @RequestParam("oldPassword") String oldPassword) {
-        return userService.updateOwner(user, oldPassword);
+        try{
+            return new ResponseEntity<>(userService.updateOwner(user, oldPassword), HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
     }
 
     @PutMapping("/update/CenterWorker")
     public ResponseEntity<CenterWorker> updateCenterWorker(@RequestBody CenterWorker user, @RequestParam("oldPassword") String oldPassword) {
-        return userService.updateCenterWorker(user, oldPassword);
+        try {
+            return new ResponseEntity<>(userService.updateCenterWorker(user, oldPassword), HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
     }
 
     @PutMapping("/update/CenterOwner")
     public ResponseEntity<AdoptionCenter> updateAdoptionCenter(@RequestBody AdoptionCenter user, @RequestParam("oldPassword") String oldPassword) {
-        return userService.updateAdoptionCenter(user, oldPassword);
+        try {
+            return new ResponseEntity<>(userService.updateAdoptionCenter(user, oldPassword), HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
     }
 
     @GetMapping("/getUser")
