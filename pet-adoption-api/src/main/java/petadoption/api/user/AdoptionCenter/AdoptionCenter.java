@@ -75,7 +75,7 @@ public class AdoptionCenter extends User {
         this.getLongAndLat(centerZip);
     }
 
-    private void getLongAndLat(String centerZip) {
+    public void getLongAndLat(String centerZip) {
         try {
             // Define the relative path from the current class location to src/main/resources/zipCSV/uszips.csv
             Path csvFilePath = Paths.get("src", "main", "resources", "zipCSV", "uszips.csv").toAbsolutePath();
