@@ -29,7 +29,7 @@ public class ImageController {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(imageService.saveImage(UPLOAD_DIRECTORY, file));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred, please try again later");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 

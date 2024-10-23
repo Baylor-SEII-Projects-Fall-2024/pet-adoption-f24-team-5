@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Head from 'next/head';
-import { Button, Card, CardContent, Stack, TextField, Typography, Paper } from '@mui/material';
+import { Button, Card, CardContent, Stack, TextField, Typography, Paper, Select, MenuItem } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { getSubjectFromToken } from '../utils/tokenUtils';
@@ -18,7 +18,14 @@ export default function HomePage() {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [phoneNumberLabel, setPhoneNumberLabel] = useState('');
   const [invalidPhoneNumber, setInvalidPhoneNumber] = useState(false);
+  const [userAge, setUserAge] = useState('');
   const [userEmail, setUserEmail] = useState('');
+  const [centerName, setCenterName] = useState('');
+  const [centerAddress, setCenterAddress] = useState('');
+  const [centerCity, setCenterCity] = useState('');
+  const [centerState, setCenterState] = useState('');
+  const [centerZip, setCenterZip] = useState('');
+  const [invalidZip, setInvalidZip] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const token = useSelector((state) => state.user.token);
 
@@ -47,16 +54,25 @@ export default function HomePage() {
             }
           });
 
-          setFirstNameLabel(response.data.firstName);
-          updatedValuesRef.current.firstName = response.data.firstName;
-          setLastNameLabel(response.data.lastName);
-          updatedValuesRef.current.lastName = response.data.lastName;
           setPhoneNumberLabel(response.data.phoneNumber);
           setPhoneNumber(response.data.phoneNumber);
           updatedValuesRef.current.phoneNumber = response.data.phoneNumber;
           updatedValuesRef.current.password = response.data.password;
           updatedValuesRef.current.userType = response.data.userType;
-          console.log("UserType: " + updatedValuesRef.current.userType);
+          if (updatedValuesRef.current.userType === `CenterWorker` || updatedValuesRef.current.userType === `Owner`){
+            setFirstNameLabel(response.data.firstName);
+            updatedValuesRef.current.firstName = response.data.firstName;
+            setLastNameLabel(response.data.lastName);
+            updatedValuesRef.current.lastName = response.data.lastName;
+            setUserAge(response.data.age);
+          }
+          else{
+            setCenterName(response.data.centerName);
+            setCenterAddress(response.data.centerAddress);
+            setCenterCity(response.data.centerCity);
+            setCenterState(response.data.centerState);
+            setCenterZip(response.data.centerZip);
+          }
         }
         catch (error) {
           console.error('Failed to fetch user', error);
@@ -86,7 +102,6 @@ export default function HomePage() {
     setPassword(passwordLabel);
     updatedValuesRef.current.password = passwordLabel;
     updatedValuesRef.current.oldPassword = oldPasswordLabel;
-    handleUserUpdate();
   };
 
   const handlePhoneNumberChange = () => {
@@ -103,13 +118,29 @@ export default function HomePage() {
     }
   };
 
+  const handleAgeChange = (event) => {
+    setUserAge(event.target.value);
+  }
+
+  const handleZipChange = () => {
+    if (centerZip.length === 5){
+      setInvalidZip(false);
+      return false;
+    }
+    else {
+      setInvalidZip(true);
+      return true;
+    }
+  }
+
   const handleSave = async () => {
     handleFirstNameChange();
     handleLastNameChange();
     handlePasswordChange();
-    let invalidInfo = handlePhoneNumberChange();
+    let phoneNumber = handlePhoneNumberChange();
+    let zip = handleZipChange();
     
-    if (!invalidInfo){
+    if ((!phoneNumber && !zip) || updatedValuesRef.current.userType != `CenterOwner`){
       const updateSuccess = await handleUserUpdate();
       if (updateSuccess === 0){
         setInvalidPassword(false);
@@ -138,6 +169,7 @@ export default function HomePage() {
       });
 
       const currentUser = response.data;
+      console.log("Got user successfully");
 
       const updatedUser = {
         id: currentUser.id,
@@ -148,7 +180,9 @@ export default function HomePage() {
       }
 
       if (updatedValuesRef.current.userType === `Owner` || updatedValuesRef.current.userType === `CenterWorker`){
-        updatedUser.age = updatedValuesRef.current.age;
+        console.log("age: " + userAge);
+        updatedUser.age = userAge;
+        console.log("updated age: " + updatedUser.age);
         updatedUser.firstName = updatedValuesRef.current.firstName;
         updatedUser.lastName = updatedValuesRef.current.lastName;
         if (updatedValuesRef.current.userType === `CenterWorker`){
@@ -156,11 +190,11 @@ export default function HomePage() {
         }
       }
       else if (updatedValuesRef.current.userType === 'CenterOwner'){
-        updatedUser.centerName = currentUser.centerName;
-        updatedUser.centerAddress = currentUser.centerAddress;
-        updatedUser.centerCity = currentUser.centerCity;
-        updatedUser.centerState = currentUser.centerState;
-        updatedUser.centerZip = currentUser.centerZip;
+        updatedUser.centerName = centerName;
+        updatedUser.centerAddress = centerAddress;
+        updatedUser.centerCity = centerCity;
+        updatedUser.centerState = centerState;
+        updatedUser.centerZip = centerZip;
         updatedUser.centerPetCount = currentUser.centerPetCount;
       }
   
@@ -185,6 +219,7 @@ export default function HomePage() {
   
     } catch (error) {
       console.error('Failed to update user', error);
+      return 1;
     }
   };
 
@@ -286,6 +321,109 @@ export default function HomePage() {
               </Typography>
             )}
           </Paper>
+          {updatedValuesRef.current.userType != `CenterOwner` && <Paper sx={{ width: 600, height: 50 }} elevation={4}>
+            <Stack spacing={1} direction="row" alignItems='center'>
+            <Typography variant='h5'>Age</Typography>
+            <Select
+              labelId="age-label"
+              id="age-select"
+              value={userAge}
+              onChange={handleAgeChange}
+              label="Age"
+              style={{ height: '40px', width: '545px', pointerEvents: !isEditing ? 'none' : 'auto' }}
+            >
+              {Array.from({ length: 101 }, (_, age) => (
+              <MenuItem key={age} value={age}>
+                {age}
+              </MenuItem>
+            ))}
+            </Select>
+            </Stack>
+          </Paper>}
+          {updatedValuesRef.current.userType == `CenterOwner` && 
+          <>
+          <Paper sx={{ width: 600, height: 50 }} elevation={4}>
+            <Stack spacing={1} direction="row" alignItems='center'>
+              <Typography variant='h5'>Center Name</Typography>
+              <TextField
+                label="Center Name"
+                align='center'
+                value={centerName}
+                onChange={(e) => setCenterName(e.target.value)}
+                InputProps={{
+                  style: { height: '40px', width: '440px' },
+                  readOnly: !isEditing
+                }}
+              />
+            </Stack>
+          </Paper>
+          <Paper sx={{ width: 600, height: 50 }} elevation={4}>
+          <Stack spacing={1} direction="row" alignItems='center'>
+            <Typography variant='h5'>Center Address</Typography>
+            <TextField
+              label="Center Address"
+              align='center'
+              value={centerAddress}
+              onChange={(e) => setCenterAddress(e.target.value)}
+              InputProps={{
+                style: { height: '40px', width: '420px' },
+                readOnly: !isEditing
+              }}
+            />
+          </Stack>
+        </Paper>
+        <Paper sx={{ width: 600, height: 50 }} elevation={4}>
+          <Stack spacing={1} direction="row" alignItems='center'>
+            <Typography variant='h5'>Center City</Typography>
+            <TextField
+              label="Center City"
+              align='center'
+              value={centerCity}
+              onChange={(e) => setCenterCity(e.target.value)}
+              InputProps={{
+                style: { height: '40px', width: '465px' },
+                readOnly: !isEditing
+              }}
+            />
+          </Stack>
+        </Paper>
+        <Paper sx={{ width: 600, height: 50 }} elevation={4}>
+          <Stack spacing={1} direction="row" alignItems='center'>
+            <Typography variant='h5'>Center State</Typography>
+            <TextField
+              label="Center State"
+              align='center'
+              value={centerState}
+              onChange={(e) => setCenterState(e.target.value)}
+              InputProps={{
+                style: { height: '40px', width: '450px' },
+                readOnly: !isEditing
+              }}
+            />
+          </Stack>
+        </Paper>
+        <Paper sx={{ width: 600, height: !invalidZip ? 50 : 70 }} elevation={4}>
+          <Stack spacing={1} direction="row" alignItems='center'>
+            <Typography variant='h5'>Center Zip</Typography>
+            <TextField
+              label="Center Zip"
+              align='center'
+              value={centerZip}
+              onChange={(e) => setCenterZip(e.target.value)}
+              InputProps={{
+                style: { height: '40px', width: '470px' },
+                readOnly: !isEditing
+              }}
+            />
+          </Stack>
+          {invalidZip && (
+                <Typography color="error" variant="body2">
+                  Please enter a valid zip code.
+                </Typography>
+              )}
+        </Paper>
+        </>
+          }
           <Button onClick={isEditing ? handleSave : handleEdit}>{isEditing ? 'Save' : 'Edit'}</Button>
         </Stack>
       </main>
