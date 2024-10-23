@@ -65,31 +65,24 @@ public class Event {
     public void setEventId(Long event_id) {
         this.event_id = event_id;
     }
-
     public Long getCenterId() {
         return center_id;
     }
-
     public void setCenterId(Long center_id) {
         this.center_id = center_id;
     }
-
     public String getEventName() {
         return event_name;
     }
-
     public void setEventName(String event_name) {
         this.event_name = event_name;
     }
-
     public LocalDate getEventDate() {
         return event_date;
     }
-
     public void setEventDate(LocalDate event_date) {
         this.event_date = event_date;
     }
-
     public LocalTime getEventTime() {
         return event_time;
     }
