@@ -168,7 +168,7 @@ public class UserServiceTests {
     }
 
     @Test
-    void testEmptyDisplayname(){
+    void testEmptyDisplayName(){
         CenterWorker centerWorker = new CenterWorker();
         centerWorker.setUserType(UserType.CenterWorker);
         centerWorker.setEmailAddress("example@example.com");
