@@ -32,8 +32,6 @@ public class PetService {
     public void deletePet(Pet pet) {
         if(pet == null) {
             throw new IllegalArgumentException("Pet is null");
-        } else if (pet.getPetId() == null) {
-            throw new IllegalArgumentException("Pet id is null");
         }
 
         petRepository.delete(pet);
