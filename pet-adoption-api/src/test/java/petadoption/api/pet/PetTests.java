@@ -140,7 +140,28 @@ public class PetTests {
         when(petService.getPetByAdoptionCenter(adoptionCenter)).thenReturn(mockedPets);
 
         try {
+            petService.savePet(pet, adoptionCenter);
             List<Pet> pets = petService.getPetByAdoptionCenter(adoptionCenterFail);
+            assertTrue(pets.isEmpty());
+        } catch (Exception e) {
+            fail("SQLException was thrown: " + e.getMessage());
+        }
+    }
+
+    @Test
+    @DisplayName("delete pet")
+    void testDeletePet() {
+        AdoptionCenter adoptionCenter = new AdoptionCenter();
+        adoptionCenter.setId(1L);
+        Pet pet = new Pet();
+        pet.setPetId(1L);
+
+        when(petService.savePet(pet, adoptionCenter)).thenReturn(pet);
+
+        try {
+            petService.savePet(pet, adoptionCenter);
+            petService.deletePet(pet);
+            List<Pet> pets = petService.getAllPets();
             assertTrue(pets.isEmpty());
         } catch (Exception e) {
             fail("SQLException was thrown: " + e.getMessage());

@@ -93,9 +93,12 @@ const PetFormComponent = (props) => {
             imageName,
         }
 
-        deletePet({petData, token, resetFields});
-
-        props.handlePostNewPet();
+        deletePet({
+            petData,
+            token,
+            resetFields,
+            handlePostNewPet: props.handlePostNewPet
+        });
 
     }
 
@@ -120,7 +123,10 @@ const PetFormComponent = (props) => {
             }
             : basePetData;
 
-        saveUpdatePet({ formType, petData, token, resetFields });
+        saveUpdatePet({
+            formType, petData, token, resetFields,
+            handlePostNewPet: props.handlePostNewPet}
+        );
 
     }
 
