@@ -10,7 +10,6 @@ import {useSelector} from "react-redux";
 
 const CreateEvent = () => {
     const [event_name, setEventName] = useState('');
-    const [center_id, setCenterID] = useState(0);
     const [event_date, setEventDate] = useState(new Date());
     const [event_time, setEventTime] = useState(() => new Date().toLocaleTimeString('en-US', {
         hour: '2-digit',
@@ -22,83 +21,11 @@ const CreateEvent = () => {
     const [events,  setEvents] = useState([]);
     const [noFutureEvents, setNoFutureEvents] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState(null);
-    const [adoptionCenterName, setAdoptionCenterName] = useState(null);
     const token = useSelector((state) => state.user.token);
 
-    useEffect(() => {
-        const fetchUserInfoAndRelatedData = async () => {
-            try {
-                let email = '';
+    /*useEffect(() => {
 
-                // Extract user email (subject) from the token
-                if (token) {
-                    const subject = getSubjectFromToken(token); // Use the provided function
-                    if (subject) {
-                        email = subject;
-                        console.log("User email = " + email);
-                    }
-                }
-
-                if (!email) {
-                    console.error("No email found");
-                    return;
-                }
-
-                // Fetch user info based on email
-                const fetchUserInfo = async () => {
-                    try {
-                        console.log("Fetching user info...");
-                        const url = `${API_URL}/api/users/getUser?emailAddress=${email}`;
-                        const response = await axios.get(url, {
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': `Bearer ${token}`,
-                            }
-                        });
-                        const fetchedUserId = response.data.id;
-                        console.log("User ID: " + fetchedUserId);
-                        return fetchedUserId; // Return userId to chain subsequent calls
-                    } catch (error) {
-                        console.error('Failed to fetch user', error);
-                        return null;
-                    }
-                };
-
-                // Fetch Center ID based on userId
-                const fetchCenterID = async (userId) => {
-                    if (!userId) return; // Return early if userId is not set
-                    try {
-                        console.log("Fetching center ID...");
-                        const url = `${API_URL}/api/users/getCenterID/${userId}`;
-                        const response = await axios.get(url, {
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': `Bearer ${token}`,
-                            }
-                        });
-                        const fetchedCenterID = response.data;
-                        setCenterID(fetchedCenterID);
-                        console.log("Center ID: " + fetchedCenterID);
-                    } catch (error) {
-                        console.error("Failed to fetch center ID", error);
-                    }
-                };
-
-                const userId = await fetchUserInfo();
-                await fetchCenterID(userId); // Fetch center ID only after user ID is available
-                await handleFetchEvents(); // Fetch events
-                if (center_id == null) {
-                    console.error("Center ID not set, cannot create event")
-                    alert("Sorry, cannot create an event. Please try again later")
-
-                }
-
-            } catch (error) {
-                console.error("Error fetching user info and related data", error);
-            }
-        };
-        fetchUserInfoAndRelatedData(); // Call the function
-    }, [token]); // Only re-run if the token changes
+    }, [token]); // Only re-run if the token changes*/
     const EventCard = ({ event }) => {
         console.log("Creating event card...");
         const [day, month, year] = event.event_date.split('/');
@@ -151,15 +78,13 @@ const CreateEvent = () => {
     };
     const resetForm = () => {
         setEventName('');
-        setCenterID(0);
         handleDateChange(new Date())
         setEventDescription('');
         setSelectedEvent(null);
     };
-
-    const fetchAdoptionCenterName = async (centerId) => {
+    const fetchAdoptionCenterName = async (center_Id) => {
         try {
-            const response = await axios.get(`${API_URL}/api/users/getAdoptionCenter/${centerId}`, {
+            const response = await axios.get(`${API_URL}/api/users/getAdoptionCenter/${center_Id}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json',
@@ -206,17 +131,13 @@ const CreateEvent = () => {
             console.error("Error fetching events:", error);
         }
     };
-
     const handleValidateSetEvent = (displayAlert) => {
-        if(event_name && !isNaN(center_id) && event_date && event_time && event_description) {
+        if(event_name && event_date && event_time && event_description) {
             return true;
         }
         if(displayAlert) {
             if(!event_name) {
                 alert("Please enter an event name");
-            }
-            else if(isNaN(center_id)) {
-                alert("Invalid Center_ID");
             }
             else if(!event_date) {
                 alert("Please enter an event date");
@@ -247,15 +168,6 @@ const CreateEvent = () => {
         console.log("Original date: " + dateString + " | New date: " + newDate);
 
         return newDate;
-    };
-    const handleTimeStringToTime = (timeString) => {
-        console.log("Converting timeString to time...");
-        const [hours, minutes] = timeString.split(':');
-        const now = new Date();
-        now.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0); // Set to provided time, reset seconds and milliseconds
-        console.log("Original time: " + timeString + " | New time: " + now);
-
-        return now;
     };
     const handleDateToTimeString = (selectedDate) => {
         console.log("Converting date to time string...");
@@ -314,33 +226,26 @@ const CreateEvent = () => {
     };
     const handleSubmit = async (event) => {
         event.preventDefault();
-
         // Validate required fields
         if (!handleValidateSetEvent(true)) {
             return;
         }
-
-        console.log("Event data being packaged...");
-        console.log("centerID: " + center_id);
-        console.log("eventName: " + event_name);
-        console.log("eventDate: " + event_date);
-        console.log("eventTime: " + event_time);
-        console.log("eventDesc: " + event_description);
-        const eventData = {
-            center_id,
+        const centerID = -1;
+        event = {
+            centerID,
             event_name,
             event_date: handleDateToString(event_date),
             event_time,
             event_description,
         };
-        console.log('Event Data: ', eventData);
+        console.log('Event Data: ', event);
 
         const url = selectedEvent
             ? `${API_URL}/api/events/update_event/${selectedEvent.event_id}`
-            : `${API_URL}/api/events/create_event`;
+            : `${API_URL}/api/events/create_event/${getSubjectFromToken(token)}`;
 
         try {
-            const response = await (selectedEvent ? axios.put : axios.post)(url, eventData, {
+            const response = await (selectedEvent ? axios.put : axios.post)(url, event, {
                 headers: {
                     Authorization: `Bearer ${token}`, // Pass token in the header
                     'Content-Type': 'application/json'
