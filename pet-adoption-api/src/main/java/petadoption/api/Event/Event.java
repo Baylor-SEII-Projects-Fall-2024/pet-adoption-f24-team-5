@@ -14,8 +14,6 @@ import java.time.LocalTime;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Event {
     public static final String TABLE_NAME = "EVENTS";
-    public static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-    public static final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,7 +31,7 @@ public class Event {
     protected LocalDate event_date;
 
     @Column(name = "EVENT_TIME")
-    @Convert(converter = LocalTimeConverter.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
     protected LocalTime event_time;
 
     @Column(name = "EVENT_DESCRIPTION")

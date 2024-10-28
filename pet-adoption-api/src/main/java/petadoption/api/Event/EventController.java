@@ -1,6 +1,7 @@
 package petadoption.api.Event;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,12 +17,16 @@ import java.util.Optional;
 
 @RequestMapping("/api/events")
 @RestController
-@RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:3000")
 public class EventController {
-
+    @Autowired
     private final EventService eventService;
+    @Autowired
     private final UserService userService;
+
+    public EventController(EventService eventService, UserService userService) {
+        this.eventService = eventService;
+        this.userService = userService;
+    }
 
 
     @GetMapping("/getCenterEvents/{email}")

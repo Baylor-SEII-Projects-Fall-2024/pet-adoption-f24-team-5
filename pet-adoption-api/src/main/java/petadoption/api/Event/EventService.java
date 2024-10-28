@@ -14,7 +14,6 @@ public class EventService {
 
     private void isValidEvent(Event event) throws IllegalArgumentException {
         if(event == null) {throw new IllegalArgumentException("Cannot create event: event doesn't exist");}
-        if(event.event_id != null) {throw new IllegalArgumentException("Cannot create event: event already has ID");}
         if(event.event_description == null || event.event_description.isEmpty()) {throw new IllegalArgumentException("Cannot create event: enter a description");}
         if(event.event_time == null) {throw new IllegalArgumentException("Cannot create event: enter a time");}
         if(event.center_id == null) {throw new IllegalArgumentException("Cannot create event: enter a center ID");}

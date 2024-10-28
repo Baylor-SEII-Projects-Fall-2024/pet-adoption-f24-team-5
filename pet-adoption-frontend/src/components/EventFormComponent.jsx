@@ -1,137 +1,142 @@
-import {Box, Button, Stack, TextField} from "@mui/material";
+import { Box, Button, Stack, TextField } from "@mui/material";
 import DatePicker from "react-datepicker";
 import React, { useEffect, useState } from "react";
 import { useSelector } from 'react-redux';
-import {DeleteEvent} from "@/utils/DeleteEvent";
-import {SaveUpdateEvent} from "@/utils/SaveUpdateEvent";
+import { DeleteEvent } from "@/utils/DeleteEvent";
+import { SaveUpdateEvent } from "@/utils/SaveUpdateEvent";
 
 const EventFormComponent = (props) => {
     const [event_id, setEventID] = useState(null);
-    const [center_id , setCenterID] = useState(null);
+    const [center_id, setCenterID] = useState(null);
     const [event_name, setEventName] = useState('');
     const [event_date, setEventDate] = useState(new Date());
-    const [event_time, setEventTime] = useState(() => new Date().toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-    }));
+    const [event_time, setEventTime] = useState(new Date());
     const [event_description, setEventDescription] = useState('');
-    const [buttonText, setButtonText] = React.useState('');
-    const [formType , setFormType] = React.useState('');
+    const [buttonText, setButtonText] = useState('');
+    const [formType, setFormType] = useState('');
     const token = useSelector((state) => state.user.token);
 
     useEffect(() => {
         setFormType(props.type);
-        if(props.type === "save") {
-            setButtonText("Save Event");
-        } else if(props.type === "update") {
-            setButtonText("Update Event");
-        }
-        if(props.event && props.event.event_id) {
+        setButtonText(props.type === "update" ? "Update Event" : "Save Event");
+
+        if (props.event && props.event.event_id) {
             setFields(props.event);
         } else {
             resetFields();
         }
     }, [props.type, props.event]);
+
     const setFields = (event) => {
+        const parseDateTime = (dateTimeString) => {
+            const [datePart, timePart] = dateTimeString.split(' ');
+
+            // Split the date (dd/MM/yyyy) and time (HH:mm)
+            const [day, month, year] = datePart.split('/').map(Number);
+            const [hours, minutes] = timePart.split(':').map(Number);
+
+            return new Date(year, month - 1, day, hours, minutes);
+        }
+        const receivedDateTime = parseDateTime(event.event_date + " " + event.event_time);
+
         setEventID(event.event_id);
         setCenterID(event.center_id);
         setEventName(event.event_name);
-        setEventDate(event.event_date);
-        setEventTime(event.event_time);
+        setEventDate(receivedDateTime);
+        setEventTime(receivedDateTime);
         setEventDescription(event.event_description);
     };
-    const resetFields= () => {
-        setEventID("");
-        setCenterID("");
-        setEventName("");
+
+    const resetFields = () => {
+        setEventID(null);
+        setCenterID(null);
+        setEventName('');
         setEventDate(null);
         setEventTime(null);
-        setEventDescription("");
+        setEventDescription('');
     };
-    const handleDelete = (event) => {
-        event.preventDefault();
+    const formatDate = (date) => {
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+        const year = date.getFullYear();
 
+        return `${day}/${month}/${year}`;
+    }
+    const formatTime = (date) => {
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+
+        return `${hours}:${minutes}`
+    }
+
+    const handleDelete = async (e) => {
+        e.preventDefault();
         const eventData = {
             event_id,
             center_id,
             event_name,
-            event_date,
-            event_time,
+            event_date: formatDate(event_date),
+            event_time: formatTime(event_time),
             event_description
         };
-        DeleteEvent({
-            eventData,
+        await DeleteEvent({
+            event: eventData,
             token,
             resetFields,
-            handleCreateEvent: props.handleCreateEvent
+            handleCreateNewEvent: props.handleCreateNewEvent
         });
     };
-    const handleSubmit = (event) => {
-        event.preventDefault();
 
+    const handleSubmit = (e) => {
+        e.preventDefault();
         handleSaveOrUpdateEvent();
     };
-    const handleSaveOrUpdateEvent = () => {
-        const baseEventData = {
+
+    const handleSaveOrUpdateEvent = async () => {
+        const eventData = {
             event_id,
             center_id,
             event_name,
-            event_date,
-            event_time,
+            event_date: formatDate(event_date),
+            event_time: formatTime(event_time),
             event_description
         };
-        const eventData = (formType === "update") ? {event_id,...baseEventData} : baseEventData;
-        SaveUpdateEvent({
-            formType, eventData, token, resetFields
-        });
-    }
+        try {
+            await SaveUpdateEvent({
+                formType,
+                event: eventData,
+                token,
+                resetFields,
+                handleCreateNewEvent: props.handleCreateNewEvent
+            });
+        } catch (error) {
+            console.error("Error saving/updating event:", error);
+            alert("An error occurred while saving or updating the event. Please try again.");
+        }
+    };
+
     const handleDateChange = (date) => {
-        if (!date) {
-            console.error("No date provided.");
-            return "Invalid time";
-        }
         setEventDate(date);
+        setEventTime(date);
+    };
 
-        const dateObj = date instanceof Date && !isNaN(date)
-            ? date
-            : new Date(date);
-
-        if (isNaN(dateObj.getTime())) {
-            console.error("Invalid date:", date);
-            return "Invalid time";
-        }
-
-        setEventTime(dateObj.toLocaleTimeString('en-US', {
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false
-        }));
-    }
     const handleValidateSetEvent = (displayAlert) => {
-        if(event_name && event_date && event_time && event_description) {
+        if (event_name && event_date && event_time && event_description) {
             return true;
         }
-        if(displayAlert) {
-            if(!event_name) {
-                alert("Please enter an event name");
-            }
-            else if(!event_date) {
-                alert("Please enter an event date");
-            }
-            else if(!event_time) {
-                alert("Please enter an event time");
-            }
-            else if(!event_description) {
-                alert("Please enter an event description");
-            }
+        if (displayAlert) {
+            if (!event_name) alert("Please enter an event name");
+            else if (!event_date) alert("Please enter an event date");
+            else if (!event_time) alert("Please enter an event time");
+            else if (!event_description) alert("Please enter an event description");
             else alert("Unknown error when validating event");
         }
         return false;
-    }
+    };
+
     return (
         <Box component="form" onSubmit={handleSubmit}>
-            <Button onClick={props.handleCreateEvent} variant='contained'>Back to Events </Button>
+            <Button onClick={props.handleCreateNewEvent} variant='contained'>Back to Events</Button>
             <Stack spacing={2} sx={{ marginTop: 2 }}>
                 <TextField
                     label="Event Name"
@@ -141,15 +146,10 @@ const EventFormComponent = (props) => {
                 />
                 <DatePicker
                     selected={event_date}
-                    onChange={(date) => handleDateChange(date)}
-                    fullWidth
+                    onChange={handleDateChange}
                     showTimeSelect
                     dateFormat="Pp"
-                    customInput={
-                    <TextField
-                        label="Event Date"
-                        fullWidth
-                    />}
+                    customInput={<TextField label="Event Date" fullWidth />}
                 />
                 <TextField
                     label="Description"
@@ -159,88 +159,24 @@ const EventFormComponent = (props) => {
                 />
                 <Button
                     type="submit"
-                    variant='contained'
-                    disabled={!handleValidateSetEvent(false)}>
+                    variant="contained"
+                    disabled={!handleValidateSetEvent(false)}
+                >
                     {buttonText}
                 </Button>
-                {(props.type === "update") &&
+                {formType === "update" && (
                     <Button
-                        type="delete"
+                        type="button"
                         variant="contained"
-                        onClick={handleDelete}>
+                        color="error"
+                        onClick={handleDelete}
+                    >
                         Delete Event
                     </Button>
-                }
+                )}
             </Stack>
         </Box>
-    )
-}
+    );
+};
 
 export default EventFormComponent;
-/*
-            {!createEvent && (
-                <Stack sx={{ paddingTop: 4, maxWidth: '1200px', margin: '0 auto' }} alignItems='center' gap={5}>
-                    {getAuthorityFromToken(token) !== "Owner" && (
-                        <Button onClick={handleCreateEvent} color='inherit' variant='contained'>
-                            Create Event
-                        </Button>
-                    )}
-                    {noFutureEvents ? (
-                        <Typography variant="h6" color="error">No future events</Typography>
-                    ) : (
-                        <Stack spacing={2} direction='row' flexWrap='wrap' justifyContent='center'>
-                            {events.map(event => (
-
-                                <EventCard key={event.event_id} event={event} onClick = {() => handleCardClick(event)} />
-                            ))}
-                        </Stack>
-                    )}
-                </Stack>
-            )}
-        </Box>
-    );*/
-/*
-const handleDateStringToDate = (dateString) => {
-    console.log("Converting dateString to date...");
-    const [day, month, year] = dateString.split('/');
-    const newDate = new Date(year, month - 1, day);
-
-    // Normalize the time to midnight for accurate date comparison
-    newDate.setHours(0, 0, 0, 0); // Set time to 00:00:00.000
-    console.log("Original date: " + dateString + " | New date: " + newDate);
-
-    return newDate;
-};
-const handleDateToTimeString = (selectedDate) => {
-    console.log("Converting date to time string...");
-
-    if (!selectedDate) {
-        console.error("No date provided.");
-        return "Invalid time";
-    }
-
-    const dateObj = selectedDate instanceof Date && !isNaN(selectedDate)
-        ? selectedDate
-        : new Date(selectedDate);
-
-    if (isNaN(dateObj.getTime())) {
-        console.error("Invalid date:", selectedDate);
-        return "Invalid time";
-    }
-
-    return dateObj.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-    });
-};
-const handleDateToString = (selectedDate) => {
-    console.log("Converting date to string...");
-    const day = String(selectedDate.getDate()).padStart(2, '0');
-    const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
-    const year = selectedDate.getFullYear();
-    console.log("Old date: " + selectedDate + " | New date: " + `${day}/${month}/${year}`);
-    return `${day}/${month}/${year}`;
-}
-
-*/

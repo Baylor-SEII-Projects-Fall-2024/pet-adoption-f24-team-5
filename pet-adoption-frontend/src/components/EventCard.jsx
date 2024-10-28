@@ -4,7 +4,7 @@ import React from "react";
 import {useSelector} from "react-redux";
 
 const EventCard = ({ event, onClick }) => {
-    const [day, month, year] = event.event_date.split('/');
+    //const [day, month, year] = event.event_date.split('/');{`${day}/${month}/${year}`}
     const token = useSelector((state) => state.user.token);
 
     return (
@@ -34,10 +34,10 @@ const EventCard = ({ event, onClick }) => {
                     {event.event_description}
                 </Typography>
                 <Typography variant="body2" align="center">
-                    {`${day}/${month}/${year}`}
+                    {event.event_date}
                 </Typography>
                 <Typography variant="body2" align="center" color="textSecondary">
-                    {`Time: ${event.event_time ? event.event_time : "N/A"}`}
+                    {event.event_time}
                 </Typography>
             </CardContent>
         </Card>

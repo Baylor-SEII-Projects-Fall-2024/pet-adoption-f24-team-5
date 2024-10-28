@@ -1,23 +1,27 @@
-import {API_URL} from "@/constants";
+import { API_URL } from "@/constants";
 import axios from "axios";
 
-export const DeleteEvent = ({event, token, resetFields, handleCreateEvent}) => {
+export const DeleteEvent = async ({ event, token, resetFields, handleCreateEvent }) => {
     try {
         const url = `${API_URL}/api/events/delete_event/${event.event_id}`;
-        axios.delete(url, {
+        const response = await axios.delete(url, {
             headers: {
-                Authorization: `Bearer ${token}`, 'Content-Type': 'application/json'
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json'
             }
-        }).then((res) => {
-            if(res) {
-                console.log(res.data);
-            }
-            alert('Event deleted.');
-            resetFields();
-            handleCreateEvent();
         });
+        console.log('Response:', response.data);
+
+        // Call reset and toggle only after a successful deletion
+        resetFields();
+        handleCreateEvent();
     } catch (error) {
-        console.error('Error: could not delete event:', error);
-        alert('Error: could not delete event');
+        if (error.response) {
+            console.error('Error response:', error.response);
+            alert(`Error: ${error.response.status} - ${error.response.statusText}`);
+        } else {
+            console.error('Unexpected error:', error);
+            alert('Error: could not delete event');
+        }
     }
 };

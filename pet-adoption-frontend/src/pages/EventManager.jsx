@@ -1,61 +1,58 @@
-import React, {useEffect, useState} from 'react';
-import {Box, Button, Stack, CircularProgress} from "@mui/material";
+import React, { useEffect, useState } from 'react';
+import { Box, Button, Stack, CircularProgress } from "@mui/material";
 import "react-datepicker/dist/react-datepicker.css";
 import axios from "axios";
-import {API_URL} from "@/constants";
+import { API_URL } from "@/constants";
 import TitleBar from "@/components/TitleBar";
-import {getAuthorityFromToken, getSubjectFromToken} from "@/utils/tokenUtils";
-import {useSelector} from "react-redux";
+import { getAuthorityFromToken, getSubjectFromToken } from "@/utils/tokenUtils";
+import { useSelector } from "react-redux";
 import EventCard from "@/components/EventCard";
 import EventFormComponent from "@/components/EventFormComponent";
 
-const CreateEvent = () => {
-    const [formType, setFormType] = React.useState('');
-    const [formEvent, setFormEvent] = React.useState({});
-    const [createEvent, setCreateEvent] = useState(false);
-    const [events,  setEvents] = useState([]);
+const EventManager = () => {
+    const [formType, setFormType] = useState('');
+    const [formEvent, setFormEvent] = useState({});
+    const [createNewEvent, setCreateNewEvent] = useState(false);
+    const [events, setEvents] = useState([]);
     const token = useSelector((state) => state.user.token);
-    const [loading, setLoading] = React.useState(true);
+    const [loading, setLoading] = useState(true);
 
     const handleCardClick = (event) => {
         if (getAuthorityFromToken(token) !== "Owner") {
             setFormEvent(event);
             setFormType("update");
-            setCreateEvent((!createEvent));
+            setCreateNewEvent(!createNewEvent);
         }
     };
 
-    const handleCreateEvent = () => {
-        setCreateEvent(!createEvent);
+    const handleCreateNewEvent = () => {
+        setCreateNewEvent(!createNewEvent);
         setFormType("save");
         setFormEvent({});
     };
+
     const handleFetchEvents = async () => {
         setLoading(true);
-        setEvents([]);
-        let response;
         try {
+            let response;
             console.log("Fetching events...");
+
             if (getAuthorityFromToken(token) === "Owner") {
-                await axios.get(`${API_URL}/api/events`, {
+                response = await axios.get(`${API_URL}/api/events`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                         'Content-Type': 'application/json',
                     },
-                }).then((res) => {
-                    console.log(res.data);
                 });
             } else {
-                await axios.get(`${API_URL}/api/events/getCenterEvents/${getSubjectFromToken(token)}`, {
+                response = await axios.get(`${API_URL}/api/events/getCenterEvents/${getSubjectFromToken(token)}`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                         'Content-Type': 'application/json',
                     },
-                }).then((res) => {
-                    console.log("Fetched Events...", res.data);
-                    response = res;
                 });
             }
+
             const eventsWithCenterNames = await Promise.all(
                 response.data.map(async (event) => {
                     const centerName = await fetchAdoptionCenterName(event.center_id);
@@ -64,16 +61,17 @@ const CreateEvent = () => {
             );
 
             setEvents(eventsWithCenterNames);
-            //setNoFutureEvents(eventsWithCenterNames.length === 0);
         } catch (error) {
             console.error("Error fetching events:", error);
+            alert(`Error: ${error.response?.status} - ${error.response?.statusText}`);
         } finally {
             setLoading(false);
         }
     };
-    const fetchAdoptionCenterName = async (center_Id) => {
+
+    const fetchAdoptionCenterName = async (centerId) => {
         try {
-            const response = await axios.get(`${API_URL}/api/users/getAdoptionCenter/${center_Id}`, {
+            const response = await axios.get(`${API_URL}/api/users/getAdoptionCenter/${centerId}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json',
@@ -87,27 +85,25 @@ const CreateEvent = () => {
     };
 
     useEffect(() => {
-        if(createEvent === false) {
-            handleFetchEvents().then((res) => {
-                if (res) {
-                    console.log(res.data);
-                }
-            });
-            setFormType('')
+        if (!createNewEvent) {
+            handleFetchEvents();
+            setFormType('');
         }
-    },[createEvent]);
+    }, [createNewEvent]);
 
     return (
         <Box sx={{ height: '100vh', width: '100vw', display: 'flex', flexDirection: 'column' }}>
-            <TitleBar/>
+            <TitleBar />
 
-            {createEvent && (
-                <EventFormComponent type={formType} handleCreateEvent={handleCreateEvent} event={formEvent} />
+            {createNewEvent && (
+                <EventFormComponent type={formType} handleCreateNewEvent={handleCreateNewEvent} event={formEvent} />
             )}
 
-            {!createEvent &&
-                <Stack sx={{ paddingTop: 4 }} alignItems='center' gap={5}>
-                    <Button onClick={handleCreateEvent} color='inherit' variant='contained'>Post Event</Button>
+            {!createNewEvent && (
+                <Stack sx={{ paddingTop: 4 }} alignItems="center" gap={5}>
+                    <Button onClick={handleCreateNewEvent} color="inherit" variant="contained">
+                        Post Event
+                    </Button>
 
                     {loading ? <CircularProgress /> :
                         ((events.length > 0) && events.map((event) => (
@@ -115,9 +111,9 @@ const CreateEvent = () => {
                         )))
                     }
                 </Stack>
-            }
+            )}
         </Box>
     );
 };
 
-export default CreateEvent;
+export default EventManager
