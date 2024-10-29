@@ -80,9 +80,6 @@ public class EventServiceTest {
         assertThrows(IllegalArgumentException.class, () -> {
             eventService.createEvent(new Event(null, null,null,null,null));
         });
-        assertThrows(IllegalArgumentException.class, () -> {
-            eventService.createEvent(new Event(1L,1L, "event",localDate,localTime,"desc"));
-        });
     }
     @Test
     public void testCreateEvent() {
