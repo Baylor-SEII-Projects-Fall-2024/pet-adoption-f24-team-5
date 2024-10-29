@@ -1,7 +1,7 @@
 import { API_URL } from "@/constants";
 import axios from "axios";
 
-export const DeleteEvent = async ({ event, token, resetFields, handleCreateEvent }) => {
+export const DeleteEvent = async ({ event, token, resetFields, handleCreateNewEvent }) => {
     try {
         const url = `${API_URL}/api/events/delete_event/${event.event_id}`;
         const response = await axios.delete(url, {
@@ -14,7 +14,7 @@ export const DeleteEvent = async ({ event, token, resetFields, handleCreateEvent
 
         // Call reset and toggle only after a successful deletion
         resetFields();
-        handleCreateEvent();
+        handleCreateNewEvent();
     } catch (error) {
         if (error.response) {
             console.error('Error response:', error.response);
