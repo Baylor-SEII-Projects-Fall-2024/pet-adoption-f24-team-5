@@ -1,4 +1,4 @@
-import { clearToken } from '../utils/userSlice'; // Adjust the path as necessary
+import { clearToken, setDisplayName } from '../utils/userSlice'; // Adjust the path as necessary
 import { getAuthorityFromToken, getSubjectFromToken } from "@/utils/tokenUtils";
 import { useSelector, useDispatch } from "react-redux";
 import { Button, Toolbar, Typography, AppBar } from "@mui/material";
@@ -10,45 +10,33 @@ import axios from 'axios';
 
 const TitleBar = () => {
     const [emailAddress, setEmailAddress] = useState('');
-    const [displayName, setDisplayName] = useState('');
+    const displayName = useSelector((state) => state.user.displayName);
     const [authority, setAuthority] = useState('');
     const token = useSelector((state) => state.user.token);
     const dispatch = useDispatch();
     const navigate = useNavigate(); // Hook for navigation
 
     useEffect(() => {
-        const fetchEmailAddress = async () => {
+        const fetchData = async () => {
             try {
                 setEmailAddress(getSubjectFromToken(token));
                 setAuthority(getAuthorityFromToken(token));
-            } catch (error) {
-                console.error('Error fetching email address:', error);
-            }
-        };
 
-        fetchEmailAddress();
-    }, []);
-
-    useEffect(() => {
-        const fetchDisplayName = async () => {
-            try {
-                console.log("Email: " + emailAddress);
                 const response = await axios.get(`${API_URL}/api/users/getDisplayName`, {
-                    params: { emailAddress: emailAddress },
+                    params: { emailAddress: getSubjectFromToken(token) },
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`,
                     }
                 });
-                setDisplayName(response.data);
+                dispatch(setDisplayName(response.data));
+            } catch (error) {
+                console.error('Error fetching email address:', error);
             }
-            catch (error) {
-                console.error("Error fetching first name: ", error);
-            }
-        }
+        };
 
-        fetchDisplayName();
-    }, [emailAddress])
+        fetchData();
+    }, [token, dispatch]);
 
     const handleLogout = () => {
         dispatch(clearToken()); // Clear token in Redux
