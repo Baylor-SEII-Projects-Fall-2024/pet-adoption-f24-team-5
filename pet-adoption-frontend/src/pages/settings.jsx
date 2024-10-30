@@ -6,7 +6,8 @@ import axios from 'axios';
 import { getSubjectFromToken } from '../utils/tokenUtils';
 import { API_URL, FRONTEND_URL } from "@/constants";
 import TitleBar from "@/components/TitleBar";
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { setDisplayName } from '../utils/userSlice';
 
 export default function HomePage() {
   const [firstNameLabel, setFirstNameLabel] = useState('');
@@ -31,6 +32,7 @@ export default function HomePage() {
 
   const updatedValuesRef = useRef({});
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -95,9 +97,6 @@ export default function HomePage() {
     fetchUserInfo();
   }, [token, navigate]);
 
-
-
-
   const handleFirstNameChange = () => {
     updatedValuesRef.current.firstName = firstNameLabel;
   };
@@ -153,11 +152,11 @@ export default function HomePage() {
     handleLastNameChange();
     handlePasswordChange();
     let phoneNumberValid = handlePhoneNumberChange();
-    let zipValid = handleZipChange();
+    let zipInvalid = handleZipChange();
 
     // Only validate zip if userType is Owner
     if (updatedValuesRef.current.userType === 'Owner') {
-      if (zipValid) {
+      if (!zipInvalid) {
         return; // Exit if zip is invalid
       }
     }
@@ -240,6 +239,16 @@ export default function HomePage() {
 
       if (updatedResponse.status !== 200) {
         return 1;
+      }
+      else {
+        if (updatedValuesRef.current.userType !== 'CenterOwner'){
+          const newDisplayName = `${updatedValuesRef.current.firstName}`;
+          dispatch(setDisplayName(newDisplayName));
+        }
+        else {
+          const newDisplayName = centerName;
+          dispatch(setDisplayName(newDisplayName));
+        }
       }
 
       console.log('User updated successfully', updatedResponse.data);
