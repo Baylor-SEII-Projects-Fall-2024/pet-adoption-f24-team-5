@@ -112,15 +112,24 @@ export default function HomePage() {
     updatedValuesRef.current.oldPassword = oldPasswordLabel;
   };
 
+  const formatPhoneNumber = (value) => {
+    const cleaned = value.replace(/\D/g, ''); // Remove all non-numeric characters
+    const match = cleaned.match(/^(\d{0,3})(\d{0,3})(\d{0,4})$/);
+    if (match) {
+      return [match[1], match[2], match[3]].filter(Boolean).join('-'); // Format as 999-999-9999
+    }
+  }
+
   const handlePhoneNumberChange = () => {
     const isValidPhone = /^\d{3}-\d{3}-\d{4}$/.test(phoneNumberLabel);
-    if (!isValidPhone) {
+    if (!isValidPhone && phoneNumberLabel.length != 10) {
       setInvalidPhoneNumber(true);
       return true;
     } else {
       setInvalidPhoneNumber(false);
-      updatedValuesRef.current.phoneNumber = phoneNumberLabel;
-      setPhoneNumber(phoneNumberLabel);
+      updatedValuesRef.current.phoneNumber = formatPhoneNumber(phoneNumberLabel);
+      setPhoneNumber(formatPhoneNumber(phoneNumberLabel));
+      setPhoneNumberLabel(formatPhoneNumber(phoneNumberLabel));
       return false;
     }
   };
