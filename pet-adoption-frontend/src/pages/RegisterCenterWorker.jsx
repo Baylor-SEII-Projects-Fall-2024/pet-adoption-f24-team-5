@@ -23,6 +23,22 @@ const RegisterCenterWorker = () => {
     const [isRegistered, setIsRegistered] = useState(false);
     const token = useSelector((state) => state.user.token);
 
+    // Phone number formatting function
+    const formatPhoneNumber = (value) => {
+        const cleaned = value.replace(/\D/g, ''); // Remove non-digit characters
+        const match = cleaned.match(/^(\d{0,3})(\d{0,3})(\d{0,4})$/); // Match groups of numbers
+
+        if (match) {
+            return [match[1], match[2], match[3]].filter(Boolean).join('-'); // Join with '-' separator
+        }
+        return value;
+    };
+
+    const handlePhoneNumberChange = (e) => {
+        const formattedNumber = formatPhoneNumber(e.target.value);
+        setPhoneNumber(formattedNumber);
+    };
+
     const getCenterID = async () => {
         try {
             const response = await axios.get(
@@ -172,7 +188,7 @@ const RegisterCenterWorker = () => {
                                     label="Phone Number"
                                     type="tel"
                                     value={phoneNumber}
-                                    onChange={(e) => setPhoneNumber(e.target.value)}
+                                    onChange={(e) => handlePhoneNumberChange(e)}
                                     required
                                     fullWidth
                                     InputProps={{

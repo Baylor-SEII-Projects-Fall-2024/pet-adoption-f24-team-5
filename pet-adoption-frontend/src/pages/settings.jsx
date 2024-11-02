@@ -17,7 +17,6 @@ export default function HomePage() {
   const [oldPasswordLabel, setOldPasswordLabel] = useState('');
   const [invalidPassword, setInvalidPassword] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [phoneNumberLabel, setPhoneNumberLabel] = useState('');
   const [invalidPhoneNumber, setInvalidPhoneNumber] = useState(false);
   const [userAge, setUserAge] = useState('');
   const [userEmail, setUserEmail] = useState('');
@@ -26,7 +25,8 @@ export default function HomePage() {
   const [centerCity, setCenterCity] = useState('');
   const [centerState, setCenterState] = useState('');
   const [centerZip, setCenterZip] = useState('');
-  const [invalidZip, setInvalidZip] = useState('');
+  const [invalidZip, setInvalidZip] = useState(false);
+  const [invalidAge, setInvalidAge] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const token = useSelector((state) => state.user.token);
 
@@ -58,9 +58,7 @@ export default function HomePage() {
         console.log("response.data: ", response.data);
 
         // Set phone number, password, and userType regardless of type
-        setPhoneNumberLabel(response.data.phoneNumber);
         setPhoneNumber(response.data.phoneNumber);
-        updatedValuesRef.current.phoneNumber = response.data.phoneNumber;
         updatedValuesRef.current.password = response.data.password;
         updatedValuesRef.current.userType = response.data.userType;
 
@@ -112,29 +110,34 @@ export default function HomePage() {
   };
 
   const formatPhoneNumber = (value) => {
-    const cleaned = value.replace(/\D/g, ''); // Remove all non-numeric characters
-    const match = cleaned.match(/^(\d{0,3})(\d{0,3})(\d{0,4})$/);
-    if (match) {
-      return [match[1], match[2], match[3]].filter(Boolean).join('-'); // Format as 999-999-9999
-    }
-  }
+    const cleaned = value.replace(/\D/g, ''); // Remove non-digit characters
+    const match = cleaned.match(/^(\d{0,3})(\d{0,3})(\d{0,4})$/); // Match groups of numbers
 
-  const handlePhoneNumberChange = () => {
-    const isValidPhone = /^\d{3}-\d{3}-\d{4}$/.test(phoneNumberLabel);
-    if (!isValidPhone && phoneNumberLabel.length != 10) {
-      setInvalidPhoneNumber(true);
-      return true;
-    } else {
-      setInvalidPhoneNumber(false);
-      updatedValuesRef.current.phoneNumber = formatPhoneNumber(phoneNumberLabel);
-      setPhoneNumber(formatPhoneNumber(phoneNumberLabel));
-      setPhoneNumberLabel(formatPhoneNumber(phoneNumberLabel));
-      return false;
+    if (match) {
+        return [match[1], match[2], match[3]].filter(Boolean).join('-'); // Join with '-' separator
     }
+    return value;
+};
+
+  const handlePhoneNumberChange = (e) => {
+   const formattedPhoneNumber = formatPhoneNumber(e.target.value);
+   if (formattedPhoneNumber.length == 12){
+    setInvalidPhoneNumber(false);
+   }
+   else{
+    setInvalidPhoneNumber(true);
+   }
+   setPhoneNumber(formattedPhoneNumber);
   };
 
   const handleAgeChange = (event) => {
     setUserAge(event.target.value);
+    if (event.target.value <= 100 && event.target.value > 0){
+      setInvalidAge(false);
+    }
+    else{
+      setInvalidAge(true);
+    }
   }
 
   const handleZipChange = () => {
@@ -151,7 +154,6 @@ export default function HomePage() {
     handleFirstNameChange();
     handleLastNameChange();
     handlePasswordChange();
-    let phoneNumberValid = handlePhoneNumberChange();
     let zipInvalid = handleZipChange();
 
     // Only validate zip if userType is Owner
@@ -161,7 +163,7 @@ export default function HomePage() {
       }
     }
 
-    if (!phoneNumberValid) {
+    if (!invalidPhoneNumber && !invalidAge) {
       const updateSuccess = await handleUserUpdate();
       if (updateSuccess === 0) {
         setInvalidPassword(false);
@@ -196,14 +198,12 @@ export default function HomePage() {
         id: currentUser.id,
         emailAddress: currentUser.emailAddress,
         password: updatedValuesRef.current.password !== null ? updatedValuesRef.current.password : password,
-        phoneNumber: updatedValuesRef.current.phoneNumber !== '' ? updatedValuesRef.current.phoneNumber : phoneNumber,
+        phoneNumber: phoneNumber,
         UserType: updatedValuesRef.current.userType
       }
 
       if (updatedValuesRef.current.userType === `Owner` || updatedValuesRef.current.userType === `CenterWorker`) {
-        console.log("age: " + userAge);
         updatedUser.age = userAge;
-        console.log("updated age: " + updatedUser.age);
         updatedUser.firstName = updatedValuesRef.current.firstName;
         updatedUser.lastName = updatedValuesRef.current.lastName;
 
@@ -315,8 +315,8 @@ export default function HomePage() {
               <TextField
                 label="Phone Number"
                 align='center'
-                value={phoneNumberLabel}
-                onChange={(e) => setPhoneNumberLabel(e.target.value)}
+                value={phoneNumber}
+                onChange={(e) => handlePhoneNumberChange(e)}
                 InputProps={{
                   style: { height: '40px', width: '425px' },
                   readOnly: !isEditing
@@ -363,25 +363,28 @@ export default function HomePage() {
             )}
           </Paper>
           {updatedValuesRef.current.userType !== 'CenterOwner' && (
-            <Paper sx={{ width: 600, height: 50 }} elevation={4}>
-              <Stack spacing={1} direction="row" alignItems='center'>
-                <Typography variant='h5'>Age</Typography>
-                <Select
-                  labelId="age-label"
-                  id="age-select"
-                  value={userAge}
-                  onChange={handleAgeChange}
-                  label="Age"
-                  style={{ height: '40px', width: '545px', pointerEvents: !isEditing ? 'none' : 'auto' }}
-                >
-                  {Array.from({ length: 101 }, (_, age) => (
-                    <MenuItem key={age} value={age}>
-                      {age}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </Stack>
-            </Paper>
+            <Paper sx={{ width: 600, height: invalidAge ? 70 : 50 }} elevation={4}>
+            <Stack spacing={1} direction="row" alignItems='center'>
+              <Typography variant='h5'>Age</Typography>
+              <TextField
+                id="age-input"
+                type="number"
+                value={userAge}
+                onChange={(e) => handleAgeChange(e)}
+                inputProps={{
+                  min: 0,
+                  max: 100,
+                  style: { height: '8px' }
+                }}
+                sx={{ width: '545px' }}
+              />
+            </Stack>
+            {invalidAge && (
+              <Typography color="error" variant="body2" sx={{ marginTop: 1 }}>
+                Please enter a valid age.
+              </Typography>
+            )}
+          </Paper>
           )}
           {updatedValuesRef.current.userType === 'CenterOwner' && (
             <>
@@ -489,9 +492,6 @@ export default function HomePage() {
               )}
             </Paper>
           )}
-
-
-
           <Button onClick={isEditing ? handleSave : handleEdit}>{isEditing ? 'Save' : 'Edit'}</Button>
         </Stack>
       </main>
