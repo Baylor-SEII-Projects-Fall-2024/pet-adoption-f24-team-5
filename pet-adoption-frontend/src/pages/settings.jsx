@@ -156,7 +156,7 @@ export default function HomePage() {
 
     // Only validate zip if userType is Owner
     if (updatedValuesRef.current.userType === 'Owner') {
-      if (!zipInvalid) {
+      if (zipInvalid) {
         return; // Exit if zip is invalid
       }
     }
