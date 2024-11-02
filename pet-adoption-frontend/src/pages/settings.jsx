@@ -26,7 +26,8 @@ export default function HomePage() {
   const [centerCity, setCenterCity] = useState('');
   const [centerState, setCenterState] = useState('');
   const [centerZip, setCenterZip] = useState('');
-  const [invalidZip, setInvalidZip] = useState('');
+  const [invalidZip, setInvalidZip] = useState(false);
+  const [invalidAge, setInvalidAge] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const token = useSelector((state) => state.user.token);
 
@@ -135,6 +136,12 @@ export default function HomePage() {
 
   const handleAgeChange = (event) => {
     setUserAge(event.target.value);
+    if (event.target.value <= 100 && event.target.value > 0){
+      setInvalidAge(false);
+    }
+    else{
+      setInvalidAge(true);
+    }
   }
 
   const handleZipChange = () => {
@@ -161,7 +168,7 @@ export default function HomePage() {
       }
     }
 
-    if (!phoneNumberValid) {
+    if (!phoneNumberValid && !invalidAge) {
       const updateSuccess = await handleUserUpdate();
       if (updateSuccess === 0) {
         setInvalidPassword(false);
@@ -201,9 +208,7 @@ export default function HomePage() {
       }
 
       if (updatedValuesRef.current.userType === `Owner` || updatedValuesRef.current.userType === `CenterWorker`) {
-        console.log("age: " + userAge);
         updatedUser.age = userAge;
-        console.log("updated age: " + updatedUser.age);
         updatedUser.firstName = updatedValuesRef.current.firstName;
         updatedUser.lastName = updatedValuesRef.current.lastName;
 
@@ -363,25 +368,28 @@ export default function HomePage() {
             )}
           </Paper>
           {updatedValuesRef.current.userType !== 'CenterOwner' && (
-            <Paper sx={{ width: 600, height: 50 }} elevation={4}>
-              <Stack spacing={1} direction="row" alignItems='center'>
-                <Typography variant='h5'>Age</Typography>
-                <Select
-                  labelId="age-label"
-                  id="age-select"
-                  value={userAge}
-                  onChange={handleAgeChange}
-                  label="Age"
-                  style={{ height: '40px', width: '545px', pointerEvents: !isEditing ? 'none' : 'auto' }}
-                >
-                  {Array.from({ length: 101 }, (_, age) => (
-                    <MenuItem key={age} value={age}>
-                      {age}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </Stack>
-            </Paper>
+            <Paper sx={{ width: 600, height: invalidAge ? 70 : 50 }} elevation={4}>
+            <Stack spacing={1} direction="row" alignItems='center'>
+              <Typography variant='h5'>Age</Typography>
+              <TextField
+                id="age-input"
+                type="number"
+                value={userAge}
+                onChange={(e) => handleAgeChange(e)}
+                inputProps={{
+                  min: 0,
+                  max: 100,
+                  style: { height: '8px' }
+                }}
+                sx={{ width: '545px' }}
+              />
+            </Stack>
+            {invalidAge && (
+              <Typography color="error" variant="body2" sx={{ marginTop: 1 }}>
+                Please enter a valid age.
+              </Typography>
+            )}
+          </Paper>
           )}
           {updatedValuesRef.current.userType === 'CenterOwner' && (
             <>
