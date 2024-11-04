@@ -1,2 +1,5 @@
-package petadoption.api.pet;public enum Species {
+package petadoption.api.pet;
+
+public enum Species {
+    DOG, CAT, SNAKE
 }
