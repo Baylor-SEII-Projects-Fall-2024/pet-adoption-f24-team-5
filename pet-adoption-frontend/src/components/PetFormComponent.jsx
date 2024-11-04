@@ -1,26 +1,51 @@
-import { Box, Button, Select, Stack, TextField } from "@mui/material";
-import MenuItem from "@mui/material/MenuItem";
+import {Box, Button, FormControl, InputLabel, MenuItem, Select, Stack, TextField} from "@mui/material";
 import ImageUploadComponent from "@/components/ImageUploadComponent";
 import React, { useEffect, useState } from "react";
 import { saveUpdatePet } from "@/utils/SaveUpdatePet";
 import { useSelector } from 'react-redux';
 import {deletePet} from "@/utils/DeletePet";
+import SearchableDropdown from "@/components/SearchableDropdown";
+
 
 
 const PetFormComponent = (props) => {
     const [petId, setPetId] = useState(null);
     const [formType, setFormType] = React.useState('');
     const [species, setSpecies] = React.useState('');
+    const [speciesInput, setSpeciesInput] = useState('');
     const [petName, setPetName] = React.useState('');
     const [breed, setBreed] = React.useState('');
+    const [breedInput, setBreedInput] = React.useState('');
     const [color, setPetColor] = React.useState('');
+    const [colorInput, setPetColorInput] = React.useState('');
     const [age, setAge] = React.useState('');
     const [description, setDescription] = React.useState('');
     const [adoptionStatus, setStatus] = React.useState(false);
+    const [adoptionStatusInput, setStatusInput] = React.useState(false);
     const [imageName, setImageName] = React.useState('');
     const [buttonText, setButtonText] = React.useState('');
     const token = useSelector((state) => state.user.token);
 
+    const speciesOptions = ["Dog", "Cat", "Snake"];
+    const dogBreeds = ["Golden Retriever", "Labrador Retriever", "German Shepherd", "French Bulldog", "Bulldog", "Poodle", "Beagle", "Rottweiler", "Yorkshire Terrier",
+                                "Boxer", "Dachshund", "Siberian Husky", "Shih Tzu", "Australian Shepherd", "Cavalier King Charles Spaniel", "Doberman Pinscher", "Miniature Schnauzer",
+                                "Great Dane", "Shiba Inu", "Cocker Spaniel", "Pug", "Border Collie", "Maltese", "Chihuahua", "Bernese Mountain Dog", "Basset Hound", "Havanese",
+                                "Pembroke Welsh Corgi", "Vizsla", "Weimaraner", "Newfoundland", "Collie", "West Highland White Terrier", "Rhodesian Ridgeback", "Saint Bernard", "Boston Terrier",
+                                "Akita", "Alaskan Malamute", "Bull Terrier", "American Staffordshire Terrier", "Australian Cattle Dog", "Bichon Frise", "Papillon", "Samoyed", "Whippet",
+                                "English Springer Spaniel", "Irish Setter", "Scottish Terrier", "Chow Chow", "Pekingese"]
+    const catBreeds = ["Domestic Shorthair", "Domestic Longhair", "Maine Coon", "Siamese", "Persian", "Ragdoll", "Bengal", "Sphynx", "British Shorthair", "Scottish Fold", "Abyssinian",
+                                "Russian Blue", "Birman", "American Shorthair", "Oriental Shorthair", "Devon Rex", "Cornish Rex", "Norwegian Forest Cat", "Himalayan", "Turkish Angora", "Savannah",
+                                "Balinese", "Tonkinese", "Bombay", "Chartreux", "Singapura", "Manx", "Burmese", "Selkirk Rex", "Egyptian Mau", "Exotic Shorthair", "American Curl", "Turkish Van", "LaPerm",
+                                "Ocicat", "Somali", "Munchkin", "Snowshoe", "Lykoi", "Japanese Bobtail", "Havana Brown", "Pixie-Bob", "Chantilly-Tiffany", "Cymric", "Peterbald", "Khao Manee",
+                                "American Bobtail", "Siberian", "Toyger", "Korat", "Tabby"]
+
+    const defaultBreed = ["No Selected Species"];
+
+    const colorOptions = ["Black", "White", "Brown", "Gray", "Tan", "Cream", "Red", "Blue", "Chocolate", "Fawn", "Silver", "Gold", "Sable", "Brindle", "Merle", "Orange", "Lilac", "Tortoiseshell",
+                                    "Calico", "Seal", "Smoke", "Cinnamon", "Buff", "Chestnut", "Piebald", "Harlequin", "Tricolor", "Bicolor", "Black and Tan", "Black and White", "Blue Merle", "Chocolate and White",
+                                    "Cream and White", "Red and White", "Silver and White", "Golden", "Liver", "Isabella", "Wheaten", "Mahogany", "Apricot", "Slate", "Peach", "Lavender", "Champagne", "Mink"]
+
+    const adoptionOptions = ["Up For Adoption", "Owned"];
 
     useEffect(() => {
         setFormType(props.type);
@@ -68,15 +93,28 @@ const PetFormComponent = (props) => {
         setImageName(name);
     };
 
-    const handleChangeSelection = (event) => {
-        setStatus(event.target.value);
-    }
+    const handleAdoptionStatusChange = (newValue) => {
+        setStatus(newValue.value); // Map the selected option to a boolean value
+    };
 
     const handleSubmit = (event) => {
         event.preventDefault();
 
         handleSaveOrUpdatePet();
     }
+
+    const getBreedOptions = () => {
+        switch (species) {
+            case "Dog":
+                return dogBreeds;
+            case "Cat":
+                return catBreeds;
+            case "Snake":
+                return "SNAKES!";
+            default:
+                return defaultBreed;
+        }
+    };
 
     const handleDelete = (event) => {
         event.preventDefault();
@@ -101,7 +139,9 @@ const PetFormComponent = (props) => {
         });
 
     }
-
+    const handleChangeSelection = (event) => {
+        setStatus(event.target.value);
+    }
 
     const handleSaveOrUpdatePet = () => {
 
@@ -143,33 +183,41 @@ const PetFormComponent = (props) => {
                     required
                     fullWidth
                 />
-                <TextField
+                <SearchableDropdown
                     label="Species"
+                    options={speciesOptions}
                     value={species}
-                    onChange={(e) => setSpecies(e.target.value)}
-                    required
-                    fullWidth
+                    inputValue={speciesInput}
+                    onChange={(newValue) => setSpecies(newValue)}
+                    onInputChange={(newInput) => setSpeciesInput(newInput)}
+                    sx={{ width: '100%' }}
                 />
-                <TextField
+
+                <SearchableDropdown
                     label="Breed"
+                    options={getBreedOptions()}
                     value={breed}
-                    onChange={(e) => setBreed(e.target.value)}
-                    required
-                    fullWidth
+                    inputValue={breedInput}
+                    onChange={(newValue) => setBreed(newValue)}
+                    onInputChange={(newInput) => setBreedInput(newInput)}
+                    sx={{ width: '100%' }}
                 />
-                <TextField
+
+                <SearchableDropdown
                     label="Pet Color"
+                    options={colorOptions}
                     value={color}
-                    onChange={(e) => setPetColor(e.target.value)}
-                    required
-                    fullWidth
+                    inputValue={colorInput}
+                    onChange={(newValue) => setPetColor(newValue)}
+                    onInputChange={(newInput) => setPetColorInput(newInput)}
+                    sx={{ width: '100%' }}
                 />
+
                 <TextField
                     label="Age"
                     type="number"
                     value={age}
                     onChange={(e) => setAge(e.target.value)}
-                    required
                     fullWidth
                 />
                 <TextField
@@ -177,7 +225,6 @@ const PetFormComponent = (props) => {
                     type="paragraph"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    required
                     fullWidth
                 />
                 <Select
