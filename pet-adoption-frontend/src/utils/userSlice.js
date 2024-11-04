@@ -7,6 +7,7 @@ const initialState = {
     age: null,
     phoneNumber: '',
     token: null,
+    displayName: '',
 };
 
 const userSlice = createSlice({
@@ -25,8 +26,11 @@ const userSlice = createSlice({
         clearToken(state) {
             state.token = null;
         },
+        setDisplayName(state, action) {
+            state.displayName = action.payload;
+        }
     },
 });
 
-export const { setUser, clearUser, setToken, clearToken } = userSlice.actions;
+export const { setUser, clearUser, setToken, clearToken, setDisplayName } = userSlice.actions;
 export default userSlice.reducer;

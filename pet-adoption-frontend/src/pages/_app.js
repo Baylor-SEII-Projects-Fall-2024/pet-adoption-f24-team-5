@@ -24,7 +24,7 @@ import PetManager from './PetManager';
 import SearchEngine from './SearchEngine';
 import Settings from './settings';
 import LocalAdoptionCenter from './LocalAdoptionCenter';
-import CreateEvent from "@/pages/CreateEvent";
+import EventManager from "@/pages/EventManager";
 import PreferencesPage from "@/pages/preferences";
 
 const reduxStore = buildStore({});
@@ -32,7 +32,7 @@ const reduxStore = buildStore({});
 import ProtectedRoute from './protectedRoute';
 import AvailablePets from "@/pages/AvailablePets";
 import ManageAccounts from "@/pages/ManageAccounts";
-import RegisterCenterWorker from "@/pages/RegisterCenterWorker"; // Ensure the path is correct
+import RegisterCenterWorker from "@/pages/RegisterCenterWorker";
 
 function AppRoutes() {
   const token = useSelector((state) => state.user.token);
@@ -44,7 +44,7 @@ function AppRoutes() {
         <Route path="/Register" element={<Register />} />
         <Route path="/Login" element={<Login />} />
         <Route path="/PetManager" element={<ProtectedRoute><PetManager /></ProtectedRoute>} />
-        <Route path="/CreateEvent" element={<ProtectedRoute><CreateEvent /></ProtectedRoute>} />
+        <Route path="/EventManager" element={<ProtectedRoute><EventManager /></ProtectedRoute>} />
         <Route path="/SearchEngine" element={<ProtectedRoute><SearchEngine /></ProtectedRoute>} />
         <Route path="/Settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
         <Route path="/LocalAdoptionCenter" element={<ProtectedRoute><LocalAdoptionCenter /></ProtectedRoute>} />

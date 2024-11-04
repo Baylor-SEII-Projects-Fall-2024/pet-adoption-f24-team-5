@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import {
-    Button, TextField, Stack, Typography, Box, Grid, MenuItem, InputAdornment
+    Button, TextField, Stack, Typography, Box, MenuItem, InputAdornment
 } from '@mui/material';
-import { Email, Lock, Phone } from '@mui/icons-material'; // Import icons for fields
+import { Email, Lock, Phone } from '@mui/icons-material';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
@@ -26,6 +26,22 @@ const Register = () => {
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
+
+    // Phone number formatting function
+    const formatPhoneNumber = (value) => {
+        const cleaned = value.replace(/\D/g, ''); // Remove non-digit characters
+        const match = cleaned.match(/^(\d{0,3})(\d{0,3})(\d{0,4})$/); // Match groups of numbers
+
+        if (match) {
+            return [match[1], match[2], match[3]].filter(Boolean).join('-'); // Join with '-' separator
+        }
+        return value;
+    };
+
+    const handlePhoneNumberChange = (e) => {
+        const formattedNumber = formatPhoneNumber(e.target.value);
+        setPhoneNumber(formattedNumber);
+    };
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -90,14 +106,14 @@ const Register = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 background: 'linear-gradient(135deg, #4b6cb7 30%, #182848 90%)',
-                overflow: 'auto', // Enable scrolling when content overflows
+                overflow: 'auto',
             }}
         >
             <Box
                 sx={{
                     width: '400px',
-                    maxHeight: '90vh', // Restrict height to prevent overflow
-                    overflowY: 'auto', // Add vertical scroll if content exceeds height
+                    maxHeight: '90vh',
+                    overflowY: 'auto',
                     backgroundColor: 'white',
                     borderRadius: '12px',
                     boxShadow: '0px 0px 15px rgba(0, 0, 0, 0.1)',
@@ -159,9 +175,10 @@ const Register = () => {
                             label="Phone Number"
                             type="tel"
                             value={phoneNumber}
-                            onChange={(e) => setPhoneNumber(e.target.value)}
+                            onChange={handlePhoneNumberChange}
                             required
                             fullWidth
+                            inputProps={{ maxLength: 12 }}
                             InputProps={{
                                 startAdornment: (
                                     <InputAdornment position="start">
@@ -241,17 +258,41 @@ const Register = () => {
                                     label="Zip Code"
                                     type="text"
                                     value={centerZip}
-                                    onChange={(e) => setCenterZip(e.target.value)}
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+                                        if (value === '' || (/^\d+$/.test(value))) {
+                                            setCenterZip(value);
+                                        }
+                                    }}
+                                    onKeyDown={(e) => {
+                                        // Prevent non-numeric key presses
+                                        if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete') {
+                                            e.preventDefault();
+                                        }
+                                    }}
+                                    inputProps={{ inputMode: 'numeric', pattern: '[0-9]*', maxLength: 5 }}
                                     required
                                     fullWidth
                                 />
                                 <TextField
                                     label="Age"
-                                    type="number"
+                                    type="text" // Use text for more control over input
                                     value={age}
-                                    onChange={(e) => setAge(e.target.value)}
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+                                        if (value === '' || (/^\d+$/.test(value) && parseInt(value, 10) >= 1 && parseInt(value, 10) <= 100)) {
+                                            setAge(value);
+                                        }
+                                    }}
+                                    onKeyDown={(e) => {
+                                        // Prevent non-numeric key presses
+                                        if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete') {
+                                            e.preventDefault();
+                                        }
+                                    }}
                                     required
                                     fullWidth
+                                    inputProps={{ inputMode: 'numeric', pattern: '[0-9]*', min: 1, max: 100 }}
                                 />
                             </>
                         )}
