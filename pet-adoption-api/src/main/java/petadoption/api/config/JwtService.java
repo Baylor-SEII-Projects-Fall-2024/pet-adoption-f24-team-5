@@ -8,6 +8,7 @@ import io.jsonwebtoken.security.Keys;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import petadoption.api.conversation.Conversation;
 import petadoption.api.user.User;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -28,6 +29,24 @@ public class JwtService {
     public String generateToken(UserDetails userDetails) {
         int tokenTimeLength = 1000  * 60 * 24;
         return generateToken(new HashMap<>(), userDetails);
+    }
+
+    public String generateToken(Conversation conversation){
+        int tokenTimeLength = 1000  * 60 * 24;
+        return generateToken(new HashMap<>(), conversation);
+    }
+
+    public String generateToken(Map<String, Object> extraClaims, Conversation conversation) {
+        int tokenTimeLength = 1000  * 60 * 24;
+
+        return Jwts
+                .builder()
+                .setClaims(extraClaims)
+                .setSubject(String.valueOf(conversation.getConversationId()))
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + tokenTimeLength))
+                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+                .compact();
     }
 
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
