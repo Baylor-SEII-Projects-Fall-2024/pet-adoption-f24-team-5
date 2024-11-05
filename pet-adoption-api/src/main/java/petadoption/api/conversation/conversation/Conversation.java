@@ -1,4 +1,4 @@
-package petadoption.api.conversation;
+package petadoption.api.conversation.conversation;
 
 import jakarta.persistence.*;
 import lombok.Data;

@@ -7,8 +7,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import petadoption.api.config.JwtService;
-import petadoption.api.conversation.Conversation;
-import petadoption.api.conversation.ConversationRepository;
+import petadoption.api.conversation.conversation.Conversation;
+import petadoption.api.conversation.conversation.ConversationRepository;
+import petadoption.api.conversation.message.Message;
+import petadoption.api.conversation.message.MessageRepository;
 import petadoption.api.user.AdoptionCenter.AdoptionCenter;
 import petadoption.api.user.AdoptionCenter.AdoptionCenterRepository;
 import petadoption.api.user.AdoptionCenter.CenterWorker;
@@ -18,7 +20,6 @@ import petadoption.api.user.Owner.OwnerRepository;
 import petadoption.api.user.User;
 import petadoption.api.user.UserRepository;
 import petadoption.api.user.UserType;
-import petadoption.api.conversation.ConversationRepository;
 
 import java.util.Optional;
 
@@ -32,6 +33,7 @@ public class AuthenticationService {
     private final AdoptionCenterRepository adoptionCenterRepository;
     private final UserRepository userRepository;
     private final ConversationRepository conversationRepository;
+    private final MessageRepository messageRepository;
 
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
@@ -103,6 +105,26 @@ public class AuthenticationService {
 
         conversationRepository.save(conversation);
         var jwtToken = jwtService.generateToken(conversation);
+        return AuthenticationResponse.builder()
+                .token(jwtToken)
+                .build();
+    }
+
+    public AuthenticationResponse createMessage(Message request) throws IllegalArgumentException {
+        if (doesIdExist(request.getMessageId())){
+            throw new IllegalArgumentException("Message already exists");
+        }
+
+        var message = new Message(
+                request.getMessageId(),
+                request.getConversationId(),
+                request.getSenderId(),
+                request.getReceiverId(),
+                request.getMessage()
+        );
+
+        messageRepository.save(message);
+        var jwtToken = jwtService.generateToken(message);
         return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .build();

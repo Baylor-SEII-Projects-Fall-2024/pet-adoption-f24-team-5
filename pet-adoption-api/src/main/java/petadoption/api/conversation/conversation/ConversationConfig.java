@@ -1,14 +1,9 @@
-package petadoption.api.conversation;
+package petadoption.api.conversation.conversation;
 
-import jakarta.websocket.OnClose;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import petadoption.api.auth.AuthenticationController;
-import petadoption.api.conversation.Conversation;
-import petadoption.api.conversation.ConversationRepository;
-
-import java.util.List;
 
 @Configuration
 public class ConversationConfig {

@@ -1,15 +1,14 @@
 package petadoption.api.auth;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import petadoption.api.conversation.Conversation;
+import petadoption.api.conversation.conversation.Conversation;
+import petadoption.api.conversation.message.Message;
 import petadoption.api.user.AdoptionCenter.AdoptionCenter;
 import petadoption.api.user.AdoptionCenter.CenterWorker;
 import petadoption.api.user.Owner.Owner;
-import petadoption.api.user.User;
 
 @RestController
 @RequestMapping("api/auth")
@@ -50,6 +49,16 @@ public class AuthenticationController {
     public ResponseEntity<AuthenticationResponse> createConversation(@RequestBody Conversation conversation) {
         try{
             return ResponseEntity.ok(authenticationService.createConversation(conversation));
+        }
+        catch (IllegalArgumentException e){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    @PostMapping("/createMessage")
+    public ResponseEntity<AuthenticationResponse> createMessage(@RequestBody Message message) {
+        try{
+            return ResponseEntity.ok(authenticationService.createMessage(message));
         }
         catch (IllegalArgumentException e){
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
