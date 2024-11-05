@@ -6,6 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { API_URL } from "../constants";
 import axios from 'axios';
+import Messages from "@/pages/Messages";
 
 
 const TitleBar = () => {
@@ -85,6 +86,10 @@ const TitleBar = () => {
                         <Button color="inherit" component={Link} to="/preferences">Preferences</Button>
                     </>
                 )}
+
+                {/* Messages Button available to all users */}
+                <Button color="inherit" component={Link} to="/Messages">Messages</Button>
+
 
                 <Button color="inherit" component={Link} to="/Settings">Settings</Button>
                 <Button color="inherit" onClick={handleLogout}>Log Out</Button>

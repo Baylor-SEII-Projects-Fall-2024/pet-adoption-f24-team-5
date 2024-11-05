@@ -26,6 +26,7 @@ import Settings from './settings';
 import LocalAdoptionCenter from './LocalAdoptionCenter';
 import EventManager from "@/pages/EventManager";
 import PreferencesPage from "@/pages/preferences";
+import Messages from "@/pages/Messages";
 
 const reduxStore = buildStore({});
 
@@ -52,6 +53,7 @@ function AppRoutes() {
         <Route path="/RegisterCenterWorker" element={<ProtectedRoute><RegisterCenterWorker /></ProtectedRoute>} />
         <Route path="/AvailablePets" element={<AvailablePets />} />
         <Route path="/preferences" element={<ProtectedRoute><PreferencesPage /></ProtectedRoute>} />
+        <Route path="/Messages" element={<ProtectedRoute><Messages/></ProtectedRoute>} />
         <Route path="*" element={<Navigate to="/Login" />} />
       </Routes>
     </BrowserRouter>
