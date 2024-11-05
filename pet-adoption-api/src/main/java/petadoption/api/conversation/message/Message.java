@@ -36,12 +36,16 @@ public class Message {
     @Column(name = "DATE")
     protected LocalDateTime date;
 
+    @Column(name = "IS_READ")
+    protected Boolean isRead;
+
     public Message() {
         this.conversationId = null;
         this.senderId = null;
         this.receiverId = null;
         this.message = null;
         this.date = null;
+        this.isRead = null;
     }
 
     public Message(Long conversationId, Long senderId, Long receiverId, String message) {
@@ -50,6 +54,7 @@ public class Message {
         this.receiverId = receiverId;
         this.message = message;
         this.date = LocalDateTime.now();
+        this.isRead = false;
     }
 
     public Message(Long messageId, Long conversationId, Long senderId, Long receiverId, String message) {
@@ -59,6 +64,7 @@ public class Message {
         this.receiverId = receiverId;
         this.message = message;
         this.date = LocalDateTime.now();
+        this.isRead = false;
     }
 
 }

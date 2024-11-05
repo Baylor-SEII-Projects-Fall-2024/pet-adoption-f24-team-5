@@ -24,14 +24,7 @@ public class Conversation {
     @Column(name = "CENTER_ID")
     protected Long centerId;
 
-    // Determines whether they have an unread notification here
-    // If the user sends a message, it should be auto-set on their end to read
-    // Might need two separate values for this, or some way to differentiate between who sent it
-    @Column(name = "IS_READ")
-    protected Boolean is_read;
-
     public Conversation(){
-        this.is_read = false;
         this.centerId = null;
         this.ownerId = null;
     }
@@ -39,13 +32,11 @@ public class Conversation {
     public Conversation(Long ownerId, Long centerId) {
         this.ownerId = ownerId;
         this.centerId = centerId;
-        this.is_read = false;
     }
 
     public Conversation(Long conversationId, Long ownerId, Long centerId) {
         this.conversationId = conversationId;
         this.ownerId = ownerId;
         this.centerId = centerId;
-        this.is_read = false;
     }
 }
