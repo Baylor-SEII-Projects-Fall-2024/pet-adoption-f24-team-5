@@ -48,7 +48,10 @@ const PetCard = ({ pet, onClick }) => {
         <StyledCard
             onClick={onClick}
             sx={{
-                width: "48%",
+                maxWidth: 600,
+                maxHeight: 500,
+                display: 'flex',
+                justifyContent: 'center',
                 "&:hover": {
                     border: "2px solid blue",
                 },
@@ -61,12 +64,17 @@ const PetCard = ({ pet, onClick }) => {
         >
             <BlurredContent isHovered={isHovered}>
                 <CardContent>
+                    <Typography variant="h4" align="left">
+                        {pet.petName}
+                    </Typography>
+
                     <Box
                         position="relative"
                         width="100%"
-                        maxWidth="200px"
                         height="auto"
                         margin="0 15px 15px 0"
+                        justifyContent="left"
+                        alignItems="center"
                     >
                         {loading && (
                             <Box
@@ -87,8 +95,8 @@ const PetCard = ({ pet, onClick }) => {
 
                         <ImageComponent
                             imageName={pet.imageName}
+                            margin="auto"
                             width="100%"
-                            maxWidth="200px"
                             height="auto"
                             onLoad={handleImageLoad} // Passing onLoad to ImageComponent.
                         />
@@ -96,23 +104,19 @@ const PetCard = ({ pet, onClick }) => {
                 </CardContent>
             </BlurredContent>
             <HoverOverlay className={isHovered ? 'hovered' : ''}>
-
-                <Typography variant="h4" align="left">
-                    {pet.petName}
-                </Typography>
-                <Typography variant="body2" align="left">
+                <Typography variant="h6" align="left">
                     Species: {pet.species}
                 </Typography>
-                <Typography variant="body2" align="left">
+                <Typography variant="h6" align="left">
                     Breed: {pet.breed}
                 </Typography>
-                <Typography variant="body2" align="left">
+                <Typography variant="h6" align="left">
                     Color: {pet.color}
                 </Typography>
-                <Typography variant="body2" align="left">
+                <Typography variant="h6" align="left">
                     Age: {pet.age}
                 </Typography>
-                <Typography variant="body2" align="left">
+                <Typography variant="body1" align="left">
                     Description: {pet.description}
                 </Typography>
             </HoverOverlay>
