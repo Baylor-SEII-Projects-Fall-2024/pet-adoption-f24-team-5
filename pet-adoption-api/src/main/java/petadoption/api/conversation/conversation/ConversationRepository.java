@@ -2,6 +2,7 @@ package petadoption.api.conversation.conversation;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,7 +15,10 @@ public interface ConversationRepository extends JpaRepository<Conversation, Long
 
     Optional<Conversation> findById(Long Id);
 
-    @Query("SELECT c FROM Conversation c WHERE c.centerId = :Id OR c.ownerId = :Id")
-    List<Conversation> findAllByUserId(Long Id);
+
+    @Query("SELECT c FROM Conversation c WHERE c.centerId = :id OR c.ownerId = :id")
+    List<Conversation> findAllByUserId(@Param("id") Long id);
+
+
 
 }

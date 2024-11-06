@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Box,
     Drawer,
@@ -15,53 +15,61 @@ import {
 import { Menu } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { API_URL } from '@/constants';
+import axios from 'axios';
+import { getSubjectFromToken } from '@/utils/tokenUtils';
+import { useSelector } from 'react-redux';
 
 const Messages = () => {
-    const tempConversations = [
-        {
-            id: 1,
-            name: 'John Doe',
-            messages: [
-                { id: 1, sender: 'John Doe', text: 'Hey, how are you?', timestamp: '10:00 AM' },
-                { id: 2, sender: 'Me', text: 'I am good, thanks!', timestamp: '10:01 AM' },
-            ],
-        },
-        {
-            id: 2,
-            name: 'Jane Smith',
-            messages: [
-                { id: 1, sender: 'Jane Smith', text: 'Are we still on for lunch?', timestamp: '9:00 AM' },
-                { id: 2, sender: 'Me', text: 'Yes, see you at noon!', timestamp: '9:05 AM' },
-            ],
-        },
-    ];
-
-    const [conversations, setConversations] = useState(tempConversations);
-    const [currentConversationId, setCurrentConversationId] = useState(1);
+    const [conversations, setConversations] = useState([]);
+    const [currentConversationId, setCurrentConversationId] = useState(null);
+    const [messages, setMessages] = useState([]); // Added messages state
     const [messageInput, setMessageInput] = useState('');
+    const [userEmail, setUserEmail] = useState('');
+    const [userData, setUserData] = useState(null);
+    const token = useSelector((state) => state.user.token);
 
-    const currentConversation = conversations.find((conv) => conv.id === currentConversationId);
+    const currentConversation = conversations.find(
+        (conv) => conv.conversationId === currentConversationId
+    );
 
-    const handleSendMessage = (e) => {
+    const handleSendMessage = async (e) => {
         e.preventDefault();
-        if (messageInput.trim() === '') return;
+        if (messageInput.trim() === '' || !currentConversationId || !userData) return;
 
-        const newMessage = {
-            id: currentConversation.messages.length + 1,
-            sender: 'Me',
-            text: messageInput,
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        };
+        const receiverId =
+            userData.id === currentConversation.ownerId
+                ? currentConversation.centerId
+                : currentConversation.ownerId;
 
-        // Update the conversations state
-        setConversations((prevConversations) =>
-            prevConversations.map((conv) =>
-                conv.id === currentConversationId
-                    ? { ...conv, messages: [...conv.messages, newMessage] }
-                    : conv
-            )
-        );
-        setMessageInput('');
+        try {
+            const url = `${API_URL}/api/message/sendMessage`;
+
+            // Create the message object
+            const newMessageData = {
+                conversationId: currentConversationId,
+                senderId: userData.id,
+                receiverId: receiverId,
+                message: messageInput,
+                isRead: false,
+            };
+
+            // Send the message to the backend
+            const response = await axios.post(url, newMessageData, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            const newMessage = response.data; // The created message returned from the server
+
+            // Update the messages state
+            setMessages((prevMessages) => [...prevMessages, newMessage]);
+            setMessageInput('');
+        } catch (error) {
+            console.error('Failed to send message', error);
+        }
     };
 
     const theme = useTheme();
@@ -75,27 +83,143 @@ const Messages = () => {
 
     const drawerWidth = 240;
 
+    // Function to load messages for a conversation
+    const loadMessages = async (conversationId) => {
+        try {
+            const url = `${API_URL}/api/message/getMessages`;
+
+            const response = await axios.post(
+                url,
+                null,
+                {
+                    params: { conversationId },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            let messages = response.data;
+            // Sort messages by date
+            messages.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            setMessages(messages);
+        } catch (error) {
+            console.error('Failed to load messages', error);
+        }
+    };
+
     const drawer = (
         <Box sx={{ overflow: 'auto' }}>
             <List>
                 {conversations.map((conversation) => (
                     <ListItem
                         button
-                        key={conversation.id}
-                        selected={conversation.id === currentConversationId}
+                        key={conversation.conversationId}
+                        selected={conversation.conversationId === currentConversationId}
                         onClick={() => {
-                            setCurrentConversationId(conversation.id);
+                            setCurrentConversationId(conversation.conversationId);
+                            loadMessages(conversation.conversationId); // Load messages when a conversation is selected
                             if (isMobile) {
                                 setMobileOpen(false);
                             }
                         }}
                     >
-                        <ListItemText primary={conversation.name} />
+                        <ListItemText primary={`Conversation ${conversation.conversationId}`} />
                     </ListItem>
                 ))}
             </List>
         </Box>
     );
+
+    // Fetches the user's information from the server
+    const fetchUser = async (token) => {
+        try {
+            let email = '';
+
+            // Extract user email (subject) from the token
+            if (token) {
+                const subject = getSubjectFromToken(token);
+                if (subject) {
+                    email = subject;
+                } else {
+                    throw new Error('Invalid token: Subject not found.');
+                }
+            } else {
+                throw new Error('Token is required to fetch user information.');
+            }
+
+            const url = `${API_URL}/api/users/getUser?emailAddress=${email}`;
+            const response = await axios.get(url, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            // Return the response object containing the user data
+            return response;
+        } catch (error) {
+            console.error('Failed to fetch user', error);
+            throw error;
+        }
+    };
+
+    // Function to fill the drawer with conversations
+    const fillDrawer = async (userId) => {
+        try {
+            const url = `${API_URL}/api/conversation/getAllConversations`;
+
+            const response = await axios.post(
+                url,
+                null,
+                {
+                    params: { userId },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            console.log('Conversations fetched:', response.data);
+
+            setConversations(response.data);
+            setCurrentConversationId(response.data[0]?.conversationId || null);
+
+            // Load messages for the first conversation
+            if (response.data.length > 0) {
+                await loadMessages(response.data[0].conversationId);
+            }
+        } catch (error) {
+            console.error('Failed to get conversations', error);
+        }
+    };
+
+    // Add the startup function
+    const startup = async () => {
+        console.log('Messages component has loaded.');
+
+        try {
+            const response = await fetchUser(token);
+            console.log('User data:', response.data);
+            setUserData(response.data);
+            setUserEmail(response.data.emailAddress);
+
+            const userId = response.data.id; // Use this directly
+
+            // Fill the drawer with conversations
+            await fillDrawer(userId);
+        } catch (error) {
+            console.error('Error during startup:', error);
+        }
+    };
+
+    // Use useEffect to call startup when the component mounts
+    useEffect(() => {
+        startup();
+    }, []); // Empty dependency array ensures this runs once on mount
 
     return (
         <Box sx={{ display: 'flex', height: '100vh', backgroundColor: '#f0f0f0' }}>
@@ -148,19 +272,22 @@ const Messages = () => {
                         </IconButton>
                     )}
                     <Typography variant="h5" gutterBottom>
-                        {currentConversation.name}
+                        {currentConversation
+                            ? `Conversation ${currentConversation.conversationId}`
+                            : 'Select a conversation'}
                     </Typography>
                 </Box>
                 <Divider />
                 {/* Messages */}
                 <Box sx={{ flexGrow: 1, overflowY: 'auto', mb: 2, mt: 2 }}>
                     <Stack spacing={2}>
-                        {currentConversation.messages.map((message) => (
+                        {messages.map((message) => (
                             <Box
-                                key={message.id}
+                                key={message.messageId} // Use messageId as key
                                 sx={{
                                     display: 'flex',
-                                    justifyContent: message.sender === 'Me' ? 'flex-end' : 'flex-start',
+                                    justifyContent:
+                                        message.senderId === userData.id ? 'flex-end' : 'flex-start',
                                 }}
                             >
                                 <Box
@@ -168,13 +295,17 @@ const Messages = () => {
                                         maxWidth: '70%',
                                         p: 1,
                                         borderRadius: 2,
-                                        backgroundColor: message.sender === 'Me' ? '#DCF8C6' : '#FFFFFF',
+                                        backgroundColor:
+                                            message.senderId === userData.id ? '#DCF8C6' : '#FFFFFF',
                                         boxShadow: 1,
                                     }}
                                 >
-                                    <Typography variant="body1">{message.text}</Typography>
+                                    <Typography variant="body1">{message.message}</Typography>
                                     <Typography variant="caption" display="block" align="right">
-                                        {message.timestamp}
+                                        {new Date(message.date).toLocaleTimeString([], {
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                        })}
                                     </Typography>
                                 </Box>
                             </Box>
@@ -191,6 +322,7 @@ const Messages = () => {
                                 fullWidth
                                 value={messageInput}
                                 onChange={(e) => setMessageInput(e.target.value)}
+                                disabled={!currentConversation}
                             />
                             <Button
                                 type="submit"
@@ -202,6 +334,7 @@ const Messages = () => {
                                         background: 'linear-gradient(90deg, #185a9d, #43cea2)',
                                     },
                                 }}
+                                disabled={!currentConversation}
                             >
                                 Send
                             </Button>

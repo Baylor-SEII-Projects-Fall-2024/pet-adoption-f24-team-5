@@ -22,34 +22,44 @@ public class ConversationService {
     private final PasswordEncoder passwordEncoder;
 
 
-    public Boolean startConversation(Long petOwnerID, Long centerID)
-    {
-        // make sure conversation doesn't already exist
-        Optional<Conversation> conversation = conversationRepository.findByOwnerIdAndCenterId(petOwnerID,centerID);
-        if (conversation.isPresent())
-        {
-            return false;
-        }
+    public Conversation startConversation(long petOwnerID, long centerID) {
+        try {
+            // Check if a conversation already exists
+            Optional<Conversation> existingConversation = conversationRepository.findByOwnerIdAndCenterId(petOwnerID, centerID);
+            if (existingConversation.isPresent()) {
+                // Return the existing conversation
+                return existingConversation.get();
+            }
 
-        // Create conversation
-        Conversation newConversation = new Conversation(petOwnerID,centerID);
-        conversationRepository.save(newConversation);
-        return true;
+            // Create and save a new conversation
+            Conversation conversation = new Conversation();
+            conversation.setOwnerId(petOwnerID);
+            conversation.setCenterId(centerID);
+            return conversationRepository.save(conversation);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
-    public List<Conversation> findAllConversations(long userID) throws SQLException
-    {
+
+
+
+    public List<Conversation> findAllConversations(long userID) throws SQLException {
         // Make sure valid
         if (userID < 1) {
             throw new IllegalArgumentException("id must be positive");
         }
-        List<Conversation> responce = conversationRepository.findAllByUserId(userID);
-
-        if (!responce.isEmpty())
-        {
-            return responce;
+        try {
+            List<Conversation> response = conversationRepository.findAllByUserId(userID);
+            if (!response.isEmpty()) {
+                return response;
+            }
+            return Collections.emptyList();
+        } catch (Exception e) {
+            e.printStackTrace(); // Log the exception
+            throw e; // Rethrow to be caught by the controller
         }
-
-        return Collections.emptyList();
     }
+
 }

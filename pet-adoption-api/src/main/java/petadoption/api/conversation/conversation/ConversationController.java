@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RequestMapping("/api/conversation")
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 public class ConversationController {
     @Autowired
@@ -27,36 +28,45 @@ public class ConversationController {
     }
 
     @PostMapping("/startConversation")
-    public ResponseEntity<AuthenticationResponse> startConversation(long petOwnerID, long centerID) throws SQLException {
-        // See if center exists
-        Optional<AdoptionCenter> Center;
-        try {
-            Center = userService.findAdoptionCenterById(centerID);
-        }
-        catch (Exception e)
-        {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        // Now that we have the center, store a conversation
-        if(!this.conversationService.startConversation(petOwnerID,centerID))
-        {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<Conversation> startConversation(
+            @RequestParam long petOwnerID,
+            @RequestParam long centerID) {
 
-        // return ok
-        return new ResponseEntity<>(HttpStatus.OK);
+        try {
+            // Check if the center exists
+            Optional<AdoptionCenter> center = userService.findAdoptionCenterById(centerID);
+            if (center.isEmpty()) {
+                // Return NOT_FOUND if the center does not exist
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+            // Start the conversation
+            Conversation conversation = conversationService.startConversation(petOwnerID, centerID);
+            if (conversation == null) {
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+            // Return the existing or new conversation
+            return new ResponseEntity<>(conversation, HttpStatus.OK);
+
+        } catch (Exception e) {
+            e.printStackTrace(); // Log the exception
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
+
+
+
     @PostMapping("/getAllConversations")
-    public ResponseEntity<AuthenticationResponse> getAllConversations(long userId)
-    {
+    public ResponseEntity<List<Conversation>> getAllConversations(@RequestParam long userId) {
         try {
             List<Conversation> returnMe = conversationService.findAllConversations(userId);
             return new ResponseEntity<>(returnMe, HttpStatus.OK);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
+            e.printStackTrace(); // Log the exception
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 }
