@@ -13,7 +13,9 @@ import petadoption.api.user.UserRepository;
 import petadoption.api.user.UserService;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequestMapping("/api/pets")
 @RestController
@@ -35,6 +37,18 @@ public class PetController {
 
     @GetMapping
     public List<Pet> getPets() { return petService.getAllPets(); }
+
+    @GetMapping("/search_engine")
+    public List<Pet> querySearchEngine() {
+        List<Pet> pets = petService.getAllPets();
+
+        //TODO: place holder logic just generates random of 3
+        //NOTE: no error checking here. There have to be at least 3 pets in the database.
+        return pets.stream().collect(Collectors.collectingAndThen(Collectors.toList(), collected -> {
+            Collections.shuffle(collected);
+            return collected.stream().limit(3).collect(Collectors.toList());
+        }));
+    }
 
     @GetMapping("/center")
     public ResponseEntity<?> getPetsCenter(@RequestParam String email) {
