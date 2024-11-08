@@ -12,6 +12,5 @@ import java.util.Optional;
 @Repository
 public interface OwnerRepository extends JpaRepository<Owner, Long> {
 
-//    @Query("SELECT cw.centerID FROM CenterWorker cw WHERE cw.emailAddress = :email")
     Optional<Owner> findAllById(long id);
 }

@@ -37,5 +37,9 @@ public class PetService {
         petRepository.delete(pet);
     }
 
+    public Optional<Pet> getPetById(long id) {
+        return petRepository.findByPetId(id);
+    }
+
 
 }

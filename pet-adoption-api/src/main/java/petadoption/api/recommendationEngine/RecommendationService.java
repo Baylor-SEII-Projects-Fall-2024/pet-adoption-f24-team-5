@@ -5,8 +5,11 @@ import lombok.RequiredArgsConstructor;
 import org.deeplearning4j.models.word2vec.Word2Vec;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.shade.protobuf.MapEntry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import petadoption.api.pet.Pet;
+import petadoption.api.pet.PetService;
 import petadoption.api.preferences.Preference;
 import petadoption.api.preferences.PreferenceRepository;
 import petadoption.api.preferences.PreferenceService;
@@ -15,7 +18,9 @@ import petadoption.api.user.Owner.OwnerService;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +29,7 @@ public class RecommendationService {
     private final PreferenceService preferenceService;
     private final OwnerService ownerService;
     private final Word2Vec word2Vec;
+    private final PetService petService;
 
 
 
@@ -95,9 +101,6 @@ public class RecommendationService {
 
         INDArray preferenceVector = speciesVec.add(breedVec).add(colorVec).add(ageVec)
                             .div(speciesWeight + breedWeight + colorWeight + ageWeight);
-        /*INDArray preferenceVector = Nd4j.create(speciesVector).add(Nd4j.create(breedVector))
-                .add(Nd4j.create(colorVector)).add(Nd4j.create(ageVector)).div(4);*/
-
         return preferenceVector.toDoubleVector();
     }
 
@@ -109,6 +112,40 @@ public class RecommendationService {
             return new double[word2Vec.getLayerSize()];
         }
     }
+
+    public List<Pet> findKthNearestNeighbors(double[] userWeights, int k){
+        List<Pet> allPets = petService.getAllPets();
+        if(allPets.isEmpty() || userWeights.length < k){
+            return allPets;
+        }
+
+        Map<Long, Double> allPetsWeights = new HashMap<>();
+
+        for (Pet pet : allPets) {
+            // Todo: potentially add a prefilter system.
+            Long petID = pet.getPetId();
+            Preference petStats = new Preference();
+            petStats.setPreferredSpecies(pet.getSpecies());
+            petStats.setPreferredBreed(pet.getBreed());
+            petStats.setPreferredColor(pet.getColor());
+            petStats.setPreferredAge(pet.getAge());
+            double[] petVector = generatePreferenceVector(petStats);
+            allPetsWeights.put(petID, VectorUtils.cosineSimilarity(userWeights, petVector));
+        }
+
+        List<Long> kMatchedPets = allPetsWeights.entrySet().stream()
+                .sorted(Map.Entry.comparingByValue())
+                .limit(k).map(x -> x.getKey()).toList();
+
+
+        List<Pet> matchedPets = new ArrayList<>();
+        kMatchedPets.stream().forEach( x -> matchedPets.add(petService.getPetById(x).get()));
+
+        return matchedPets;
+
+    }
+
+
 
 
 }
