@@ -3,16 +3,11 @@ package petadoption.api.pet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import petadoption.api.images.ImageController;
 import petadoption.api.images.ImageService;
-import petadoption.api.user.AdoptionCenter.AdoptionCenter;
-import petadoption.api.user.UserRepository;
 import petadoption.api.user.UserService;
 
-import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -44,8 +39,9 @@ public class PetController {
     public List<Pet> querySearchEngine() {
         List<Pet> pets = petService.getAllPets();
 
-        //TODO: place holder logic just generates random of 3
-        //NOTE: no error checking here. There have to be at least 3 pets in the database.
+        // TODO: place holder logic just generates random of 3
+        // NOTE: no error checking here. There have to be at least 3 pets in the
+        // database.
         return pets.stream().collect(Collectors.collectingAndThen(Collectors.toList(), collected -> {
             Collections.shuffle(collected);
             return collected.stream().limit(3).collect(Collectors.toList());

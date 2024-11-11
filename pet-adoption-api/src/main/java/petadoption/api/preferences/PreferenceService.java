@@ -2,8 +2,6 @@ package petadoption.api.preferences;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import petadoption.api.preferences.Preference;
-import petadoption.api.preferences.PreferenceRepository;
 
 @Service
 public class PreferenceService {
