@@ -41,6 +41,9 @@ public class Pet {
     @Column(name = "COLOR")
     protected String color;
 
+    @Column(name = "SEX")
+    protected String sex;
+
     @Column(name = "AGE")
     protected Integer age;
 
@@ -57,23 +60,27 @@ public class Pet {
     @JoinColumn(name = "OWNER_ID")
     private Owner owner;
 
-    public Pet(String species, String petName, String breed, String color, Integer age, Boolean adoptionStatus,
+    public Pet(String species, String petName, String breed, String color, String sex, Integer age,
+            Boolean adoptionStatus,
             String description) {
         this.species = species;
         this.petName = petName;
         this.breed = breed;
         this.color = color;
+        this.sex = sex;
         this.age = age;
         this.adoptionStatus = adoptionStatus;
         this.description = description;
     }
 
-    public Pet(String species, String petName, String breed, String color, Integer age, Boolean adoptionStatus,
+    public Pet(String species, String petName, String breed, String color, String sex, Integer age,
+            Boolean adoptionStatus,
             String description, String imageName) {
         this.species = species;
         this.petName = petName;
         this.breed = breed;
         this.color = color;
+        this.sex = sex;
         this.age = age;
         this.adoptionStatus = adoptionStatus;
         this.description = description;

@@ -149,6 +149,9 @@ const PetCard = ({ pet, onClick }) => {
                         Color: {pet.color}
                     </Typography>
                     <Typography variant="h6" align="left">
+                        Sex: {pet.sex}
+                    </Typography>
+                    <Typography variant="h6" align="left">
                         Age: {pet.age}
                     </Typography>
                     <Typography variant="body1" align="left">

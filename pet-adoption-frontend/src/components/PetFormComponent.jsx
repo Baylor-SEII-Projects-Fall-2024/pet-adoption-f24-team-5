@@ -17,6 +17,8 @@ const PetFormComponent = (props) => {
     const [color, setPetColor] = React.useState('');
     const [colorInput, setPetColorInput] = React.useState('');
     const [age, setAge] = React.useState('');
+    const [sex, setSex] = React.useState('');
+    const [sexInput, setSexInput] = React.useState('');
     const [description, setDescription] = React.useState('');
     const [adoptionStatus, setStatus] = React.useState(false);
     const [adoptionStatusInput, setStatusInput] = React.useState(false);
@@ -38,6 +40,8 @@ const PetFormComponent = (props) => {
         "American Bobtail", "Siberian", "Toyger", "Korat", "Tabby"]
 
     const defaultBreed = ["No Selected Species"];
+
+    const sexOptions = ["Male", "Female"];
 
     const colorOptions = ["Black", "White", "Brown", "Gray", "Tan", "Cream", "Red", "Blue", "Chocolate", "Fawn", "Silver", "Gold", "Sable", "Brindle", "Merle", "Orange", "Lilac", "Tortoiseshell",
         "Calico", "Seal", "Smoke", "Cinnamon", "Buff", "Chestnut", "Piebald", "Harlequin", "Tricolor", "Bicolor", "Black and Tan", "Black and White", "Blue Merle", "Chocolate and White",
@@ -68,6 +72,7 @@ const PetFormComponent = (props) => {
         setPetName(pet.petName);
         setBreed(pet.breed);
         setPetColor(pet.color);
+        setSex(pet.sex);
         setAge(pet.age);
         setStatus(pet.adoptionStatus);
         setDescription(pet.description);
@@ -78,6 +83,7 @@ const PetFormComponent = (props) => {
         setSpecies("");
         setPetName("");
         setBreed("")
+        setSex("");
         setPetName("");
         setAge("");
         setDescription("");
@@ -123,6 +129,7 @@ const PetFormComponent = (props) => {
             petName,
             breed,
             color,
+            sex,
             age,
             adoptionStatus,
             description,
@@ -148,6 +155,7 @@ const PetFormComponent = (props) => {
             petName,
             breed,
             color,
+            sex,
             age,
             adoptionStatus,
             description,
@@ -209,6 +217,16 @@ const PetFormComponent = (props) => {
                     inputValue={colorInput}
                     onChange={(newValue) => setPetColor(newValue)}
                     onInputChange={(newInput) => setPetColorInput(newInput)}
+                    sx={{ width: '100%' }}
+                />
+
+                <SearchableDropdown
+                    label="Sex"
+                    options={sexOptions}
+                    value={sex}
+                    inputValue={sexInput}
+                    onChange={(newValue) => setSex(newValue)}
+                    onInputChange={(newInput) => setSexInput(newInput)}
                     sx={{ width: '100%' }}
                 />
 
