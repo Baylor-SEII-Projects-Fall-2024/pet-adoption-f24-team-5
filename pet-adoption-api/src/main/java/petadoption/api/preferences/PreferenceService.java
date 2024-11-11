@@ -23,6 +23,7 @@ public class PreferenceService {
             existingPreferences.setPreferredSpecies(newPreferences.getPreferredSpecies());
             existingPreferences.setPreferredBreed(newPreferences.getPreferredBreed());
             existingPreferences.setPreferredColor(newPreferences.getPreferredColor());
+            existingPreferences.setPreferredSex(newPreferences.getPreferredSex());
             existingPreferences.setPreferredAge(newPreferences.getPreferredAge());
             return preferenceRepository.save(existingPreferences);
         }

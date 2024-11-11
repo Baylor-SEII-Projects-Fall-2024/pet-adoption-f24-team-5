@@ -12,6 +12,7 @@ const PreferencesPage = () => {
         preferredSpecies: '',
         preferredBreed: '',
         preferredColor: '',
+        preferredSex: '',
         preferredAge: '',
     });
     const [preferenceObject, setPreferenceObject] = useState(null);
@@ -173,6 +174,13 @@ const PreferencesPage = () => {
                                     label="Preferred Color"
                                     name="preferredColor"
                                     value={preferences.preferredColor}
+                                    onChange={handleInputChange}
+                                    fullWidth
+                                />
+                                <TextField
+                                    label="Preferred Sex"
+                                    name="preferredSex"
+                                    value={preferences.preferredSex}
                                     onChange={handleInputChange}
                                     fullWidth
                                 />
