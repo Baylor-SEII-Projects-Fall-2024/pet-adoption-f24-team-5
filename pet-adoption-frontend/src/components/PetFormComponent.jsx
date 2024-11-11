@@ -3,14 +3,8 @@ import ImageUploadComponent from "@/components/ImageUploadComponent";
 import React, { useEffect, useState } from "react";
 import { saveUpdatePet } from "@/utils/SaveUpdatePet";
 import { useSelector } from 'react-redux';
-<<<<<<< HEAD
 import { deletePet } from "@/utils/DeletePet";
-=======
-import {deletePet} from "@/utils/DeletePet";
 import SearchableDropdown from "@/components/SearchableDropdown";
-
->>>>>>> origin/main
-
 
 const PetFormComponent = (props) => {
     const [petId, setPetId] = useState(null);
