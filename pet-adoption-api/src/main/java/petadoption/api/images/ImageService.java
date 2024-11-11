@@ -1,21 +1,45 @@
 package petadoption.api.images;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 @Service
 public class ImageService {
 
-    public String saveImage(String uploadDirectory, MultipartFile imageFile) throws IOException {
-        if (imageFile == null || imageFile.isEmpty() || uploadDirectory == null) {
-            throw new IllegalArgumentException("File is empty");
+    @Value("${file.upload-dir}")
+    private String uploadDir;
+
+    public String saveImage(MultipartFile imageFile) throws IOException {
+        try {
+            Path path = Paths.get(uploadDir);
+            if (!Files.exists(path)) {
+                Files.createDirectories(path); // Create the directory if it doesn't exist
+            }
+
+            if (imageFile.isEmpty()) {
+                throw new IllegalArgumentException("File is empty");
+            }
+            System.out.println("Uploading file: " + imageFile.getOriginalFilename() + " of size " + imageFile.getSize());
+            Path filePath = path.resolve(Objects.requireNonNull(imageFile.getOriginalFilename()));
+
+            System.out.println("Saving file to: " + filePath.toAbsolutePath());
+            Files.copy(imageFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            return filePath.getFileName().toString();
+        } catch (IOException e) {
+            return "Failed to upload file: " + e.getMessage();
         }
+<<<<<<< HEAD
+=======
         String uniqueImageName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
 
         Path uploadPath = Path.of(uploadDirectory);
@@ -28,15 +52,20 @@ public class ImageService {
         Files.copy(imageFile.getInputStream(), imagePath, StandardCopyOption.REPLACE_EXISTING);
 
         return uniqueImageName;
+>>>>>>> main
     }
 
-    public Map.Entry<String, String> getImage(String uploadDirectory, String uniqueImageName) throws IOException {
+    public Map.Entry<String, String> getImage(String uniqueImageName) throws IOException {
 
+<<<<<<< HEAD
+        if(uniqueImageName == null || uniqueImageName.isEmpty() || uploadDir == null) {
+=======
         if (uniqueImageName == null || uniqueImageName.isEmpty() || uploadDirectory == null) {
+>>>>>>> main
             throw new IllegalArgumentException("File or directory is null");
         }
 
-        Path imagePath = Path.of(uploadDirectory, uniqueImageName);
+        Path imagePath = Path.of(uploadDir, uniqueImageName);
 
         if (Files.exists(imagePath)) {
             byte[] imageBytes = Files.readAllBytes(imagePath);
@@ -54,13 +83,17 @@ public class ImageService {
         }
     }
 
-    public Boolean deleteImage(String uploadDirectory, String uniqueImageName) throws IOException {
+    public Boolean deleteImage(String uniqueImageName) throws IOException {
 
+<<<<<<< HEAD
+        if(uniqueImageName == null || uniqueImageName.isEmpty() || uploadDir == null) {
+=======
         if (uniqueImageName == null || uniqueImageName.isEmpty() || uploadDirectory == null) {
+>>>>>>> main
             throw new IllegalArgumentException("File or directory is null");
         }
 
-        Path imagePath = Path.of(uploadDirectory, uniqueImageName);
+        Path imagePath = Path.of(uploadDir, uniqueImageName);
 
         if (Files.exists(imagePath)) {
             Files.delete(imagePath);

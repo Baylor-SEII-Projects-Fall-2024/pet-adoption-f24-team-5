@@ -17,5 +17,7 @@ spring:
       ddl-auto: create-drop
       dialect: org.hibernate.dialect.MySQLDialect
     show-sql: true
+file:
+  upload-dir: /tmp/uploads
 
 

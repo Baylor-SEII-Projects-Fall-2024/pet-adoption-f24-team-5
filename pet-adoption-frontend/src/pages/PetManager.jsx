@@ -76,7 +76,7 @@ const PetManager = () => {
 
             {!postNewPet &&
                 <Stack sx={{ paddingTop: 4 }} alignItems='center' gap={5}>
-                    <Button onClick={handlePostNewPet} color='inherit' variant='contaiend'>Post Pet</Button>
+                    <Button onClick={handlePostNewPet} color='inherit' variant='contained'>Post Pet</Button>
 
                     {loading ? <CircularProgress /> :
                         ((pets.length > 0) && pets.map((pet) => (
