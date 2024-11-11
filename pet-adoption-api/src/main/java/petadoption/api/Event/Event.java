@@ -36,9 +36,11 @@ public class Event {
     @Column(name = "EVENT_DESCRIPTION")
     protected String event_description;
 
-    public Event() {}
+    public Event() {
+    }
 
-    public Event(Long center_id, String event_name, LocalDate event_date, LocalTime event_time, String event_description) {
+    public Event(Long center_id, String event_name, LocalDate event_date, LocalTime event_time,
+            String event_description) {
         this.center_id = center_id;
         this.event_name = event_name;
         this.event_date = event_date;
@@ -46,7 +48,9 @@ public class Event {
         this.event_description = event_description;
 
     }
-    public Event(Long event_id, Long center_id, String event_name, LocalDate event_date, LocalTime event_time, String event_description) {
+
+    public Event(Long event_id, Long center_id, String event_name, LocalDate event_date, LocalTime event_time,
+            String event_description) {
         this.event_id = event_id;
         this.center_id = center_id;
         this.event_name = event_name;
@@ -62,24 +66,31 @@ public class Event {
     public void setEventId(Long event_id) {
         this.event_id = event_id;
     }
+
     public Long getCenterId() {
         return center_id;
     }
+
     public void setCenterId(Long center_id) {
         this.center_id = center_id;
     }
+
     public String getEventName() {
         return event_name;
     }
+
     public void setEventName(String event_name) {
         this.event_name = event_name;
     }
+
     public LocalDate getEventDate() {
         return event_date;
     }
+
     public void setEventDate(LocalDate event_date) {
         this.event_date = event_date;
     }
+
     public LocalTime getEventTime() {
         return event_time;
     }
@@ -87,9 +98,11 @@ public class Event {
     public void setEventTime(LocalTime event_time) {
         this.event_time = event_time;
     }
+
     public String getEventDescription() {
         return event_description;
     }
+
     public void setEventDescription(String event_description) {
         this.event_description = event_description;
     }

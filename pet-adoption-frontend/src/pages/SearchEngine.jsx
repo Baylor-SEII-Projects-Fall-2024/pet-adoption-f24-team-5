@@ -1,10 +1,10 @@
-import React, {useState} from 'react'
-import {Box, Grid, Card, CardContent, Typography, Button} from "@mui/material";
+import React, { useState } from 'react'
+import { Box, Grid, Card, CardContent, Typography, Button } from "@mui/material";
 import TitleBar from "@/components/TitleBar";
-import {API_URL} from "@/constants";
-import {getSubjectFromToken} from "@/utils/tokenUtils";
+import { API_URL } from "@/constants";
+import { getSubjectFromToken } from "@/utils/tokenUtils";
 import axios from "axios";
-import {useSelector} from "react-redux";
+import { useSelector } from "react-redux";
 import PetCard from "@/components/PetCard";
 
 const SearchEngine = () => {
@@ -32,7 +32,7 @@ const SearchEngine = () => {
 
     return (
         <>
-            <TitleBar/>
+            <TitleBar />
             <Box
                 sx={{
                     height: '100vh',

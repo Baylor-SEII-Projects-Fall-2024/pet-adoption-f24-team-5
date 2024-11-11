@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { TextField, Button, LinearProgress, Typography } from '@mui/material';
-import axios from 'axios';
+import axios from '../utils/axiosConfig';
 import { API_URL } from '@/constants';
 import { useSelector } from 'react-redux';
 
@@ -8,6 +8,7 @@ const ImageUploadComponent = ({ onImageUpload }) => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [uploadProgress, setUploadProgress] = useState(0);
     const [previewSrc, setPreviewSrc] = useState(''); // Store preview image
+    const [sizeError, setSizeError] = useState(false);
     const token = useSelector((state) => state.user.token);
 
     const handleFileSelect = (event) => {
@@ -51,7 +52,11 @@ const ImageUploadComponent = ({ onImageUpload }) => {
             if (onImageUpload) onImageUpload(response.data);
         } catch (error) {
             console.error('Upload failed:', error);
-            alert('An error occurred during upload. Please try again.');
+            if (error.response && error.response.status === 400) {
+                setSizeError(true);
+            } else {
+                alert('An error occurred during upload. Please try again.');
+            }
         }
     };
 
@@ -69,6 +74,7 @@ const ImageUploadComponent = ({ onImageUpload }) => {
                     style={{ maxWidth: '200px', margin: '10px 0' }}
                 />
             )}
+            {sizeError && <Typography color="error">File size exceeds the 5MB limit.</Typography>}
             <LinearProgress variant="determinate" value={uploadProgress} />
             <Button
                 variant="contained"

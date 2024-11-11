@@ -1,8 +1,10 @@
 package petadoption.api.pet;
+
 import jakarta.persistence.*;
 import lombok.*;
 import petadoption.api.user.AdoptionCenter.AdoptionCenter;
 import petadoption.api.user.User;
+import petadoption.api.user.Owner.Owner;
 
 @Entity
 @Getter
@@ -11,7 +13,7 @@ import petadoption.api.user.User;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = Pet.TABLE_NAME)
-public class Pet  {
+public class Pet {
     public static final String TABLE_NAME = "Pets";
 
     @Id
@@ -51,8 +53,12 @@ public class Pet  {
     @Column(name = "IMAGE_NAME", length = 1000)
     private String imageName;
 
+    @ManyToOne
+    @JoinColumn(name = "OWNER_ID")
+    private Owner owner;
 
-    public Pet(String species, String petName, String breed, String color, Integer age, Boolean adoptionStatus, String description) {
+    public Pet(String species, String petName, String breed, String color, Integer age, Boolean adoptionStatus,
+            String description) {
         this.species = species;
         this.petName = petName;
         this.breed = breed;
@@ -62,7 +68,8 @@ public class Pet  {
         this.description = description;
     }
 
-    public Pet(String species, String petName, String breed, String color, Integer age, Boolean adoptionStatus, String description, String imageName) {
+    public Pet(String species, String petName, String breed, String color, Integer age, Boolean adoptionStatus,
+            String description, String imageName) {
         this.species = species;
         this.petName = petName;
         this.breed = breed;
@@ -76,6 +83,5 @@ public class Pet  {
     public Pet(String imageName) {
         this.imageName = imageName;
     }
-
 
 }

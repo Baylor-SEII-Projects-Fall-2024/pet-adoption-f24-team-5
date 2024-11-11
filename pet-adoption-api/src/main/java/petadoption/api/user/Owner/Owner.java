@@ -48,6 +48,11 @@ public class Owner extends User {
     @Column(name = "LAST_NAME")
     protected String lastName;
 
+    @ElementCollection
+    @CollectionTable(name = "saved_pets", joinColumns = @JoinColumn(name = "owner_id"))
+    @Column(name = "pet_id")
+    private List<Long> savedPetIds;
+
     public Owner() {
         super();
     }
@@ -80,6 +85,16 @@ public class Owner extends User {
         this.age = age;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.centerZip = centerZip;
+        getLongAndLat(centerZip);
+    }
+
+    public Owner(String emailAddress, String password, UserType userType, int age, String phoneNumber,
+            Preference preference, String centerZip, List<Long> savedPetIds) {
+        super(emailAddress, password, userType, phoneNumber);
+        this.preference = preference;
+        this.age = age;
+        this.savedPetIds = savedPetIds;
         this.centerZip = centerZip;
         getLongAndLat(centerZip);
     }
@@ -146,5 +161,9 @@ public class Owner extends User {
 
     public void setPreferenceId(Long preferenceId) {
         this.preference.setPreferenceId(preferenceId);
+    }
+
+    public void addPetToSavedPets(Long petId) {
+        this.savedPetIds.add(petId);
     }
 }
