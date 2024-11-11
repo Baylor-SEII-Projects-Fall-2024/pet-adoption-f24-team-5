@@ -7,13 +7,13 @@ import {
     Stack, CircularProgress,
 } from "@mui/material";
 import { Link } from "react-router-dom";
-import axios from 'axios';
+import axios from '../utils/axiosConfig';
 import PetCard from "@/components/PetCard";
 import PetFormComponent from "@/components/PetFormComponent";
 import { API_URL } from "@/constants";
 import TitleBar from "@/components/TitleBar";
 import { useSelector } from 'react-redux';
-import {getSubjectFromToken} from "@/utils/tokenUtils";
+import { getSubjectFromToken } from "@/utils/tokenUtils";
 const PetManager = () => {
     const [formType, setFormType] = React.useState('');
     const [pets, setPets] = React.useState([]);
@@ -69,9 +69,7 @@ const PetManager = () => {
 
 
     return (
-        <Box sx={{ height: '100vh', width: '100vw', display: 'flex', flexDirection: 'column' }}>
-            <TitleBar />
-
+        <Box>
             {postNewPet && (
                 <PetFormComponent type={formType} handlePostNewPet={handlePostNewPet} pet={formPet} />
             )}
@@ -81,9 +79,9 @@ const PetManager = () => {
                     <Button onClick={handlePostNewPet} color='inherit' variant='contaiend'>Post Pet</Button>
 
                     {loading ? <CircularProgress /> :
-                       ((pets.length > 0) && pets.map((pet) => (
-                       <PetCard pet={pet} key={pet.petName} onClick={() => handleCardClick(pet)} />
-                       )))
+                        ((pets.length > 0) && pets.map((pet) => (
+                            <PetCard pet={pet} key={pet.petName} onClick={() => handleCardClick(pet)} />
+                        )))
                     }
 
                 </Stack>

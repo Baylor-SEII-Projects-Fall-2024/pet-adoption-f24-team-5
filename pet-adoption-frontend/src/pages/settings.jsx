@@ -241,7 +241,7 @@ export default function HomePage() {
         return 1;
       }
       else {
-        if (updatedValuesRef.current.userType !== 'CenterOwner'){
+        if (updatedValuesRef.current.userType !== 'CenterOwner') {
           const newDisplayName = `${updatedValuesRef.current.firstName}`;
           dispatch(setDisplayName(newDisplayName));
         }
@@ -265,9 +265,6 @@ export default function HomePage() {
       <Head>
         <title>Settings Page</title>
       </Head>
-
-      <TitleBar />
-
       <main>
         <Stack sx={{ paddingTop: 4 }} alignItems='center' gap={2}>
           <Card sx={{ width: 600, height: 80 }} elevation={4}>
@@ -366,20 +363,28 @@ export default function HomePage() {
             <Paper sx={{ width: 600, height: 50 }} elevation={4}>
               <Stack spacing={1} direction="row" alignItems='center'>
                 <Typography variant='h5'>Age</Typography>
-                <Select
-                  labelId="age-label"
-                  id="age-select"
-                  value={userAge}
-                  onChange={handleAgeChange}
+                <TextField
                   label="Age"
-                  style={{ height: '40px', width: '545px', pointerEvents: !isEditing ? 'none' : 'auto' }}
-                >
-                  {Array.from({ length: 101 }, (_, age) => (
-                    <MenuItem key={age} value={age}>
-                      {age}
-                    </MenuItem>
-                  ))}
-                </Select>
+                  type="text"
+                  value={userAge}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === '' || (/^\d+$/.test(value) && parseInt(value, 10) >= 1 && parseInt(value, 10) <= 99)) {
+                      setUserAge(value);
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    // Prevent non-numeric key presses
+                    if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete') {
+                      e.preventDefault();
+                    }
+                  }}
+                  InputProps={{
+                    style: { height: '40px', width: '545px' },
+                    readOnly: !isEditing
+                  }}
+                  inputProps={{ inputMode: 'numeric', pattern: '[0-9]*', min: 1, max: 99 }}
+                />
               </Stack>
             </Paper>
           )}

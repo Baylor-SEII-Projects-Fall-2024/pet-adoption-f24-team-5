@@ -3,12 +3,12 @@ import {
     Button, TextField, Stack, Typography, Box, InputAdornment, CircularProgress
 } from '@mui/material';
 import { Email, Lock, Phone, CheckCircle } from '@mui/icons-material'; // Import Check Icon
-import axios from 'axios';
+import axios from '../utils/axiosConfig';
 import { API_URL } from "@/constants";
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 import ManageAccounts from "@/pages/ManageAccounts";
-import {getSubjectFromToken} from "@/utils/tokenUtils";
-import {useSelector} from "react-redux";
+import { getSubjectFromToken } from "@/utils/tokenUtils";
+import { useSelector } from "react-redux";
 import TitleBar from "@/components/TitleBar";
 
 const RegisterCenterWorker = () => {
@@ -58,7 +58,7 @@ const RegisterCenterWorker = () => {
                 userType: "CenterWorker",
                 age: parseInt(age, 10),
                 phoneNumber,
-                centerID : id,
+                centerID: id,
             };
             console.log(registrationData);
             await axios.post(`${API_URL}/api/auth/register/center-worker`, registrationData);
@@ -74,18 +74,9 @@ const RegisterCenterWorker = () => {
     return (
         <Box
             sx={{
-                height: '100vh',
-                display: 'flex',
-                flexDirection: 'column',
                 background: 'linear-gradient(135deg, #FFFFFF 30%, #E7E9EC 90%)',
             }}
         >
-
-            <Box sx={{ flexShrink: 0 }}>
-                <TitleBar />
-            </Box>
-
-
             <Box
                 sx={{
                     display: 'flex',
@@ -164,7 +155,19 @@ const RegisterCenterWorker = () => {
                                     label="Age"
                                     type="number"
                                     value={age}
-                                    onChange={(e) => setAge(e.target.value)}
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+                                        if (value === '' || (/^\d+$/.test(value) && parseInt(value, 10) >= 1 && parseInt(value, 10) <= 99)) {
+                                            setAge(value);
+                                        }
+
+                                    }}
+                                    onKeyDown={(e) => {
+                                        // Prevent non-numeric key presses
+                                        if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete') {
+                                            e.preventDefault();
+                                        }
+                                    }}
                                     required
                                     fullWidth
                                 />

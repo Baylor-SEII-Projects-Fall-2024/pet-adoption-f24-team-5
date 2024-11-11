@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button, TextField, Stack, Typography, Box, InputAdornment, Grid } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import { AccountCircle, Lock } from '@mui/icons-material'; // Icons for inputs
-import axios from 'axios';
+import axios from '../utils/axiosConfig';
 import { useDispatch } from 'react-redux';
 import { setToken } from '../utils/userSlice';
 import { API_URL } from "@/constants";
@@ -10,6 +10,7 @@ import { API_URL } from "@/constants";
 const Login = () => {
     const [emailAddress, setEmailAddress] = useState('');
     const [password, setPassword] = useState('');
+    const [errorMessage, setErrorMessage] = useState(''); // New state for error message
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
@@ -27,15 +28,16 @@ const Login = () => {
                     dispatch(setToken(res.data.token));
                     setEmailAddress('');
                     setPassword('');
+                    setErrorMessage(''); // Clear error message on success
                     navigate('/');
                 }
             })
             .catch((err) => {
                 if (err.response && err.response.status === 401) {
-                    alert(err.response.data);
+                    setErrorMessage(err.response.data); // Set error message from response
                 } else {
                     console.error('An unexpected error occurred:', err);
-                    alert('An unexpected error occurred. Please try again later.');
+                    setErrorMessage('Email or password is incorrect please try again');
                 }
             });
     };
@@ -47,7 +49,7 @@ const Login = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                background: 'linear-gradient(135deg, #4b6cb7 30%, #182848 90%)', // Background gradient
+                background: 'linear-gradient(135deg, #4b6cb7 30%, #182848 90%)',
             }}
         >
             <Box
@@ -100,6 +102,12 @@ const Login = () => {
                             }}
                         />
 
+                        {/* Error Message */}
+                        {errorMessage && (
+                            <Typography variant="body2" color="error">
+                                {errorMessage}
+                            </Typography>
+                        )}
 
                         {/* Login Button */}
                         <Button

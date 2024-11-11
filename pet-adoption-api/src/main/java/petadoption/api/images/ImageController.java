@@ -20,11 +20,18 @@ public class ImageController {
     private final ImageService imageService;
 
     @Autowired
-    public ImageController(ImageService imageService) { this.imageService = imageService; }
+    public ImageController(ImageService imageService) {
+        this.imageService = imageService;
+    }
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) {
         System.out.println(file.getOriginalFilename());
+
+        // Check file size (5MB limit)
+        if (file.getSize() > 5 * 1024 * 1024) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("File size exceeds the 5MB limit.");
+        }
 
         try {
             return ResponseEntity.status(HttpStatus.OK).body(imageService.saveImage(UPLOAD_DIRECTORY, file));
@@ -38,7 +45,8 @@ public class ImageController {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(imageService.getImage(UPLOAD_DIRECTORY, imageName));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new AbstractMap.SimpleEntry<>("Error", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new AbstractMap.SimpleEntry<>("Error", e.getMessage()));
         }
     }
 

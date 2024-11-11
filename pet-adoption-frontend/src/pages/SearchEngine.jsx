@@ -1,6 +1,6 @@
 import React from 'react'
 import Head from "next/head";
-import {Button, Stack} from "@mui/material";
+import { Button, Stack } from "@mui/material";
 import TitleBar from "@/components/TitleBar";
 
 const DogPress = () => {
@@ -12,21 +12,21 @@ const CatPress = () => {
 const OtherPress = () => {
     alert('You are LOST!');
 }
-function DogButton(){
+function DogButton() {
     return (
-      <button className="styled-button" onClick={DogPress}>
-          I prefer Dogs
-      </button>
+        <button className="styled-button" onClick={DogPress}>
+            I prefer Dogs
+        </button>
     );
 }
-function CatButton(){
+function CatButton() {
     return (
-      <button className="styled-button" onClick={CatPress}>
-          I prefer Cats
-      </button>
+        <button className="styled-button" onClick={CatPress}>
+            I prefer Cats
+        </button>
     );
 }
-function OtherButton(){
+function OtherButton() {
     return (
         <button className="styled-button" onClick={OtherPress}>
             I prefer Another Species
@@ -37,7 +37,6 @@ const SearchEngine = () => {
 
     return (
         <div>
-            <TitleBar/>
             <h1>Welcome to the Search Engine Page!</h1>
             <h3 >Please select your preference:</h3>
             <Stack direction={"row"} spacing={2}>

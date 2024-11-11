@@ -4,7 +4,7 @@ import ImageUploadComponent from "@/components/ImageUploadComponent";
 import React, { useEffect, useState } from "react";
 import { saveUpdatePet } from "@/utils/SaveUpdatePet";
 import { useSelector } from 'react-redux';
-import {deletePet} from "@/utils/DeletePet";
+import { deletePet } from "@/utils/DeletePet";
 
 
 const PetFormComponent = (props) => {
@@ -125,7 +125,8 @@ const PetFormComponent = (props) => {
 
         saveUpdatePet({
             formType, petData, token, resetFields,
-            handlePostNewPet: props.handlePostNewPet}
+            handlePostNewPet: props.handlePostNewPet
+        }
         );
 
     }
@@ -168,7 +169,18 @@ const PetFormComponent = (props) => {
                     label="Age"
                     type="number"
                     value={age}
-                    onChange={(e) => setAge(e.target.value)}
+                    onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === '' || (/^\d+$/.test(value) && parseInt(value, 10) >= 1 && parseInt(value, 10) <= 99)) {
+                            setAge(value);
+                        }
+                    }}
+                    onKeyDown={(e) => {
+                        // Prevent non-numeric key presses
+                        if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete') {
+                            e.preventDefault();
+                        }
+                    }}
                     required
                     fullWidth
                 />
