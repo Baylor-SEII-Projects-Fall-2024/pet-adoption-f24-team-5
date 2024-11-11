@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import PetGrid from '@/components/PetGrid';
-import {Box} from "@mui/material";
+import { Box } from "@mui/material";
 import TitleBar from "@/components/TitleBar";
 
 const petsData = [];
@@ -19,7 +19,6 @@ const AvailablePets = () => {
 
     return (
         <Box>
-            <TitleBar/>
             <PetGrid pets={pets} loading={loading} />
         </Box>
     )

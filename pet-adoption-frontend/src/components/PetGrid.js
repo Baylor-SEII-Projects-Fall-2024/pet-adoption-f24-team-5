@@ -3,7 +3,7 @@ import { Grid, CircularProgress, Box, Typography } from '@mui/material';
 import PetCard from './PetCard';
 import TitleBar from "@/components/TitleBar";
 import { API_URL } from "@/constants";
-import axios from "axios";
+import axios from "../utils/axiosConfig";
 import { useSelector } from 'react-redux'; // For accessing the token
 
 const PetGrid = () => {

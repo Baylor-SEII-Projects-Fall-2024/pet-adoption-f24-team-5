@@ -1,13 +1,13 @@
-import {API_URL} from "@/constants";
-import axios from "axios";
-import {getSubjectFromToken} from "@/utils/tokenUtils";
+import { API_URL } from "@/constants";
+import axios from "../utils/axiosConfig";
+import { getSubjectFromToken } from "@/utils/tokenUtils";
 
-export const saveUpdatePet = ({formType, petData, token, resetFields, handlePostNewPet}) => {
+export const saveUpdatePet = ({ formType, petData, token, resetFields, handlePostNewPet }) => {
 
     let url = `${API_URL}/api/pets/`
 
-    if(formType === "update") {
-       url  += `update`;
+    if (formType === "update") {
+        url += `update`;
     } else if (formType === "save") {
         url += `save`;
     }
@@ -25,7 +25,7 @@ export const saveUpdatePet = ({formType, petData, token, resetFields, handlePost
         })
         .then((res) => {
             alert('Pet Saved!');
-            if(formType !== "update") {
+            if (formType !== "update") {
                 resetFields();
                 handlePostNewPet();
             }

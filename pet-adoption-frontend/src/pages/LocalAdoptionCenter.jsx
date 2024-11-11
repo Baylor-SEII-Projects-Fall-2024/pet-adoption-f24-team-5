@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
 import { Card, CardContent, Stack, Typography } from '@mui/material';
 import AdoptionCenterCard from '../components/AdoptionCenterCard';
-import axios from 'axios';
+import axios from '../utils/axiosConfig';
 import { getSubjectFromToken } from '../utils/tokenUtils';
 import { API_URL, FRONTEND_URL } from "@/constants";
 import TitleBar from "@/components/TitleBar";
@@ -108,7 +108,6 @@ export default function AdoptionCenterPage() {
 
     return (
         <>
-            <TitleBar />
             <Head>
                 <title>Local Adoption Centers</title>
             </Head>

@@ -3,7 +3,6 @@ package petadoption.api.images;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,43 +27,42 @@ public class ImageService {
 
         Files.copy(imageFile.getInputStream(), imagePath, StandardCopyOption.REPLACE_EXISTING);
 
-
         return uniqueImageName;
     }
 
     public Map.Entry<String, String> getImage(String uploadDirectory, String uniqueImageName) throws IOException {
 
-        if(uniqueImageName == null || uniqueImageName.isEmpty() || uploadDirectory == null) {
+        if (uniqueImageName == null || uniqueImageName.isEmpty() || uploadDirectory == null) {
             throw new IllegalArgumentException("File or directory is null");
         }
 
         Path imagePath = Path.of(uploadDirectory, uniqueImageName);
 
-        if(Files.exists(imagePath)) {
+        if (Files.exists(imagePath)) {
             byte[] imageBytes = Files.readAllBytes(imagePath);
 
-            //encode string to standardize
+            // encode string to standardize
             String encodedString = Base64.getEncoder().encodeToString(imageBytes);
 
-            //get filetype
+            // get filetype
             String mimeType = Files.probeContentType(imagePath);
 
             return new AbstractMap.SimpleEntry<>(mimeType, encodedString);
         } else {
             throw new IOException("image not found");
-            ///TODO return standard image for not found when that is added to resources
+            /// TODO return standard image for not found when that is added to resources
         }
     }
 
     public Boolean deleteImage(String uploadDirectory, String uniqueImageName) throws IOException {
 
-        if(uniqueImageName == null || uniqueImageName.isEmpty() || uploadDirectory == null) {
+        if (uniqueImageName == null || uniqueImageName.isEmpty() || uploadDirectory == null) {
             throw new IllegalArgumentException("File or directory is null");
         }
 
         Path imagePath = Path.of(uploadDirectory, uniqueImageName);
 
-        if(Files.exists(imagePath)) {
+        if (Files.exists(imagePath)) {
             Files.delete(imagePath);
             return true;
         } else {
