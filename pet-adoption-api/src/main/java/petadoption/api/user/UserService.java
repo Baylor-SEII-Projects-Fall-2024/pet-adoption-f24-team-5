@@ -2,16 +2,10 @@ package petadoption.api.user;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.server.ResponseStatusException;
-import petadoption.api.Event.Event;
 import petadoption.api.user.AdoptionCenter.AdoptionCenter;
 import petadoption.api.user.AdoptionCenter.AdoptionCenterRepository;
 import petadoption.api.user.AdoptionCenter.CenterWorker;
@@ -19,10 +13,8 @@ import petadoption.api.user.AdoptionCenter.CenterWorkerRepository;
 import petadoption.api.user.Owner.Owner;
 import petadoption.api.user.Owner.OwnerRepository;
 
-import javax.swing.text.html.Option;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -106,7 +98,7 @@ public class UserService {
 
     public ResponseEntity<Owner> updateOwnerPreferenceId(Owner owner) {
         Owner newUser = (Owner) findUser(owner.getEmailAddress()).get();
-        newUser.setPreference(owner.getPreference());
+        newUser.setPreferenceWeights(owner.getPreferenceWeights());
         return new ResponseEntity<>(userRepository.save(newUser), HttpStatus.OK);
     }
 

@@ -1,33 +1,32 @@
 package petadoption.api.preferences;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import petadoption.api.preferences.Preference;
-import petadoption.api.preferences.PreferenceRepository;
+import petadoption.api.user.Owner.OwnerService;
+import petadoption.api.user.UserService;
+
+import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class PreferenceService {
+    private final PreferenceRepository preferenceRepository;
+    private final OwnerService ownerService;
 
-    @Autowired
-    private PreferenceRepository preferenceRepository;
 
-    public Preference getPreferences(Long preferenceId) {
-        return preferenceRepository.findById(preferenceId).orElse(null);
+    public Optional<Preference> getPreference(long id) {
+        return preferenceRepository.findById(id);
     }
 
-    public Preference createPreference(Preference newPreference) {
-        return preferenceRepository.save(newPreference);
+    public Preference createPreference(long id, Preference preference) {
+
+        Preference savedPref =  preferenceRepository.save(preference);
+        ownerService.saveDefaultPreferences(id, savedPref);
+        return savedPref;
     }
 
-    public Preference updatePreferences(Long preferenceId, Preference newPreferences) {
-        Preference existingPreferences = preferenceRepository.findById(preferenceId).orElse(null);
-        if (existingPreferences != null) {
-            existingPreferences.setPreferredSpecies(newPreferences.getPreferredSpecies());
-            existingPreferences.setPreferredBreed(newPreferences.getPreferredBreed());
-            existingPreferences.setPreferredColor(newPreferences.getPreferredColor());
-            existingPreferences.setPreferredAge(newPreferences.getPreferredAge());
-            return preferenceRepository.save(existingPreferences);
-        }
-        return null;
+    public Preference updatePreference(long id, Preference preference) {
+        preference.setPreferenceId(id);
+        return preferenceRepository.save(preference);
     }
 }

@@ -1,13 +1,10 @@
 package petadoption.api.recommendationEngine;
 
 import lombok.RequiredArgsConstructor;
-import org.deeplearning4j.models.word2vec.Word2Vec;
-import org.nd4j.linalg.api.ndarray.INDArray;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import petadoption.api.preferences.Preference;
-import petadoption.api.preferences.PreferenceService;
+import petadoption.api.preferences.PreferenceWeightsService;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,7 +21,7 @@ public class RecommendationEngineController {
             .add(word2Vec.getWordVectorMatrix("black"))
             .div(4); // Average out the vectors*/
     private final AttributeEmbedding attributeEmbedding;
-    private final PreferenceService preferenceService;
+    private final PreferenceWeightsService preferenceWeightsService;
     private final RecommendationService recommendationService;
 
     @PostMapping("/update-preference/{id}")
@@ -49,7 +46,7 @@ public class RecommendationEngineController {
 
         try{
             double[] vector1 = recommendationService.savePreferenceEmbedding(3L, pref1);
-            double[] vector2 = recommendationService.savePreferenceEmbedding(3L, pref2);
+            double[] vector2 = recommendationService.savePreferenceEmbedding(5L, pref2);
 
             return new ResponseEntity<>(VectorUtils.cosineSimilarity(vector1, vector2), HttpStatus.OK);
 

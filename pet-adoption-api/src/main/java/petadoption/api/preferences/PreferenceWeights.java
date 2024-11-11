@@ -5,16 +5,16 @@ import lombok.*;
 
 @Data
 @Entity
-@Table(name = Preference.TABLE_NAME)
+@Table(name = PreferenceWeights.TABLE_NAME)
 @NoArgsConstructor
 @AllArgsConstructor
-public class NewPreferences {
-    public static final String TABLE_NAME = "NEWPREFERENCES";
+public class PreferenceWeights {
+    public static final String TABLE_NAME = "PREFERENCE_WEIGHTS";
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "PREFERENCE_ID")
-    private Long preferenceId;
+    @Column(name = "PREFERENCE_WEIGHTS_ID")
+    private Long preferenceWeightId;
 
     @Column(name = "WEIGHT-1")
     private Double weight1;
@@ -166,7 +166,7 @@ public class NewPreferences {
     @Column(name = "WEIGHT-50")
     private Double weight50;
 
-    public NewPreferences(Double[] weights){
+    public PreferenceWeights(double[] weights){
         weight1 = weights[0];
         weight2 = weights[1];
         weight3 = weights[2];
@@ -220,4 +220,65 @@ public class NewPreferences {
 
     }
 
+    public double[] getAllWeights(){
+        double[] weights = {
+                weight1,
+                weight2,
+                weight3,
+                weight4,
+                weight5,
+                weight6,
+                weight7,
+                weight8,
+                weight9,
+                weight10,
+                weight11,
+                weight12,
+                weight13,
+                weight14,
+                weight15,
+                weight16,
+                weight17,
+                weight18,
+                weight19,
+                weight20,
+                weight21,
+                weight22,
+                weight23,
+                weight24,
+                weight25,
+                weight26,
+                weight27,
+                weight28,
+                weight29,
+                weight30,
+                weight31,
+                weight32,
+                weight33,
+                weight34,
+                weight35,
+                weight36,
+                weight37,
+                weight38,
+                weight39,
+                weight40,
+                weight41,
+                weight42,
+                weight43,
+                weight44,
+                weight45,
+                weight46,
+                weight47,
+                weight48,
+                weight49,
+                weight50
+        };
+        return weights;
+    }
+    public Long getPreferenceWeightId() {
+        return preferenceWeightId;
+    }
+    public void setPreferenceWeightId(Long preferenceWeightId) {
+        this.preferenceWeightId = preferenceWeightId;
+    }
 }

@@ -1,19 +1,15 @@
 package petadoption.api.recommendationEngine;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.deeplearning4j.models.word2vec.Word2Vec;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
-import org.nd4j.shade.protobuf.MapEntry;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import petadoption.api.pet.Pet;
 import petadoption.api.pet.PetService;
 import petadoption.api.preferences.Preference;
-import petadoption.api.preferences.PreferenceRepository;
-import petadoption.api.preferences.PreferenceService;
-import petadoption.api.user.Owner.Owner;
+import petadoption.api.preferences.PreferenceWeights;
+import petadoption.api.preferences.PreferenceWeightsService;
 import petadoption.api.user.Owner.OwnerService;
 
 import java.io.IOException;
@@ -26,7 +22,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class RecommendationService {
     private final AttributeEmbedding attributeEmbedding;
-    private final PreferenceService preferenceService;
+    private final PreferenceWeightsService preferenceWeightsService;
     private final OwnerService ownerService;
     private final Word2Vec word2Vec;
     private final PetService petService;
@@ -34,26 +30,32 @@ public class RecommendationService {
 
 
     public double[] savePreferenceEmbedding(Long ownerId, List<String> newPreferences) throws IOException {
-        Long preferenceID = ownerService.getPreferenceIdByOwnerID(ownerId);
-        Preference oldPref = null;
+        Long preferenceID = ownerService.getPreferenceWeightsIdByOwnerID(ownerId);
+        PreferenceWeights oldPref = null;
         boolean isNewPreference = false;
 
         if (preferenceID != null) {
-            oldPref = preferenceService.getPreferences(preferenceID);
+            oldPref = preferenceWeightsService.getPreferenceWeights(preferenceID);
         }
         if (oldPref == null){
             // No existing preference, create a new one.
             isNewPreference = true;
-            oldPref = new Preference();
         }
-        Preference newPref = extractArgsFromString(newPreferences, oldPref);
+        Preference newPref = extractArgsFromString(newPreferences);
         double[] embeddingVector = generatePreferenceVector(newPref);
+        PreferenceWeights newWeights = new PreferenceWeights(embeddingVector);
         try{
             if(isNewPreference){
-                newPref = preferenceService.createPreference(newPref);
-                ownerService.savePreference(ownerId, newPref);
+                //No existing weights so create new weights
+                preferenceWeightsService.savePreferenceWeights(newWeights);
+                ownerService.savePreferenceWeights(ownerId, newWeights);
             }else{
-                preferenceService.updatePreferences(preferenceID, newPref);
+                // Incorperates new preference into the existing one
+                double weightOfOld = 0.7;
+                double weightOfNew= 0.3;
+
+                embeddingVector = VectorUtils.combineVectors(oldPref.getAllWeights(), weightOfOld, newWeights.getAllWeights(), weightOfNew);
+                preferenceWeightsService.updatePreferenceWeights(preferenceID, new PreferenceWeights(embeddingVector));
             }
             //preferenceRepository.updatePreferences(id, newPref); updatePreferences
         }catch (Exception e){
@@ -63,16 +65,17 @@ public class RecommendationService {
     }
 
 
-    private Preference extractArgsFromString(List<String> preference, Preference oldPref) throws IOException{
+    private Preference extractArgsFromString(List<String> preference) throws IOException{
         if(preference.size() < 4){
             throw new IOException("Not enough arguments in the preference vector");
         }
-        oldPref.setPreferredSpecies(preference.get(0));
-        oldPref.setPreferredBreed(preference.get(1));
-        oldPref.setPreferredColor(preference.get(2));
-        oldPref.setPreferredAge(Integer.parseInt(preference.get(3)));
+        Preference pref = new Preference();
+        pref.setPreferredSpecies(preference.get(0));
+        pref.setPreferredBreed(preference.get(1));
+        pref.setPreferredColor(preference.get(2));
+        pref.setPreferredAge(Integer.parseInt(preference.get(3)));
 
-        return oldPref;
+        return pref;
     }
 
     public double[] generatePreferenceVector(Preference preference) {

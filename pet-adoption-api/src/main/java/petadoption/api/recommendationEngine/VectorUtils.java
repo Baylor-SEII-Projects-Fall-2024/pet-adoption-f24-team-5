@@ -29,4 +29,25 @@ public class VectorUtils {
 
         return dotProduct / (magnitudeA * magnitudeB);
     }
+
+    public static double[] combineVectors(double[] vectorA, double weightOfA, double[] vectorB, double weightOfB) {
+        if (vectorA.length != vectorB.length) {
+            throw new IllegalArgumentException("Vectors must be of the same length.");
+        }
+
+        // Normalize the weights
+        double weightSum = weightOfA + weightOfB;
+        double normalizedWeightA = weightOfA / weightSum;
+        double normalizedWeightB = weightOfB / weightSum;
+
+        // Create a new vector to store the combined result
+        double[] combinedVector = new double[vectorA.length];
+
+        // Combine the vectors with normalized weights
+        for (int i = 0; i < vectorA.length; i++) {
+            combinedVector[i] = (vectorA[i] * normalizedWeightA) + (vectorB[i] * normalizedWeightB);
+        }
+
+        return combinedVector;
+    }
 }
