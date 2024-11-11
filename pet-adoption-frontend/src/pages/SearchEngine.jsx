@@ -32,7 +32,6 @@ const SearchEngine = () => {
 
     return (
         <>
-            <TitleBar />
             <Box
                 sx={{
                     height: '100vh',
