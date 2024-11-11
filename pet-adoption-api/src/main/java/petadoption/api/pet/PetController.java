@@ -96,7 +96,7 @@ public class PetController {
 
         try {
             if (!pet.getImageName().isEmpty()) {
-                imageService.deleteImage(ImageController.UPLOAD_DIRECTORY, pet.getImageName());
+                imageService.deleteImage(pet.getImageName());
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());

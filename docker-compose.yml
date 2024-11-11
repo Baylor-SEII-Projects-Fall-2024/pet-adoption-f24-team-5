@@ -1,0 +1,14 @@
+services:
+  myapp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "9000:8080"
+    volumes:
+      - uploads:/tmp/uploads  # Mounts the Docker-managed `uploads` volume to /uploads in the container
+    environment:
+      FILE_UPLOAD_DIR: /tmp/uploads  # Path within the container where images are stored
+
+volumes:
+  uploads:
