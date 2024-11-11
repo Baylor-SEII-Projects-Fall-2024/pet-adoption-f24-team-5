@@ -26,6 +26,7 @@ const ExpandedPetCard = ({ pet, onClose }) => {
                 <Typography variant="body1">Species: {pet.species}</Typography>
                 <Typography variant="body1">Breed: {pet.breed}</Typography>
                 <Typography variant="body1">Color: {pet.color}</Typography>
+                <Typography variant="body1">Sex: {pet.sex}</Typography>
                 <Typography variant="body1">Age: {pet.age}</Typography>
                 <Typography variant="body1">Description: {pet.description}</Typography>
                 <Button onClick={onClose}>Close</Button>
