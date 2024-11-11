@@ -130,22 +130,6 @@ const PetCard = ({ pet, onClick }) => {
                                 onLoad={handleImageLoad}
                             />
                         </Box>
-
-                        <Typography variant="body2" align="left">
-                            Species: {pet.species}
-                        </Typography>
-                        <Typography variant="body2" align="left">
-                            Breed: {pet.breed}
-                        </Typography>
-                        <Typography variant="body2" align="left">
-                            Color: {pet.color}
-                        </Typography>
-                        <Typography variant="body2" align="left">
-                            Age: {pet.age}
-                        </Typography>
-                        <Typography variant="body2" align="left">
-                            Description: {pet.description}
-                        </Typography>
                         <Button onClick={handleSavePetToOwner} variant="contained" color="primary">
                             Save Pet
                         </Button>
