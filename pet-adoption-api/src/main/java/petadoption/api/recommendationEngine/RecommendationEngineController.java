@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import petadoption.api.preferences.Preference;
 import petadoption.api.preferences.PreferenceWeightsService;
 
 import java.io.IOException;
@@ -25,13 +26,15 @@ public class RecommendationEngineController {
     private final RecommendationService recommendationService;
 
     @PostMapping("/update-preference/{id}")
-    public ResponseEntity<?> updatePreference(@PathVariable long id, @RequestBody String[] inputPreferences) {
+    public ResponseEntity<?> updatePreference(@PathVariable long id, @RequestBody Preference preference) {
 
         try{
             List<String> cleanedPreferences = new ArrayList<>();
-            for (String inputPreference : inputPreferences) {
-                cleanedPreferences.add(inputPreference.toLowerCase().replaceAll("\\s+", ""));
-            }
+            cleanedPreferences.add(preference.getPreferredSpecies().toLowerCase().replaceAll("\\s+", ""));
+            cleanedPreferences.add(preference.getPreferredBreed().toLowerCase().replaceAll("\\s+", ""));
+            cleanedPreferences.add(preference.getPreferredColor().toLowerCase().replaceAll("\\s+", ""));
+            cleanedPreferences.add(String.valueOf(preference.getPreferredAge()).toLowerCase().replaceAll("\\s+", ""));
+
             return new ResponseEntity<>(recommendationService.savePreferenceEmbedding(id, cleanedPreferences)
                     ,HttpStatus.OK);
         }catch (IOException e){
