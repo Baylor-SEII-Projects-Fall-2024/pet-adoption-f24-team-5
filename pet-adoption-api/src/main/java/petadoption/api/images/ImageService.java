@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -38,64 +39,41 @@ public class ImageService {
         } catch (IOException e) {
             return "Failed to upload file: " + e.getMessage();
         }
-<<<<<<< HEAD
-=======
-        String uniqueImageName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
-
-        Path uploadPath = Path.of(uploadDirectory);
-        Path imagePath = uploadPath.resolve(uniqueImageName);
-
-        if (!Files.exists(uploadPath)) {
-            Files.createDirectories(uploadPath);
-        }
-
-        Files.copy(imageFile.getInputStream(), imagePath, StandardCopyOption.REPLACE_EXISTING);
-
-        return uniqueImageName;
->>>>>>> main
     }
 
     public Map.Entry<String, String> getImage(String uniqueImageName) throws IOException {
 
-<<<<<<< HEAD
         if(uniqueImageName == null || uniqueImageName.isEmpty() || uploadDir == null) {
-=======
-        if (uniqueImageName == null || uniqueImageName.isEmpty() || uploadDirectory == null) {
->>>>>>> main
             throw new IllegalArgumentException("File or directory is null");
         }
 
         Path imagePath = Path.of(uploadDir, uniqueImageName);
 
-        if (Files.exists(imagePath)) {
+        if(Files.exists(imagePath)) {
             byte[] imageBytes = Files.readAllBytes(imagePath);
 
-            // encode string to standardize
+            //encode string to standardize
             String encodedString = Base64.getEncoder().encodeToString(imageBytes);
 
-            // get filetype
+            //get filetype
             String mimeType = Files.probeContentType(imagePath);
 
             return new AbstractMap.SimpleEntry<>(mimeType, encodedString);
         } else {
             throw new IOException("image not found");
-            /// TODO return standard image for not found when that is added to resources
+            ///TODO return standard image for not found when that is added to resources
         }
     }
 
     public Boolean deleteImage(String uniqueImageName) throws IOException {
 
-<<<<<<< HEAD
         if(uniqueImageName == null || uniqueImageName.isEmpty() || uploadDir == null) {
-=======
-        if (uniqueImageName == null || uniqueImageName.isEmpty() || uploadDirectory == null) {
->>>>>>> main
             throw new IllegalArgumentException("File or directory is null");
         }
 
         Path imagePath = Path.of(uploadDir, uniqueImageName);
 
-        if (Files.exists(imagePath)) {
+        if(Files.exists(imagePath)) {
             Files.delete(imagePath);
             return true;
         } else {
