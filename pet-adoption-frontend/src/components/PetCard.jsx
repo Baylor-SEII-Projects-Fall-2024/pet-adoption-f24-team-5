@@ -39,7 +39,7 @@ const HoverOverlay = styled(Box)(({ theme }) => ({
     },
 }));
 
-const PetCard = ({ pet, onClick }) => {
+const PetCard = ({ pet, onClick, expandable = true, saveable = true, likeable = true }) => {
     const [loading, setLoading] = useState(true);
     const [isHovered, setIsHovered] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -65,11 +65,17 @@ const PetCard = ({ pet, onClick }) => {
     };
 
     const handleExpandClick = () => {
-        setIsModalOpen(true);
+        if (expandable) {
+            setIsModalOpen(true);
+        }
     };
 
     const handleCloseModal = () => {
         setIsModalOpen(false);
+    };
+
+    const handleLikePet = () => {
+        console.log("Liking pet");
     };
 
     return (
@@ -130,38 +136,45 @@ const PetCard = ({ pet, onClick }) => {
                                 onLoad={handleImageLoad}
                             />
                         </Box>
-                        <Button onClick={handleSavePetToOwner} variant="contained" color="primary">
-                            Save Pet
-                        </Button>
-                        <Button onClick={handleExpandClick} variant="outlined" color="secondary">
-                            Expand
-                        </Button>
+
                     </CardContent>
                 </BlurredContent>
                 <HoverOverlay className={isHovered ? 'hovered' : ''}>
-                    <Typography variant="h6" align="left">
-                        Species: {pet.species}
-                    </Typography>
-                    <Typography variant="h6" align="left">
-                        Breed: {pet.breed}
-                    </Typography>
-                    <Typography variant="h6" align="left">
-                        Color: {pet.color}
-                    </Typography>
-                    <Typography variant="h6" align="left">
-                        Sex: {pet.sex}
-                    </Typography>
-                    <Typography variant="h6" align="left">
-                        Age: {pet.age}
-                    </Typography>
-                    <Typography variant="body1" align="left">
-                        Description: {pet.description}
-                    </Typography>
+                    <Box onClick={handleExpandClick}>
+                        <Typography variant="h6" align="left">
+                            Species: {pet.species}
+                        </Typography>
+                        <Typography variant="h6" align="left">
+                            Breed: {pet.breed}
+                        </Typography>
+                        <Typography variant="h6" align="left">
+                            Color: {pet.color}
+                        </Typography>
+                        <Typography variant="h6" align="left">
+                            Sex: {pet.sex}
+                        </Typography>
+                        <Typography variant="h6" align="left">
+                            Age: {pet.age}
+                        </Typography>
+                        <Typography variant="body1" align="left">
+                            Description: {pet.description}
+                        </Typography>
+                    </Box>
+                    {saveable && (
+                        <Button onClick={handleSavePetToOwner} variant="contained" color="primary">
+                            Save Pet
+                        </Button>
+                    )}
+                    {likeable && (
+                        <Button onClick={handleLikePet} variant="contained" color="primary">
+                            Like Pet
+                        </Button>
+                    )}
                 </HoverOverlay>
             </StyledCard>
 
             {isModalOpen && (
-                <ExpandedPetCard pet={pet} onClose={handleCloseModal} />
+                <ExpandedPetCard pet={pet} saveable={saveable} likeable={likeable} onClose={handleCloseModal} />
             )}
         </>
     );
