@@ -2,7 +2,15 @@ import React from 'react';
 import { Modal, Box, Typography, Button } from '@mui/material';
 import ImageComponent from './ImageComponent';
 
-const ExpandedPetCard = ({ pet, onClose }) => {
+const ExpandedPetCard = ({ pet, onClose, saveable = true, likeable = true }) => {
+    const handleSavePetToOwner = () => {
+        console.log("Saving pet to owner");
+    };
+
+    const handleLikePet = () => {
+        console.log("Liking pet");
+    };
+
     return (
         <Modal open={!!pet} onClose={onClose}>
             <Box
@@ -29,6 +37,16 @@ const ExpandedPetCard = ({ pet, onClose }) => {
                 <Typography variant="body1">Sex: {pet.sex}</Typography>
                 <Typography variant="body1">Age: {pet.age}</Typography>
                 <Typography variant="body1">Description: {pet.description}</Typography>
+                {saveable && (
+                    <Button onClick={handleSavePetToOwner} variant="contained" color="primary">
+                        Save Pet
+                    </Button>
+                )}
+                {likeable && (
+                    <Button onClick={handleLikePet} variant="contained" color="primary">
+                        Like Pet
+                    </Button>
+                )}
                 <Button onClick={onClose}>Close</Button>
             </Box>
         </Modal>

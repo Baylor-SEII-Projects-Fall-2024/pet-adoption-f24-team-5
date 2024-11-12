@@ -80,7 +80,7 @@ const PetManager = () => {
 
                     {loading ? <CircularProgress /> :
                         ((pets.length > 0) && pets.map((pet) => (
-                            <PetCard pet={pet} key={pet.petName} onClick={() => handleCardClick(pet)} />
+                            <PetCard pet={pet} expandable={false} saveable={false} likeable={false} key={pet.petName} onClick={() => handleCardClick(pet)} />
                         )))
                     }
 
