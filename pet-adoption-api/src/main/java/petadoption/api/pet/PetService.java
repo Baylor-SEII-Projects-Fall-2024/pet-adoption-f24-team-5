@@ -67,6 +67,7 @@ public class PetService {
     }
 
 
-
-
+    public PetWeights getPetWeights(Pet pet) {
+        return petWeightService.getPetWeights(pet.getPetWeightId());
+    }
 }

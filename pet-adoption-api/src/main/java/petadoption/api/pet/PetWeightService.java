@@ -23,4 +23,8 @@ public class PetWeightService {
 
 
     }
+
+    public PetWeights getPetWeights(long id) {
+        return petWeightsRepository.findById(id).orElse(null);
+    }
 }
