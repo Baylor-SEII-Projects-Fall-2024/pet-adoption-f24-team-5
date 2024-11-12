@@ -12,6 +12,7 @@ import petadoption.api.user.AdoptionCenter.CenterWorker;
 import petadoption.api.user.AdoptionCenter.CenterWorkerRepository;
 import petadoption.api.user.Owner.Owner;
 import petadoption.api.user.Owner.OwnerRepository;
+
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
@@ -60,6 +61,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
+
     public Owner updateOwner(Owner owner, String oldPassword) throws IllegalAccessException {
         if (findUser(owner.getEmailAddress()).isEmpty()) {
             throw new IllegalAccessException("User not found");
@@ -78,23 +80,6 @@ public class UserService {
         return userRepository.save(newUser);
     }
 
-    public ResponseEntity<Owner> addPetToSavedPets(String email, Long petId) {
-        Owner newUser = (Owner) findUser(email).get();
-
-        List<Long> savedPetIds = newUser.getSavedPetIds();
-        if (!savedPetIds.contains(petId)) {
-            newUser.addPetToSavedPets(petId);
-        }
-
-        return new ResponseEntity<>(userRepository.save(newUser), HttpStatus.OK);
-    }
-
-    public ResponseEntity<Owner> updateOwnerPreferenceId(Owner owner) {
-        Owner newUser = (Owner) findUser(owner.getEmailAddress()).get();
-        newUser.setPreference(owner.getPreference());
-        return new ResponseEntity<>(userRepository.save(newUser), HttpStatus.OK);
-    }
-
     public CenterWorker updateCenterWorker(CenterWorker worker, String oldPassword) throws IllegalAccessException {
         if (findUser(worker.getEmailAddress()).isEmpty()) {
             throw new IllegalAccessException("User not found");
@@ -110,6 +95,23 @@ public class UserService {
         newUser.setLastName(worker.getLastName());
         newUser.setAge(worker.getAge());
         return userRepository.save(newUser);
+    }
+
+    public ResponseEntity<Owner> addPetToSavedPets(String email, Long petId) {
+        Owner newUser = (Owner) findUser(email).get();
+
+        List<Long> savedPetIds = newUser.getSavedPetIds();
+        if (!savedPetIds.contains(petId)) {
+            newUser.addPetToSavedPets(petId);
+        }
+
+        return new ResponseEntity<>(userRepository.save(newUser), HttpStatus.OK);
+    }
+
+    public ResponseEntity<Owner> updateOwnerPreferenceId(Owner owner) {
+        Owner newUser = (Owner) findUser(owner.getEmailAddress()).get();
+        newUser.setPreferenceWeights(owner.getPreferenceWeights());
+        return new ResponseEntity<>(userRepository.save(newUser), HttpStatus.OK);
     }
 
     public AdoptionCenter updateAdoptionCenter(AdoptionCenter adoptionCenter, String oldPassword)

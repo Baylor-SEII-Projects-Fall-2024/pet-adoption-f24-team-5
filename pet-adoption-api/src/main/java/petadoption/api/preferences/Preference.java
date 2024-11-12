@@ -1,21 +1,22 @@
 package petadoption.api.preferences;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+
 
 @Data
 @Entity
 @Table(name = Preference.TABLE_NAME)
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 public class Preference {
-    public static final String TABLE_NAME = "PREFERENCES";
+    public static final String TABLE_NAME = "DEFAULT_PREFERENCES";
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "PREFERENCE_ID")
+    @Column(name = "DEFAULT_PREFERENCE_ID")
     private Long preferenceId;
 
     @Column(name = "PREFERRED_SPECIES")
@@ -33,11 +34,7 @@ public class Preference {
     @Column(name = "PREFERRED_AGE")
     private int preferredAge;
 
-    public Preference() {
-    }
-
-    public Preference(String preferredSpecies, String preferredBreed, String preferredColor, String preferredSex,
-            int preferredAge) {
+    public Preference(String preferredSpecies, String preferredBreed, String preferredColor, String preferredSex, int preferredAge) {
         this.preferredSpecies = preferredSpecies;
         this.preferredBreed = preferredBreed;
         this.preferredColor = preferredColor;
@@ -45,13 +42,5 @@ public class Preference {
         this.preferredAge = preferredAge;
     }
 
-    public Preference(Long preferenceId, String preferredSpecies, String preferredBreed, String preferredColor,
-            String preferredSex, int preferredAge) {
-        this.preferenceId = preferenceId;
-        this.preferredSpecies = preferredSpecies;
-        this.preferredBreed = preferredBreed;
-        this.preferredColor = preferredColor;
-        this.preferredSex = preferredSex;
-        this.preferredAge = preferredAge;
-    }
+
 }

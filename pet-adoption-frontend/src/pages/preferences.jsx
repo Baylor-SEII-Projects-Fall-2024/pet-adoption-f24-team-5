@@ -82,7 +82,7 @@ const PreferencesPage = () => {
         if (preferenceObject == null) {
             try {
                 // Create a new preference if none exists
-                const createResponse = await axios.post(`${API_URL}/api/preferences/create`, preferences, {
+                const createResponse = await axios.post(`${API_URL}/api/preferences/create/${user.id}`, preferences, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json',
