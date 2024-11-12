@@ -8,6 +8,7 @@ import petadoption.api.pet.Pet;
 import petadoption.api.pet.PetService;
 import petadoption.api.preferences.Preference;
 import petadoption.api.preferences.PreferenceWeightsService;
+import petadoption.api.user.Owner.OwnerService;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ public class RecommendationEngineController {
             .div(4); // Average out the vectors*/
     private final PetService petService;
     private final RecommendationService recommendationService;
+    private final OwnerService ownerService;
 
     @PostMapping("/update-preference/{id}")
     public ResponseEntity<?> updatePreference(@PathVariable long id, @RequestBody Preference preference) {
@@ -47,8 +49,9 @@ public class RecommendationEngineController {
     @GetMapping("/generate-new-options/{id}")
     public ResponseEntity<?> getNewPets(@PathVariable long id) {
         try{
+            long userWeightID = ownerService.getPreferenceWeightsIdByOwnerID(id);
             int coldStartValue = recommendationService.getColdStartValue(id);
-            double[] usersNewWeights = recommendationService.getUsersWeights(id);
+            double[] usersNewWeights = recommendationService.getUsersWeights(userWeightID);
 
 
             // If the user's cold start is over give them valid recommendations
