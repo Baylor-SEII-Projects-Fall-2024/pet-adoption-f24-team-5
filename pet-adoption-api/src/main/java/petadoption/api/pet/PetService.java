@@ -21,14 +21,14 @@ public class PetService {
 
     public List<Pet> getAllPets() { return petRepository.findAll(); }
 
-/*    public Pet savePet(Pet pet, AdoptionCenter adoptionCenter) {
+    public Pet savePet(Pet pet, AdoptionCenter adoptionCenter) {
         if(adoptionCenter == null) {
             throw new IllegalArgumentException("Adoption center is null");
         }
         pet.setAdoptionCenter(adoptionCenter);
         return petRepository.save(pet);
 
-    }*/
+    }
 
     public Pet savePet(Pet pet, AdoptionCenter adoptionCenter, double[] petVector) {
         if(adoptionCenter == null) {
