@@ -6,6 +6,7 @@ import org.deeplearning4j.models.word2vec.Word2Vec;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.springframework.stereotype.Service;
+import org.springframework.context.annotation.Lazy;
 import petadoption.api.pet.Pet;
 import petadoption.api.pet.PetService;
 import petadoption.api.preferences.Preference;
@@ -76,6 +77,17 @@ public class RecommendationService {
         return pref;
     }
 
+    public double[] generatePreferenceVector(Pet pet) throws IOException {
+        Preference petStats = new Preference();
+
+        petStats.setPreferredSpecies(pet.getSpecies());
+        petStats.setPreferredBreed(pet.getBreed());
+        petStats.setPreferredColor(pet.getColor());
+        petStats.setPreferredAge(pet.getAge());
+
+        return generatePreferenceVector(petStats);
+
+    }
     public double[] generatePreferenceVector(Preference preference) {
         List<String> newWords = new ArrayList<>();
 
