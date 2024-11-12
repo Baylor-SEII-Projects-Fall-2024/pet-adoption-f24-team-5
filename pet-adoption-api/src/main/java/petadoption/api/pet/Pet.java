@@ -6,6 +6,11 @@ import petadoption.api.user.AdoptionCenter.AdoptionCenter;
 import petadoption.api.user.User;
 import petadoption.api.user.Owner.Owner;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 @Entity
 @Getter
 @Setter
@@ -28,6 +33,9 @@ public class Pet {
     @ManyToOne
     @JoinColumn(name = "CENTER_ID", nullable = false)
     protected AdoptionCenter adoptionCenter;
+
+    @ManyToMany(mappedBy = "savedPets")
+    private Set<Owner> usersWhoSaved = new HashSet<>();
 
     @Column(name = "SPECIES")
     protected String species;

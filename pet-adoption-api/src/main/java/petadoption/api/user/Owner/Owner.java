@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import petadoption.api.pet.Pet;
 import petadoption.api.preferences.Preference;
 import petadoption.api.user.User;
 import petadoption.api.user.UserType;
@@ -14,9 +15,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @Getter
 @Setter
@@ -29,6 +28,14 @@ public class Owner extends User {
     @OneToOne
     @JoinColumn(name = "PREFERENCE_ID")
     private Preference preference;
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "user_saved_pets",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "pet_id")
+    )
+    private Set<Pet> savedPets = new HashSet<>();
 
     @Column(name = "AGE")
     private int age;
