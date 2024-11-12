@@ -9,13 +9,36 @@ import PetCard from "@/components/PetCard";
 
 const SearchEngine = () => {
     const [pets, setPets] = useState([]);
+    const [user, setUser] = useState(null);
+    const [userId, setUserId] = useState(null);
     const token = useSelector((state) => state.user.token);
 
+    useEffect(() => {
+        const fetchPreferenceId = async () => {
+            const email = getSubjectFromToken(token);
+            if (email) {
+                try {
+                    const response = await axios.get(`${API_URL}/api/users/getUser`, {
+                        params: { emailAddress: email },
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json',
+                        },
+                    });
+                    setUser(response.data);
+                    setUserId(response.data.id);
+                } catch (error) {
+                    console.error('Error fetching ID:', error);
+                }
+            }
+        };
+        fetchPreferenceId();
+    }, [token]);
 
     const handleSearch = async () => {
         setPets([]);
 
-        const url = `${API_URL}/api/pets/search_engine`;
+        const url = `${API_URL}/api/recommendation-engine/generate-new-options/${userId}`;
 
         try {
             const res = await axios.get(url, {

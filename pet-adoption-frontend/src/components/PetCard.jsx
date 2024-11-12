@@ -75,7 +75,7 @@ const PetCard = ({ pet, onClick, expandable = true, saveable = true, likeable = 
     };
 
     const handleLikePet = () => {
-        
+
         console.log("Liking pet");
     };
 
@@ -84,8 +84,8 @@ const PetCard = ({ pet, onClick, expandable = true, saveable = true, likeable = 
             <StyledCard
                 onClick={onClick}
                 sx={{
-                    maxWidth: 600,
-                    maxHeight: 500,
+                    width: 200,
+                    height: 300,
                     display: 'flex',
                     justifyContent: 'center',
                     "&:hover": {
