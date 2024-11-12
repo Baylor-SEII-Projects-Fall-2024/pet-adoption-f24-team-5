@@ -2,13 +2,8 @@ server:
   port: 8080
 spring:
   datasource:
-<<<<<<< HEAD
     #url: jdbc:mysql://${MYSQL_HOST:mysql}:3306/petadoption
     url: jdbc:mysql://${MYSQL_HOST:localhost}:3307/petadoption
-=======
-    url: jdbc:mysql://${MYSQL_HOST:mysql}:3306/petadoption
-    #url: jdbc:mysql://${MYSQL_HOST:localhost}:3307/petadoption
->>>>>>> ff373c71d3c3a86f9c8b175d1e40d62ac4d3fbb8
     username: root
     password: password
     driverClassName: com.mysql.cj.jdbc.Driver

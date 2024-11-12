@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.Set;
 import petadoption.api.preferences.Preference;
 import petadoption.api.preferences.PreferenceWeights;
-import java.util.Optional;
 
 
 @Service
@@ -19,16 +18,8 @@ public class OwnerService {
     public Optional<Set<Pet>> getAllSavedPetsByEmail(String email) {
         Optional<Owner> owner = ownerRepository.findByEmailAddress(email);
 
-        if (owner.isPresent()) {
+        return owner.map(Owner::getSavedPets);
 
-            Optional<Set<Pet>> pets = Optional.ofNullable(owner.get().getSavedPets());
-
-            //TODO: clean the pet list to remove all pets that have been adopted
-
-            return pets;
-        }
-
-        return Optional.empty();
     }
 
     public void savePetForOwnerByEmail(String email, Pet pet) {
@@ -40,6 +31,17 @@ public class OwnerService {
 
         ownerRepository.save(owner);
 
+    }
+
+    public void removeSavedPetForOwnerByEmail(String email, Pet pet) {
+        Owner owner = ownerRepository.findByEmailAddress(email)
+                .orElseThrow(() -> new RuntimeException("Owner not found"));
+
+        if(owner.getSavedPets().remove(pet)) {
+            pet.getUsersWhoSaved().remove(owner);
+        }
+
+        ownerRepository.save(owner);
     }
 
     public Long getPreferenceWeightsIdByOwnerID(Long id) {

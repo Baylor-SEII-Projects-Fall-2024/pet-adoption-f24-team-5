@@ -113,4 +113,35 @@ public class OwnerTest {
         assertTrue(result.isPresent(), "Result should be present.");
         assertTrue(result.get().isEmpty(), "The set should be empty.");
     }
+
+    @Test
+    void removeSavedPetForOwnerByEmail_Success() {
+        String email = "test@example.com";
+
+        Set<Pet> savedPets = new HashSet<>();
+        savedPets.add(pet1);
+        savedPets.add(pet2);
+        Set<Owner> usersWhoSaved = new HashSet<>();
+        usersWhoSaved.add(owner);
+
+        when(ownerRepository.findByEmailAddress(email)).thenReturn(Optional.of(owner));
+        when(owner.getSavedPets()).thenReturn(savedPets);
+        when(pet1.getUsersWhoSaved()).thenReturn(usersWhoSaved);
+        when(pet2.getUsersWhoSaved()).thenReturn(usersWhoSaved);
+
+        ownerService.removeSavedPetForOwnerByEmail(email, pet1);
+
+        verify(ownerRepository).save(owner);
+
+
+        assertFalse(owner.getSavedPets().contains(pet1), "The pet should be removed in the owner's savedPets.");
+        assertTrue(owner.getSavedPets().contains(pet2), "The pet should be removed in the owner's savedPets.");
+        assertFalse(pet1.getUsersWhoSaved().contains(owner), "The owner should be removed in the pet's usersWhoSaved.");
+
+        ownerService.removeSavedPetForOwnerByEmail(email, pet2);
+        verify(ownerRepository, times(2)).save(owner);
+
+        assertFalse(usersWhoSaved.contains(owner), "The pet should be removed in the owner's savedPets.");
+        assertFalse(pet2.getUsersWhoSaved().contains(owner), "The owner should be removed in the pet's usersWhoSaved.");
+    }
 }
