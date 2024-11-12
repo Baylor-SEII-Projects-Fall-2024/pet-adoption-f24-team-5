@@ -75,6 +75,7 @@ const PetCard = ({ pet, onClick, expandable = true, saveable = true, likeable = 
     };
 
     const handleLikePet = () => {
+        
         console.log("Liking pet");
     };
 

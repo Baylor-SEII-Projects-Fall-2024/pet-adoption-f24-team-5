@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import petadoption.api.pet.Pet;
 import petadoption.api.preferences.Preference;
+import petadoption.api.preferences.PreferenceWeights;
 import petadoption.api.user.User;
 import petadoption.api.user.UserType;
 
@@ -26,8 +27,12 @@ import java.util.*;
 public class Owner extends User {
 
     @OneToOne
-    @JoinColumn(name = "PREFERENCE_ID")
-    private Preference preference;
+    @JoinColumn(name = "PREFERENCE_WEIGHTS_ID")
+    private PreferenceWeights preferenceWeights;
+
+    @OneToOne
+    @JoinColumn(name = "DEFAULT_PREFERENCE_ID")
+    private Preference defaultPreference;
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
@@ -75,9 +80,9 @@ public class Owner extends User {
     }
 
     public Owner(String emailAddress, String password, UserType userType, int age, String phoneNumber,
-            Preference preference, String centerZip) {
+                 PreferenceWeights preferenceWeights, String centerZip) {
         super(emailAddress, password, userType, phoneNumber);
-        this.preference = preference;
+        this.preferenceWeights = preferenceWeights;
         this.age = age;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -86,9 +91,9 @@ public class Owner extends User {
     }
 
     public Owner(Long id, String firstName, String lastName, String emailAddress, String password, UserType userType,
-            int age, String phoneNumber, Preference preference, String centerZip) {
+                 int age, String phoneNumber, PreferenceWeights preferenceWeights, String centerZip) {
         super(id, emailAddress, password, userType, phoneNumber);
-        this.preference = preference;
+        this.preferenceWeights = preferenceWeights;
         this.age = age;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -99,7 +104,7 @@ public class Owner extends User {
     public Owner(String emailAddress, String password, UserType userType, int age, String phoneNumber,
             Preference preference, String centerZip, List<Long> savedPetIds) {
         super(emailAddress, password, userType, phoneNumber);
-        this.preference = preference;
+        this.defaultPreference = preference;
         this.age = age;
         this.savedPetIds = savedPetIds;
         this.centerZip = centerZip;
@@ -167,7 +172,7 @@ public class Owner extends User {
     }
 
     public void setPreferenceId(Long preferenceId) {
-        this.preference.setPreferenceId(preferenceId);
+        this.preferenceWeights.setPreferenceWeightId(preferenceId);
     }
 
     public void addPetToSavedPets(Long petId) {
