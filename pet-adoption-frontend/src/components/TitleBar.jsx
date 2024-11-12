@@ -5,7 +5,7 @@ import { Button, Toolbar, Typography, AppBar } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { API_URL } from "../constants";
-import axios from 'axios';
+import axios from '../utils/axiosConfig';
 
 
 const TitleBar = () => {
@@ -83,6 +83,7 @@ const TitleBar = () => {
                         <Button color="inherit" component={Link} to="/LocalAdoptionCenter">Local Adoption Center</Button>
                         <Button color="inherit" component={Link} to="/EventManager">All Events</Button>
                         <Button color="inherit" component={Link} to="/preferences">Preferences</Button>
+                        <Button color="inherit" component={Link} to="/SavedPets">Saved Pets</Button>
                     </>
                 )}
 

@@ -1,5 +1,5 @@
 import { API_URL } from "@/constants";
-import axios from "axios";
+import axios from "../utils/axiosConfig";
 import { getSubjectFromToken } from "@/utils/tokenUtils";
 
 export const SaveUpdateEvent = async ({ formType, event, token, resetFields, handleCreateNewEvent }) => {

@@ -1,5 +1,6 @@
 package petadoption.api.recommendationEngine;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.RequiredArgsConstructor;
 import org.deeplearning4j.models.word2vec.Word2Vec;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -13,10 +14,7 @@ import petadoption.api.preferences.PreferenceWeightsService;
 import petadoption.api.user.Owner.OwnerService;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -149,6 +147,33 @@ public class RecommendationService {
     }
 
 
+    public int getColdStartValue(long userId) throws IOException{
+        Long weightID = ownerService.getPreferenceWeightsIdByOwnerID(userId);
+        if(weightID == null){
+            throw new IOException("Did not find user with ID: " + userId);
+        }
+        Optional<Integer> coldStartResult = preferenceWeightsService.getColdStartValue(weightID);
+        if(coldStartResult.isPresent()){
+            return coldStartResult.get();
+        }
+        throw new IOException("Did not find weight with ID: " + weightID);
+    }
 
+    public int setColdStartValue(long userId, int coldStartValue) throws IOException{
 
+        Long weightID = ownerService.getPreferenceWeightsIdByOwnerID(userId);
+        if(weightID == null){
+            throw new IOException("Did not find user with ID: " + userId);
+        }
+
+        return preferenceWeightsService.setColdStartValue(weightID, coldStartValue);
+    }
+
+    public double[] getUsersWeights(long id) {
+        PreferenceWeights preferenceWeights = preferenceWeightsService.getPreferenceWeights(id);
+        if(preferenceWeights != null){
+            return preferenceWeights.getAllWeights();
+        }
+        return null;
+    }
 }

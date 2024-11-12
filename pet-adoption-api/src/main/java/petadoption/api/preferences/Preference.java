@@ -28,14 +28,19 @@ public class Preference {
     @Column(name = "PREFERRED_COLOR")
     private String preferredColor;
 
+    @Column(name = "PREFERRED_SEX")
+    private String preferredSex;
+
     @Column(name = "PREFERRED_AGE")
     private int preferredAge;
 
-    public Preference(String preferredSpecies, String preferredBreed, String preferredColor, int preferredAge) {
+    public Preference(String preferredSpecies, String preferredBreed, String preferredColor, String preferredSex, int preferredAge) {
         this.preferredSpecies = preferredSpecies;
         this.preferredBreed = preferredBreed;
         this.preferredColor = preferredColor;
+        this.preferredSex = preferredSex;
         this.preferredAge = preferredAge;
     }
+
 
 }

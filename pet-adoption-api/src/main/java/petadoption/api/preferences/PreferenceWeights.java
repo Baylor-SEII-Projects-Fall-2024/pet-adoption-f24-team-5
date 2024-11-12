@@ -16,6 +16,9 @@ public class PreferenceWeights {
     @Column(name = "PREFERENCE_WEIGHTS_ID")
     private Long preferenceWeightId;
 
+    @Column(name = "COLD-START-VALUE", columnDefinition = "int default 3")
+    private int coldStartValue;
+
     @Column(name = "WEIGHT-1")
     private Double weight1;
 
@@ -280,5 +283,9 @@ public class PreferenceWeights {
     }
     public void setPreferenceWeightId(Long preferenceWeightId) {
         this.preferenceWeightId = preferenceWeightId;
+    }
+
+    public int getColdStartValue() {
+        return coldStartValue;
     }
 }

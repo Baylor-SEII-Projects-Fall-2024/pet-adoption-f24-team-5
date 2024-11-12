@@ -1,8 +1,11 @@
 package petadoption.api.preferences;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -45,5 +48,19 @@ public class PreferenceWeightsService {
             return preferenceRepository.save(preferenceWeights);
         }
         return null;
+    }
+
+    public Optional<Integer> getColdStartValue(long preferenceWeightId) {
+        Optional<PreferenceWeights> preferenceWeights = preferenceRepository.findById(preferenceWeightId);
+        if (preferenceWeights.isPresent()) {
+            return Optional.of(preferenceWeights.get().getColdStartValue());
+        }
+        return Optional.empty();
+    }
+
+    public int setColdStartValue(long id, int coldStartValue) {
+        PreferenceWeights preferenceWeights = getPreferenceWeights(id);
+        preferenceWeights.setColdStartValue(coldStartValue);
+        return preferenceRepository.save(preferenceWeights).getColdStartValue();
     }
 }

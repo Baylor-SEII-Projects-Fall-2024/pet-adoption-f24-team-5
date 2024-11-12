@@ -1,6 +1,5 @@
 package petadoption.api.config;
 
-import jakarta.servlet.Filter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,32 +14,32 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfiguration {
-    private final JwtAuthenticationFilter jwtAuthFilter;
-    private final AuthenticationProvider authenticationProvider;
+        private final JwtAuthenticationFilter jwtAuthFilter;
+        private final AuthenticationProvider authenticationProvider;
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("api/auth/**").permitAll() // White Lists these the methods in Authentication Controller
-                        .anyRequest()
-                        .authenticated()
-                )
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
-                .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+                http
+                                .csrf(csrf -> csrf.disable())
+                                .authorizeHttpRequests(authorize -> authorize
+                                                .requestMatchers("api/auth/**").permitAll() // White Lists these the
+                                                                                            // methods in Authentication
+                                                                                            // Controller
+                                                .anyRequest()
+                                                .authenticated())
+                                .sessionManagement(session -> session
+                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                                .authenticationProvider(authenticationProvider)
+                                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
-        return http.build();
-    }
+                return http.build();
+        }
 }
 
 /*
-// Restricted endpoints based on authorities
-    .requestMatchers("/api/owner/**").hasAuthority("Owner")
-    .requestMatchers("/api/center-worker/**").hasAuthority("CenterWorker")
-    .requestMatchers("/api/center-owner/**").hasAuthority("CenterOwner")
-    .requestMatchers("/api/admin/**").hasAuthority("Admin")
+ * // Restricted endpoints based on authorities
+ * .requestMatchers("/api/owner/**").hasAuthority("Owner")
+ * .requestMatchers("/api/center-worker/**").hasAuthority("CenterWorker")
+ * .requestMatchers("/api/center-owner/**").hasAuthority("CenterOwner")
+ * .requestMatchers("/api/admin/**").hasAuthority("Admin")
  */

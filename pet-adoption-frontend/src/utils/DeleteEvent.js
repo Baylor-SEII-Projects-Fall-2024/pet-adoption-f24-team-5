@@ -1,5 +1,5 @@
 import { API_URL } from "@/constants";
-import axios from "axios";
+import axios from "../utils/axiosConfig";
 
 export const DeleteEvent = async ({ event, token, resetFields, handleCreateNewEvent }) => {
     try {

@@ -7,7 +7,9 @@ import { CssBaseline } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { PetAdoptionThemeProvider } from '@/utils/theme';
-import { buildStore } from '@/utils/redux';
+import { PersistGate } from 'redux-persist/integration/react';
+import store, { persistor } from '@/utils/redux';
+import SavedPets from './SavedPets';
 
 import '@/styles/globals.css';
 import '@/styles/styled-button.css';
@@ -27,12 +29,13 @@ import LocalAdoptionCenter from './LocalAdoptionCenter';
 import EventManager from "@/pages/EventManager";
 import PreferencesPage from "@/pages/preferences";
 
-const reduxStore = buildStore({});
-
 import ProtectedRoute from './protectedRoute';
 import AvailablePets from "@/pages/AvailablePets";
 import ManageAccounts from "@/pages/ManageAccounts";
 import RegisterCenterWorker from "@/pages/RegisterCenterWorker";
+
+import Layout from '@/components/Layout';
+import SessionExpired from "@/pages/SessionExpired";
 
 function AppRoutes() {
   const token = useSelector((state) => state.user.token);
@@ -40,18 +43,22 @@ function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+        <Route element={<Layout />}>
+          <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+          <Route path="/PetManager" element={<ProtectedRoute><PetManager /></ProtectedRoute>} />
+          <Route path="/EventManager" element={<ProtectedRoute><EventManager /></ProtectedRoute>} />
+          <Route path="/SearchEngine" element={<ProtectedRoute><SearchEngine /></ProtectedRoute>} />
+          <Route path="/Settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+          <Route path="/LocalAdoptionCenter" element={<ProtectedRoute><LocalAdoptionCenter /></ProtectedRoute>} />
+          <Route path="/ManageAccounts" element={<ProtectedRoute><ManageAccounts /></ProtectedRoute>} />
+          <Route path="/RegisterCenterWorker" element={<ProtectedRoute><RegisterCenterWorker /></ProtectedRoute>} />
+          <Route path="/AvailablePets" element={<ProtectedRoute><AvailablePets /></ProtectedRoute>} />
+          <Route path="/preferences" element={<ProtectedRoute><PreferencesPage /></ProtectedRoute>} />
+          <Route path="/SavedPets" element={<ProtectedRoute><SavedPets /></ProtectedRoute>} />
+        </Route>
         <Route path="/Register" element={<Register />} />
         <Route path="/Login" element={<Login />} />
-        <Route path="/PetManager" element={<ProtectedRoute><PetManager /></ProtectedRoute>} />
-        <Route path="/EventManager" element={<ProtectedRoute><EventManager /></ProtectedRoute>} />
-        <Route path="/SearchEngine" element={<ProtectedRoute><SearchEngine /></ProtectedRoute>} />
-        <Route path="/Settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-        <Route path="/LocalAdoptionCenter" element={<ProtectedRoute><LocalAdoptionCenter /></ProtectedRoute>} />
-        <Route path="/ManageAccounts" element={<ProtectedRoute><ManageAccounts /></ProtectedRoute>} />
-        <Route path="/RegisterCenterWorker" element={<ProtectedRoute><RegisterCenterWorker /></ProtectedRoute>} />
-        <Route path="/AvailablePets" element={<AvailablePets />} />
-        <Route path="/preferences" element={<ProtectedRoute><PreferencesPage /></ProtectedRoute>} />
+        <Route path="/session-expired" element={<SessionExpired />} />
         <Route path="*" element={<Navigate to="/Login" />} />
       </Routes>
     </BrowserRouter>
@@ -66,18 +73,20 @@ export default function App() {
   }, []);
 
   return (
-    <ReduxProvider store={reduxStore}>
-      <AppCacheProvider>
-        <Head>
-          <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
-          <link rel='icon' href='/favicon.ico' />
-        </Head>
+    <ReduxProvider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <AppCacheProvider>
+          <Head>
+            <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
+            <link rel='icon' href='/favicon.ico' />
+          </Head>
 
-        <PetAdoptionThemeProvider>
-          <CssBaseline />
-          {isClient && <AppRoutes />}
-        </PetAdoptionThemeProvider>
-      </AppCacheProvider>
+          <PetAdoptionThemeProvider>
+            <CssBaseline />
+            {isClient && <AppRoutes />}
+          </PetAdoptionThemeProvider>
+        </AppCacheProvider>
+      </PersistGate>
     </ReduxProvider>
   );
 }

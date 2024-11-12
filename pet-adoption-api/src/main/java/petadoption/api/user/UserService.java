@@ -61,6 +61,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
+
     public Owner updateOwner(Owner owner, String oldPassword) throws IllegalAccessException {
         if (findUser(owner.getEmailAddress()).isEmpty()) {
             throw new IllegalAccessException("User not found");
@@ -94,6 +95,17 @@ public class UserService {
         newUser.setLastName(worker.getLastName());
         newUser.setAge(worker.getAge());
         return userRepository.save(newUser);
+    }
+
+    public ResponseEntity<Owner> addPetToSavedPets(String email, Long petId) {
+        Owner newUser = (Owner) findUser(email).get();
+
+        List<Long> savedPetIds = newUser.getSavedPetIds();
+        if (!savedPetIds.contains(petId)) {
+            newUser.addPetToSavedPets(petId);
+        }
+
+        return new ResponseEntity<>(userRepository.save(newUser), HttpStatus.OK);
     }
 
     public ResponseEntity<Owner> updateOwnerPreferenceId(Owner owner) {

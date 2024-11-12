@@ -32,6 +32,7 @@ const ImageComponent = (props) => {
                 width: props.width,
                 maxWidth: props.maxWidth,
                 height: props.height,
+                align: props.align,
             }}
             onLoad={props.onLoad}
         />

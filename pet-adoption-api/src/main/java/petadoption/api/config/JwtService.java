@@ -10,11 +10,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import petadoption.api.user.User;
 
-import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 public class JwtService {
@@ -26,12 +24,12 @@ public class JwtService {
     }
 
     public String generateToken(UserDetails userDetails) {
-        int tokenTimeLength = 1000  * 60 * 24;
+        int tokenTimeLength = 1000 * 60 * 24;
         return generateToken(new HashMap<>(), userDetails);
     }
 
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-        int tokenTimeLength = 1000  * 60 * 24;
+        int tokenTimeLength = 1000 * 60 * 24;
 
         if (userDetails instanceof User user) {
             // Add the UserType as the authorities claim
@@ -61,8 +59,7 @@ public class JwtService {
         return extractClaim(token, Claims::getExpiration);
     }
 
-
-    public<T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import {Box, Button, CircularProgress, List, ListItem, ListItemText, Typography,} from '@mui/material';
+import { Box, Button, CircularProgress, List, ListItem, ListItemText, Typography, } from '@mui/material';
 import { Link } from 'react-router-dom';
 import TitleBar from '@/components/TitleBar';
 import { useSelector } from 'react-redux';
 import { API_URL } from '@/constants';
-import axios from 'axios';
+import axios from '../utils/axiosConfig';
 import { getSubjectFromToken } from '@/utils/tokenUtils';
 
 const ManageAccounts = () => {
@@ -71,24 +71,33 @@ const ManageAccounts = () => {
         loadData();
     }, [token]);
 
-    return (
-        <Box
-            sx={{
-                height: '100vh',
-                width: '100vw',
-                display: 'flex',
-                flexDirection: 'column',
-                overflow: 'auto',
-                alignItems: 'center',
-            }}
-        >
-            <TitleBar />
+    const deleteEmployee = async (employeeId) => {
+        try {
+            await axios.delete(
+                `${API_URL}/api/adoption-center/deleteEmployee/${employeeId}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            );
+            setEmployees((prevEmployees) =>
+                prevEmployees.filter((employee) => employee.id !== employeeId)
+            );
+        } catch (err) {
+            console.error('Failed to delete employee:', err);
+            setError('Failed to delete employee');
+        }
+    };
 
+    return (
+        <Box>
             <Button
                 color="inherit"
                 component={Link}
                 to="/RegisterCenterWorker"
-                sx={{ width: 'auto', alignSelf: 'center', mt: 2,  border: '1px solid #000000', borderRadius: '8px',}}
+                sx={{ width: 'auto', alignSelf: 'center', mt: 2, border: '1px solid #000000', borderRadius: '8px', }}
 
             >
                 Create Center Worker Account
@@ -108,6 +117,13 @@ const ManageAccounts = () => {
                                 primary={`${employee.firstName} ${employee.lastName}`}
                                 secondary={`Email: ${employee.emailAddress} | Phone: ${employee.phoneNumber}`}
                             />
+                            <Button
+                                color="secondary"
+                                onClick={() => deleteEmployee(employee.id)}
+                                sx={{ ml: 2 }}
+                            >
+                                Delete
+                            </Button>
                         </ListItem>
                     ))}
                 </List>
