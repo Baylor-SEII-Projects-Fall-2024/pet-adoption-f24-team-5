@@ -14,7 +14,7 @@ spring:
       max-request-size: 15MB
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
       dialect: org.hibernate.dialect.MySQLDialect
     show-sql: true
 file:
