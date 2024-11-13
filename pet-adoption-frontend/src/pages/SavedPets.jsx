@@ -50,10 +50,7 @@ const SavedPets = () => {
                     petWeightId: petToDelete.petWeightId
                 },
             });
-    
-            // After successful deletion, remove the pet from the local state
-            if (response.status === 200)
-                setSavedPets(prevSavedPets => prevSavedPets.filter(pet => pet.id !== petToDelete.id));
+            getSavedPets();
         } catch (error) {
             console.error('Error deleting pet:', error);
         }
@@ -69,21 +66,21 @@ const SavedPets = () => {
                 Saved Pets
             </Typography>
             <Grid container spacing={3} justifyContent="center">
-            {savedPets.length > 0 ? (
-                savedPets.map((pet) => (
-                    <Grid item xs={12} sm={6} md={4} lg={3} key={pet.petName}>
-                        <PetCard
-                            pet={pet}
-                            canDelete={true}
-                            onDelete={handleDeletePet}
-                        />
-                    </Grid>
-                ))
-            ) : (
-                <Typography variant="h6" align="center">
-                    No saved pets yet.
-                </Typography>
-            )}
+                {savedPets.length > 0 ? (
+                    savedPets.map((pet) => (
+                        <Grid item xs={12} sm={6} md={4} lg={3} key={pet.petName}>
+                            <PetCard
+                                pet={pet}
+                                canDelete={true}
+                                onDelete={handleDeletePet}
+                            />
+                        </Grid>
+                    ))
+                ) : (
+                    <Typography variant="h6" align="center">
+                        No saved pets yet.
+                    </Typography>
+                )}
             </Grid>
         </Box>
     );
