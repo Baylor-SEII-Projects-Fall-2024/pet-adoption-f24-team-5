@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { handleTokenExpiration } from './checkTokenExpiration';
-import store from '@/utils/redux'; // Correct import for default export
+import { store } from '@/utils/redux';
 
 // Add a response interceptor
 axios.interceptors.response.use(
