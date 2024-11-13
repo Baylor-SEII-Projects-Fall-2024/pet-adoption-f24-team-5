@@ -39,7 +39,7 @@ const HoverOverlay = styled(Box)(({ theme }) => ({
     },
 }));
 
-const PetCard = ({ pet, onClick, expandable = true, saveable = true, likeable = true, onLike = null }) => {
+const PetCard = ({ pet, onClick, expandable = true, saveable = true, likeable = true, onLike = null, onDelete = null }) => {
     const [loading, setLoading] = useState(true);
     const [isHovered, setIsHovered] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -208,6 +208,15 @@ const PetCard = ({ pet, onClick, expandable = true, saveable = true, likeable = 
                         {likeable && (
                             <Button onClick={handleLikePet} variant="contained" color="primary">
                                 Like Pet
+                            </Button>
+                        )}
+                        {onDelete && (
+                            <Button
+                                onClick={() => onDelete(pet)} // This calls the parent function to delete the pet
+                                variant="contained"
+                                color="secondary"
+                            >
+                                Delete Pet
                             </Button>
                         )}
                     </Box>
