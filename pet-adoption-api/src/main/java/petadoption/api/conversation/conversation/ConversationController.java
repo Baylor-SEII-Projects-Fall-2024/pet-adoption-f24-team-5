@@ -132,6 +132,18 @@ public class ConversationController {
         }
     }
 
+    @PostMapping("/getAllUnreadForUser")
+    public ResponseEntity<List<Conversation>> getAllUnreadForUser(@RequestParam long userId) {
+        try {
+            List<Conversation> unreadConversations = conversationService.getAllUnreadForUser(userId);
+            return new ResponseEntity<>(unreadConversations, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace(); // Log the exception
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
 
 
     public boolean isCenter(Long senderId) throws SQLException {

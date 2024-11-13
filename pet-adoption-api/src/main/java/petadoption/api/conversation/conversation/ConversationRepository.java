@@ -50,4 +50,10 @@ public interface ConversationRepository extends JpaRepository<Conversation, Long
             "JOIN AdoptionCenter ac ON c.centerId = ac.id " +
             "WHERE c.conversationId = :conversationId")
     String findCenterNameByConversationId(@Param("conversationId") long conversationId);
+
+    @Query("SELECT c FROM Conversation c " +
+            "WHERE (c.ownerId = :userId AND c.unreadMessagesOwner > 0) " +
+            "OR (c.centerId = :userId AND c.unreadMessagesCenter > 0)")
+    List<Conversation> findUnreadByUserId(@Param("userId") long userId);
+
 }

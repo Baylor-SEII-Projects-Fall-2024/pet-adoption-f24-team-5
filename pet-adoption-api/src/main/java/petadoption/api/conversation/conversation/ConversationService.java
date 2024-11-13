@@ -130,6 +130,19 @@ public class ConversationService {
         }
     }
 
+    public List<Conversation> getAllUnreadForUser(long userId) throws SQLException {
+        if (userId < 1) {
+            throw new IllegalArgumentException("User ID must be positive");
+        }
+        try {
+            return conversationRepository.findUnreadByUserId(userId);
+        } catch (Exception e) {
+            e.printStackTrace(); // Log the exception
+            throw e; // Rethrow the exception to be handled by the controller
+        }
+    }
+
+
 
     public String getOwnerNameByConversationId(long conversationId) {
         // Call repository method to fetch owner name
