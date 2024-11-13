@@ -184,8 +184,8 @@ public class RecommendationService {
             }
 
             List<Long> kMatchedPets = allPetsWeights.entrySet().stream()
-                    .sorted(Map.Entry.comparingByValue())
-                    .limit(k).map(x -> x.getKey()).toList();
+                    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                    .limit(k).map(Map.Entry::getKey).toList();
 
 
             List<Pet> matchedPets = new ArrayList<>();
