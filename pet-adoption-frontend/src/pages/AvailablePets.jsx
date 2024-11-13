@@ -19,7 +19,7 @@ const AvailablePets = () => {
 
     return (
         <Box>
-            <PetGrid pets={pets} loading={loading} />
+            <PetGrid pets={pets} saveable={false} likeable={false} loading={loading} />
         </Box>
     )
 };

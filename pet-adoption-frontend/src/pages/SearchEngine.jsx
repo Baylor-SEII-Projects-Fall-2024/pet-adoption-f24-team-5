@@ -34,6 +34,12 @@ const SearchEngine = () => {
         }
     }
 
+    const handleResetPreferences = async () => {
+        const url = `${API_URL}/api/recommendation-engine/reset-preferences`;
+        await axios.post(url, { email }, { headers: { Authorization: `Bearer ${token}` } });
+        handleSearch();
+    }
+
     useEffect(() => {
         handleSearch();
     }, []);
@@ -135,6 +141,26 @@ const SearchEngine = () => {
                                     }}
                                 >
                                     View Saved Pets
+                                </Button>
+                            </Grid>
+                            <Grid container justifyContent="center" spacing={2}>
+                                <Button
+                                    onClick={handleResetPreferences}
+                                    type="submit"
+                                    variant="contained"
+                                    sx={{
+                                        background: 'linear-gradient(90deg, #43cea2, #246e56)',
+                                        color: 'white',
+                                        width: '450px',
+                                        padding: '10px 0',
+                                        borderRadius: '50px',
+                                        marginTop: 2,
+                                        '&:hover': {
+                                            background: 'linear-gradient(90deg, #246e56, #43cea2)',
+                                        },
+                                    }}
+                                >
+                                    Reset Preferences
                                 </Button>
                             </Grid>
                         </Grid>
