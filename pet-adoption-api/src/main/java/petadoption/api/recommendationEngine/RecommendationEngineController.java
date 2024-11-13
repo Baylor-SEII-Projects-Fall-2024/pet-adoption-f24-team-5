@@ -56,7 +56,7 @@ public class RecommendationEngineController {
 
             // If the user's cold start is over give them valid recommendations
             if(coldStartValue == 0){
-                return new ResponseEntity<>(recommendationService.findKthNearestNeighbors(usersNewWeights, 3)
+                return new ResponseEntity<>(recommendationService.findKthNearestNeighbors(id, usersNewWeights, 3)
                         ,HttpStatus.OK);
             }
 
@@ -72,6 +72,8 @@ public class RecommendationEngineController {
 
         }catch (IOException e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }catch (Exception e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.I_AM_A_TEAPOT);
         }
     }
 

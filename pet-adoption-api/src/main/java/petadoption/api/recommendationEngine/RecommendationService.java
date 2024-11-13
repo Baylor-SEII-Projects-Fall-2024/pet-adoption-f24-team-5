@@ -15,8 +15,11 @@ import petadoption.api.preferences.Preference;
 import petadoption.api.preferences.PreferenceWeights;
 import petadoption.api.preferences.PreferenceWeightsService;
 import petadoption.api.user.Owner.OwnerService;
+import petadoption.api.user.Owner.SeenPetService;
+import petadoption.api.user.Owner.SeenPets;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.*;
 
 @Service
@@ -28,6 +31,7 @@ public class RecommendationService {
     private final Word2Vec word2Vec;
     private final PetService petService;
     private final PetWeightService petWeightService;
+    private final SeenPetService seenPetService;
 
 
     public double[] savePreferenceEmbedding(Long ownerId, List<String> newPreferences) throws IOException {
@@ -128,35 +132,59 @@ public class RecommendationService {
         }
     }
 
-    public List<Pet> findKthNearestNeighbors(double[] userWeights, int k){
-        List<Pet> allPets = petService.getAllPets();
-        if(allPets.isEmpty() || userWeights.length < k){
-            return allPets;
+    public List<Pet> findKthNearestNeighbors(Long ownerID, double[] userWeights, int k) throws Exception{
+        try {
+
+            List<Pet> allPets = petService.getAllPets();
+            if (allPets.isEmpty() || userWeights.length < k) {
+                return allPets;
+            }
+
+            Map<Long, Double> allPetsWeights = new HashMap<>();
+            List<SeenPets> seenPets = seenPetService.getSeenPets(ownerID);
+
+            if (seenPets.size() >= allPets.size()) {
+                //User has seen all pets, restart their seen pets
+                seenPetService.resetSeenPets(ownerID);
+                seenPets = new ArrayList<>();
+            }
+
+            for (Pet pet : allPets) {
+                boolean hasBeenSeen = false;
+                for (SeenPets seenPet : seenPets) {
+                    hasBeenSeen = seenPet.getSeenPetId() == pet.getPetId();
+                    if (hasBeenSeen) {
+                        break;
+                    }
+                }
+                if (!hasBeenSeen) {
+                    PetWeights petWeights = petService.getPetWeights(pet);
+                    Long petID = pet.getPetId();
+                    Preference petStats = new Preference();
+                    petStats.setPreferredSpecies(pet.getSpecies());
+                    petStats.setPreferredBreed(pet.getBreed());
+                    petStats.setPreferredColor(pet.getColor());
+                    petStats.setPreferredAge(pet.getAge());
+                    allPetsWeights.put(petID, VectorUtils.cosineSimilarity(userWeights, petWeights.getAllWeights()));
+                }
+            }
+
+            List<Long> kMatchedPets = allPetsWeights.entrySet().stream()
+                    .sorted(Map.Entry.comparingByValue())
+                    .limit(k).map(x -> x.getKey()).toList();
+
+
+            List<Pet> matchedPets = new ArrayList<>();
+            kMatchedPets.stream().forEach(x -> matchedPets.add(petService.getPetById(x).get()));
+
+
+            //Add three new pets to the list of seen pets
+            seenPetService.addSeenPets(ownerID, matchedPets);
+
+            return matchedPets;
+        }catch (Exception e){
+            throw new SQLException("Error creating kth nearest neighbors: ", e);
         }
-
-        Map<Long, Double> allPetsWeights = new HashMap<>();
-
-        for (Pet pet : allPets) {
-            PetWeights petWeights = petService.getPetWeights(pet);
-            // Todo: potentially add a prefilter system.
-            Long petID = pet.getPetId();
-            Preference petStats = new Preference();
-            petStats.setPreferredSpecies(pet.getSpecies());
-            petStats.setPreferredBreed(pet.getBreed());
-            petStats.setPreferredColor(pet.getColor());
-            petStats.setPreferredAge(pet.getAge());
-            allPetsWeights.put(petID, VectorUtils.cosineSimilarity(userWeights, petWeights.getAllWeights()));
-        }
-
-        List<Long> kMatchedPets = allPetsWeights.entrySet().stream()
-                .sorted(Map.Entry.comparingByValue())
-                .limit(k).map(x -> x.getKey()).toList();
-
-
-        List<Pet> matchedPets = new ArrayList<>();
-        kMatchedPets.stream().forEach( x -> matchedPets.add(petService.getPetById(x).get()));
-
-        return matchedPets;
 
     }
 

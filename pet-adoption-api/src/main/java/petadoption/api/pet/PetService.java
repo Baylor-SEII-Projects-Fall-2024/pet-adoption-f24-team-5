@@ -59,6 +59,7 @@ public class PetService {
             throw new IllegalArgumentException("Pet is null");
         }
 
+        petWeightService.deletePet(pet.getPetWeightId());
         petRepository.delete(pet);
     }
 
