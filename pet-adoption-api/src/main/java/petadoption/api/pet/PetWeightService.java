@@ -27,4 +27,8 @@ public class PetWeightService {
     public PetWeights getPetWeights(long id) {
         return petWeightsRepository.findById(id).orElse(null);
     }
+
+    public void deletePet(long petWeightId) {
+        petWeightsRepository.deleteById(petWeightId);
+    }
 }
