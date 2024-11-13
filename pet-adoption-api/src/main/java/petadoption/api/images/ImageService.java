@@ -48,7 +48,7 @@ public class ImageService {
         }
 
         Path imagePath = Path.of(uploadDir, uniqueImageName);
-        imagePath = Files.exists(imagePath) ? imagePath : Path.of("src/main/resources/static/noPicture.jpg");
+        imagePath = Files.exists(imagePath) ? imagePath : Path.of("src/main/resources/defaultPictures/noPicture.jpg");
 
         if(Files.exists(imagePath)) {
             byte[] imageBytes = Files.readAllBytes(imagePath);
