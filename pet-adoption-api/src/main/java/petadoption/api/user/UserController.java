@@ -73,14 +73,14 @@ public class UserController {
         }
     }
 
-    @PutMapping("/update/Owner/addSavedPet")
+   /* @PutMapping("/update/Owner/addSavedPet")
     public ResponseEntity<Owner> addSavedPet(@RequestParam String email, @RequestParam Long petId) {
         Owner ownerOpt = (Owner) userService.findUser(email).get();
         if (ownerOpt == null) {
             return null;
         }
         return userService.addPetToSavedPets(email, petId);
-    }
+    }*/
 
 
 

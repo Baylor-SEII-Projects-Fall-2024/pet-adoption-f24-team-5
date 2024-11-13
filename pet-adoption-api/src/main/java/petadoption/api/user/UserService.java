@@ -97,7 +97,7 @@ public class UserService {
         return userRepository.save(newUser);
     }
 
-    public ResponseEntity<Owner> addPetToSavedPets(String email, Long petId) {
+    /*public ResponseEntity<Owner> addPetToSavedPets(String email, Long petId) {
         Owner newUser = (Owner) findUser(email).get();
 
         List<Long> savedPetIds = newUser.getSavedPetIds();
@@ -106,7 +106,7 @@ public class UserService {
         }
 
         return new ResponseEntity<>(userRepository.save(newUser), HttpStatus.OK);
-    }
+    }*/
 
     public ResponseEntity<Owner> updateOwnerPreferenceId(Owner owner) {
         Owner newUser = (Owner) findUser(owner.getEmailAddress()).get();

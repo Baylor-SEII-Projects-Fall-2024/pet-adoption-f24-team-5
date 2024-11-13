@@ -1,6 +1,7 @@
 package petadoption.api.user;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
@@ -28,6 +29,13 @@ import java.util.List;
  * property = "userType"
  * )
  */
+/*
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.CLASS,
+        property = "@class"
+)
+*/
+
 @JsonSubTypes({
         @JsonSubTypes.Type(value = CenterWorker.class, name = "CenterWorker"),
         @JsonSubTypes.Type(value = Owner.class, name = "Owner")
