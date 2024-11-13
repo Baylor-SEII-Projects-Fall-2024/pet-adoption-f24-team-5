@@ -40,4 +40,14 @@ public interface ConversationRepository extends JpaRepository<Conversation, Long
 
     boolean existsByCenterId(Long centerId);
 
+    @Query("SELECT CONCAT(o.firstName, ' ', o.lastName) FROM Conversation c " +
+            "JOIN Owner o ON c.ownerId = o.id " +
+            "WHERE c.conversationId = :conversationId")
+    String findOwnerNameByConversationId(@Param("conversationId") long conversationId);
+
+
+    @Query("SELECT ac.centerName FROM Conversation c " +
+            "JOIN AdoptionCenter ac ON c.centerId = ac.id " +
+            "WHERE c.conversationId = :conversationId")
+    String findCenterNameByConversationId(@Param("conversationId") long conversationId);
 }

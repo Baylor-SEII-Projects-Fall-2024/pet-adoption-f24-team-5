@@ -27,7 +27,9 @@ const Messages = () => {
     const [messageInput, setMessageInput] = useState('');
     const [userEmail, setUserEmail] = useState('');
     const [userData, setUserData] = useState(null);
+    const [otherUserName, setOtherUserName] = useState('');
     const token = useSelector((state) => state.user.token);
+
 
     const currentConversation = conversations.find(
         (conv) => conv.conversationId === currentConversationId
@@ -125,7 +127,10 @@ const Messages = () => {
                             }
                         }}
                     >
-                        <ListItemText primary={`Conversation ${conversation.conversationId}`} />
+                        <ListItemText
+                            primary={otherUserName || `Conversation ${conversation.conversationId}`}
+                        />
+
                     </ListItem>
 
                 ))}
@@ -165,6 +170,32 @@ const Messages = () => {
             throw error;
         }
     };
+
+
+    const fetchOtherUserName = async (conversationId, userType) => {
+        try {
+            const url = `${API_URL}/api/conversation/getOtherUserName`; // Updated URL
+
+            const response = await axios.post(
+                url,
+                null,
+                {
+                    params: { t: userType, conversationId: conversationId },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            setOtherUserName(response.data);
+        } catch (error) {
+            console.error('Failed to fetch other user name', error);
+        }
+    };
+
+
+
 
     // Function to fill the drawer with conversations
     const fillDrawer = async (userId) => {
@@ -245,6 +276,13 @@ const Messages = () => {
         startup();
     }, []); // Empty dependency array ensures this runs once on mount
 
+    useEffect(() => {
+        if (currentConversationId && userData?.userType) {
+            fetchOtherUserName(currentConversationId, userData.userType);
+        }
+    }, [currentConversationId, userData?.userType]);
+
+
     return (
         <Box sx={{ display: 'flex', height: '100vh', backgroundColor: '#f0f0f0' }}>
             {/* Drawer */}
@@ -296,9 +334,15 @@ const Messages = () => {
                         </IconButton>
                     )}
                     <Typography variant="h5" gutterBottom>
-                        {currentConversation
-                            ? `Conversation ${currentConversation.conversationId}`
-                            : 'Select a conversation'}
+                        {currentConversation ? (
+                            otherUserName ? (
+                                otherUserName
+                            ) : (
+                                'Loading...'
+                            )
+                        ) : (
+                            'Select a conversation'
+                        )}
                     </Typography>
                 </Box>
                 <Divider />

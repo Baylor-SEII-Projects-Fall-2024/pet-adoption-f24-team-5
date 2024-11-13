@@ -131,4 +131,13 @@ public class ConversationService {
     }
 
 
+    public String getOwnerNameByConversationId(long conversationId) {
+        // Call repository method to fetch owner name
+        return conversationRepository.findOwnerNameByConversationId(conversationId);
+    }
+
+    public String getCenterNameByConversationId(long conversationId) {
+        // Call repository method to fetch center name
+        return conversationRepository.findCenterNameByConversationId(conversationId);
+    }
 }

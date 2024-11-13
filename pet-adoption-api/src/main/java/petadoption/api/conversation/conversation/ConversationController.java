@@ -1,12 +1,11 @@
 package petadoption.api.conversation.conversation;
 
+import org.hibernate.usertype.UserType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import petadoption.api.auth.AuthenticationResponse;
 import petadoption.api.user.AdoptionCenter.AdoptionCenter;
-import petadoption.api.user.Owner.Owner;
 import petadoption.api.user.UserService;
 
 import java.sql.SQLException;
@@ -108,6 +107,28 @@ public class ConversationController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+
+    @PostMapping("/getOtherUserName")
+    public ResponseEntity<String> getOtherUserName(@RequestParam petadoption.api.user.UserType t, @RequestParam long conversationId) {
+        try {
+            String otherUserName;
+
+            // Check the user type and call the appropriate service method
+            if (t == petadoption.api.user.UserType.CenterOwner) {
+                otherUserName = conversationService.getOwnerNameByConversationId(conversationId);
+            } else if (t == petadoption.api.user.UserType.Owner) {
+                otherUserName = conversationService.getCenterNameByConversationId(conversationId);
+            } else {
+                return new ResponseEntity<>("Invalid user type", HttpStatus.BAD_REQUEST);
+            }
+
+            return new ResponseEntity<>(otherUserName, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
