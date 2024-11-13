@@ -35,11 +35,11 @@ const SearchEngine = () => {
         }
     }
 
-    const handleResetPreferences = async () => {
-        const url = `${API_URL}/api/recommendation-engine/reset-preferences`;
-        await axios.post(url, { email }, { headers: { Authorization: `Bearer ${token}` } });
-        handleSearch();
-    }
+    // const handleResetPreferences = async () => {
+    //     const url = `${API_URL}/api/recommendation-engine/reset-preferences`;
+    //     await axios.post(url, { email }, { headers: { Authorization: `Bearer ${token}` } });
+    //     handleSearch();
+    // }
 
     useEffect(() => {
         handleSearch();
@@ -200,7 +200,7 @@ const SearchEngine = () => {
                                     View Saved Pets
                                 </Button>
                             </Grid>
-                            <Grid container justifyContent="center" spacing={2}>
+                            {/* <Grid container justifyContent="center" spacing={2}>
                                 <Button
                                     onClick={handleResetPreferences}
                                     type="submit"
@@ -219,7 +219,7 @@ const SearchEngine = () => {
                                 >
                                     Reset Preferences
                                 </Button>
-                            </Grid>
+                            </Grid> */}
                         </Grid>
                     </Grid>
                 )}
