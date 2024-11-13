@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { TextField, Button, Stack, Typography, Paper } from '@mui/material';
 import TitleBar from '@/components/TitleBar';
-import axios from 'axios';
+import axios from '../utils/axiosConfig';
 import { API_URL } from '@/constants';
 import { useSelector } from 'react-redux';
 import { getSubjectFromToken } from '@/utils/tokenUtils';
@@ -12,6 +12,7 @@ const PreferencesPage = () => {
         preferredSpecies: '',
         preferredBreed: '',
         preferredColor: '',
+        preferredSex: '',
         preferredAge: '',
     });
     const [preferenceObject, setPreferenceObject] = useState(null);
@@ -81,7 +82,7 @@ const PreferencesPage = () => {
         if (preferenceObject == null) {
             try {
                 // Create a new preference if none exists
-                const createResponse = await axios.post(`${API_URL}/api/preferences/create`, preferences, {
+                const createResponse = await axios.post(`${API_URL}/api/preferences/create/${user.id}`, preferences, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json',
@@ -149,7 +150,6 @@ const PreferencesPage = () => {
 
     return (
         <div>
-            <TitleBar />
             <main>
                 <Stack sx={{ paddingTop: 4 }} alignItems='center' gap={2}>
                     <Paper sx={{ width: 600, padding: 4 }} elevation={4}>
@@ -178,11 +178,29 @@ const PreferencesPage = () => {
                                     fullWidth
                                 />
                                 <TextField
+                                    label="Preferred Sex"
+                                    name="preferredSex"
+                                    value={preferences.preferredSex}
+                                    onChange={handleInputChange}
+                                    fullWidth
+                                />
+                                <TextField
                                     label="Preferred Age"
                                     name="preferredAge"
-                                    type="number"
+                                    type="text"
                                     value={preferences.preferredAge}
-                                    onChange={handleInputChange}
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+                                        if (value === '' || (/^\d+$/.test(value) && parseInt(value, 10) >= 1 && parseInt(value, 10) <= 99)) {
+                                            setPreferences({ ...preferences, preferredAge: value });
+                                        }
+                                    }}
+                                    onKeyDown={(e) => {
+                                        // Prevent non-numeric key presses
+                                        if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete') {
+                                            e.preventDefault();
+                                        }
+                                    }}
                                     fullWidth
                                 />
                                 <Button type="submit" variant="contained" color="primary">

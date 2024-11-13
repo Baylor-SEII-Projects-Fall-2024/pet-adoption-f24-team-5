@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "../utils/axiosConfig";
 import { API_URL } from "@/constants";
 import { useSelector } from 'react-redux';
 

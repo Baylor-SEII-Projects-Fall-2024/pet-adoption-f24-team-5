@@ -26,7 +26,7 @@ public class JwtService {
     }
 
     public String generateToken(UserDetails userDetails) {
-        int tokenTimeLength = 1000  * 60 * 24;
+        int tokenTimeLength = 1000 * 60 * 24;
         return generateToken(new HashMap<>(), userDetails);
     }
 
@@ -67,7 +67,7 @@ public class JwtService {
     }
 
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-        int tokenTimeLength = 1000  * 60 * 24;
+        int tokenTimeLength = 1000 * 60 * 24;
 
         if (userDetails instanceof User user) {
             // Add the UserType as the authorities claim
@@ -97,8 +97,7 @@ public class JwtService {
         return extractClaim(token, Claims::getExpiration);
     }
 
-
-    public<T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }

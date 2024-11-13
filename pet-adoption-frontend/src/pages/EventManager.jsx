@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Button, Stack, CircularProgress } from "@mui/material";
 import "react-datepicker/dist/react-datepicker.css";
-import axios from "axios";
+import axios from "../utils/axiosConfig";
 import { API_URL } from "@/constants";
 import TitleBar from "@/components/TitleBar";
 import { getAuthorityFromToken, getSubjectFromToken } from "@/utils/tokenUtils";
@@ -63,7 +63,6 @@ const EventManager = () => {
             setEvents(eventsWithCenterNames);
         } catch (error) {
             console.error("Error fetching events:", error);
-            alert(`Error: ${error.response?.status} - ${error.response?.statusText}`);
         } finally {
             setLoading(false);
         }
@@ -92,9 +91,7 @@ const EventManager = () => {
     }, [createNewEvent]);
 
     return (
-        <Box sx={{ height: '100vh', width: '100vw', display: 'flex', flexDirection: 'column' }}>
-            <TitleBar />
-
+        <Box>
             {createNewEvent && (
                 <EventFormComponent type={formType} handleCreateNewEvent={handleCreateNewEvent} event={formEvent} />
             )}

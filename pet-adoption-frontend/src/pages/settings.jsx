@@ -114,28 +114,28 @@ export default function HomePage() {
     const match = cleaned.match(/^(\d{0,3})(\d{0,3})(\d{0,4})$/); // Match groups of numbers
 
     if (match) {
-        return [match[1], match[2], match[3]].filter(Boolean).join('-'); // Join with '-' separator
+      return [match[1], match[2], match[3]].filter(Boolean).join('-'); // Join with '-' separator
     }
     return value;
-};
+  };
 
   const handlePhoneNumberChange = (e) => {
-   const formattedPhoneNumber = formatPhoneNumber(e.target.value);
-   if (formattedPhoneNumber.length == 12){
-    setInvalidPhoneNumber(false);
-   }
-   else{
-    setInvalidPhoneNumber(true);
-   }
-   setPhoneNumber(formattedPhoneNumber);
+    const formattedPhoneNumber = formatPhoneNumber(e.target.value);
+    if (formattedPhoneNumber.length == 12) {
+      setInvalidPhoneNumber(false);
+    }
+    else {
+      setInvalidPhoneNumber(true);
+    }
+    setPhoneNumber(formattedPhoneNumber);
   };
 
   const handleAgeChange = (event) => {
     setUserAge(event.target.value);
-    if (event.target.value <= 100 && event.target.value > 0){
+    if (event.target.value <= 100 && event.target.value > 0) {
       setInvalidAge(false);
     }
-    else{
+    else {
       setInvalidAge(true);
     }
   }
@@ -241,7 +241,7 @@ export default function HomePage() {
         return 1;
       }
       else {
-        if (updatedValuesRef.current.userType !== 'CenterOwner'){
+        if (updatedValuesRef.current.userType !== 'CenterOwner') {
           const newDisplayName = `${updatedValuesRef.current.firstName}`;
           dispatch(setDisplayName(newDisplayName));
         }
@@ -265,9 +265,6 @@ export default function HomePage() {
       <Head>
         <title>Settings Page</title>
       </Head>
-
-      <TitleBar />
-
       <main>
         <Stack sx={{ paddingTop: 4 }} alignItems='center' gap={2}>
           <Card sx={{ width: 600, height: 80 }} elevation={4}>
@@ -364,27 +361,27 @@ export default function HomePage() {
           </Paper>
           {updatedValuesRef.current.userType !== 'CenterOwner' && (
             <Paper sx={{ width: 600, height: invalidAge ? 70 : 50 }} elevation={4}>
-            <Stack spacing={1} direction="row" alignItems='center'>
-              <Typography variant='h5'>Age</Typography>
-              <TextField
-                id="age-input"
-                type="number"
-                value={userAge}
-                onChange={(e) => handleAgeChange(e)}
-                inputProps={{
-                  min: 0,
-                  max: 100,
-                  style: { height: '8px' }
-                }}
-                sx={{ width: '545px' }}
-              />
-            </Stack>
-            {invalidAge && (
-              <Typography color="error" variant="body2" sx={{ marginTop: 1 }}>
-                Please enter a valid age.
-              </Typography>
-            )}
-          </Paper>
+              <Stack spacing={1} direction="row" alignItems='center'>
+                <Typography variant='h5'>Age</Typography>
+                <TextField
+                  id="age-input"
+                  type="number"
+                  value={userAge}
+                  onChange={(e) => handleAgeChange(e)}
+                  inputProps={{
+                    min: 0,
+                    max: 100,
+                    style: { height: '8px' }
+                  }}
+                  sx={{ width: '545px' }}
+                />
+              </Stack>
+              {invalidAge && (
+                <Typography color="error" variant="body2" sx={{ marginTop: 1 }}>
+                  Please enter a valid age.
+                </Typography>
+              )}
+            </Paper>
           )}
           {updatedValuesRef.current.userType === 'CenterOwner' && (
             <>

@@ -4,7 +4,7 @@ import {
 } from '@mui/material';
 import { Email, Lock, Phone } from '@mui/icons-material';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../utils/axiosConfig';
 import { useDispatch } from 'react-redux';
 import { setToken } from '../utils/userSlice';
 import { API_URL } from "@/constants";
@@ -23,6 +23,7 @@ const Register = () => {
     const [centerState, setCenterState] = useState('');
     const [centerZip, setCenterZip] = useState('');
     const [numberOfPets, setNumberOfPets] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -77,8 +78,12 @@ const Register = () => {
                 loginUser();
             })
             .catch((err) => {
-                console.error('An error occurred during registration:', err);
-                alert('An error occurred during registration. Please try again later.');
+                if (err.response && err.response.data) {
+                    setErrorMessage(err.response.data);
+                } else {
+                    console.error('An unexpected error occurred during registration:', err);
+                    setErrorMessage('Email already exists');
+                }
             });
     };
 
@@ -229,7 +234,18 @@ const Register = () => {
                                     label="Center Pet Count"
                                     type="number"
                                     value={numberOfPets}
-                                    onChange={(e) => setNumberOfPets(e.target.value)}
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+                                        if (value === '' || (/^\d+$/.test(value) && parseInt(value, 10) > 0 && parseInt(value, 10) <= 999)) {
+                                            setNumberOfPets(value);
+                                        }
+                                    }}
+                                    onKeyDown={(e) => {
+                                        // Prevent non-numeric key presses
+                                        if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete') {
+                                            e.preventDefault();
+                                        }
+                                    }}
                                     required
                                     fullWidth
                                 />
@@ -280,7 +296,7 @@ const Register = () => {
                                     value={age}
                                     onChange={(e) => {
                                         const value = e.target.value;
-                                        if (value === '' || (/^\d+$/.test(value) && parseInt(value, 10) >= 1 && parseInt(value, 10) <= 100)) {
+                                        if (value === '' || (/^\d+$/.test(value) && parseInt(value, 10) > 0 && parseInt(value, 10) <= 100)) {
                                             setAge(value);
                                         }
                                     }}
@@ -295,6 +311,12 @@ const Register = () => {
                                     inputProps={{ inputMode: 'numeric', pattern: '[0-9]*', min: 1, max: 100 }}
                                 />
                             </>
+                        )}
+
+                        {errorMessage && (
+                            <Typography variant="body2" color="error">
+                                {errorMessage}
+                            </Typography>
                         )}
 
                         <Button

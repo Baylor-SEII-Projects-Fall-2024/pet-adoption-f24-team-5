@@ -1,8 +1,8 @@
-import {API_URL} from "@/constants";
-import axios from "axios";
+import { API_URL } from "@/constants";
+import axios from "../utils/axiosConfig";
 
 
-export const deletePet = ({petData, token, resetFields, handlePostNewPet}) => {
+export const deletePet = ({ petData, token, resetFields, handlePostNewPet }) => {
 
     const url = `${API_URL}/api/pets/delete`
 
@@ -24,5 +24,6 @@ export const deletePet = ({petData, token, resetFields, handlePostNewPet}) => {
 
         })
         .catch(error => {
-            console.log(error)});
+            console.log(error)
+        });
 }

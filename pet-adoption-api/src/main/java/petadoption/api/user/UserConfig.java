@@ -66,6 +66,17 @@ public class UserConfig {
                     "14757"
             );
 
+            Owner user5 = new Owner(
+                    "John",
+                    "Strange",
+                    "Strange@gmail.com",
+                    "password",
+                    UserType.Owner,
+                    21,
+                    "254-556-7794",
+                    "76706"
+            );
+
             AdoptionCenter adoptionCenter1 = new AdoptionCenter(
                     4L,
                     "Andrew@gmail.com",
@@ -111,6 +122,7 @@ public class UserConfig {
             authenticationController.register(user2);
             authenticationController.register(user3);
             authenticationController.register(user4);
+            authenticationController.register(user5);
             authenticationController.register(adoptionCenter1);
             authenticationController.register(adoptionCenter2);
             authenticationController.register(adoptionCenter3);

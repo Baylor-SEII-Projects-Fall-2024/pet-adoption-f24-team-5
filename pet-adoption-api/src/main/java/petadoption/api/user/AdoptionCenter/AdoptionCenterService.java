@@ -22,7 +22,8 @@ public class AdoptionCenterService {
         return centerWorkerRepository.findAllByCenterID(centerId);
     }
 
-
-
+    void deleteCenterWorker(long id) {
+        centerWorkerRepository.deleteById(id);
+    }
 
 }

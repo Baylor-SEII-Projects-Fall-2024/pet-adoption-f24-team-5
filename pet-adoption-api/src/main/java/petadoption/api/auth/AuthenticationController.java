@@ -19,7 +19,7 @@ public class AuthenticationController {
 
     @PostMapping("/register/owner")
     public ResponseEntity<AuthenticationResponse> register(@RequestBody Owner owner) {
-        try{
+        try {
             return ResponseEntity.ok(authenticationService.register(owner));
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -28,7 +28,7 @@ public class AuthenticationController {
 
     @PostMapping("/register/center-worker")
     public ResponseEntity<AuthenticationResponse> register(@RequestBody CenterWorker centerWorker) {
-        try{
+        try {
             return ResponseEntity.ok(authenticationService.register(centerWorker));
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -37,7 +37,7 @@ public class AuthenticationController {
 
     @PostMapping("/register/adoption-center")
     public ResponseEntity<AuthenticationResponse> register(@RequestBody AdoptionCenter adoptionCenter) {
-        try{
+        try {
             System.out.println("inside of adoption-center");
             return ResponseEntity.ok(authenticationService.register(adoptionCenter));
         } catch (IllegalArgumentException e) {
@@ -70,9 +70,5 @@ public class AuthenticationController {
         System.out.println("Entered authenticate method");
         return ResponseEntity.ok(authenticationService.authenticate(request));
     }
-
-
-
-
 
 }

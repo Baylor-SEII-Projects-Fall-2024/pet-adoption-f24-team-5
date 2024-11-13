@@ -42,7 +42,16 @@ dependencies {
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
-	// Utility libraries
+    // DeepLearning4J Core
+    implementation 'org.deeplearning4j:deeplearning4j-core:1.0.0-M2.1'
+
+    // DL4J NLP module for Word2Vec and text processing classes
+    implementation 'org.deeplearning4j:deeplearning4j-nlp:1.0.0-M2.1'
+
+    // ND4J native backend (CPU)
+    implementation 'org.nd4j:nd4j-native-platform:1.0.0-M2.1'
+
+    // Utility libraries
 	implementation 'com.google.guava:guava:33.0.0-jre'
 	implementation 'org.apache.commons:commons-lang3:3.12.0'
 
