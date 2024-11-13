@@ -22,20 +22,6 @@ import java.util.List;
 @Table(name = User.TABLE_NAME)
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "USER_TYPE", discriminatorType = DiscriminatorType.STRING)
-/*
- * @JsonTypeInfo(
- * use = JsonTypeInfo.Id.NAME,
- * include = JsonTypeInfo.As.PROPERTY,
- * property = "userType"
- * )
- */
-/*
-@JsonTypeInfo(
-        use = JsonTypeInfo.Id.CLASS,
-        property = "@class"
-)
-*/
-
 @JsonSubTypes({
         @JsonSubTypes.Type(value = CenterWorker.class, name = "CenterWorker"),
         @JsonSubTypes.Type(value = Owner.class, name = "Owner")

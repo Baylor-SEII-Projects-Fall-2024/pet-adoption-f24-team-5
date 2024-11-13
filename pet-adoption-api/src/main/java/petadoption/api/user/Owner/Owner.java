@@ -26,17 +26,6 @@ import java.util.*;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-
-/*
-@JsonIdentityInfo(
-        generator = ObjectIdGenerators.PropertyGenerator.class,
-        property = "id"
-)
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-*/
-
-
-
 public class Owner extends User {
 
     @OneToOne
@@ -46,16 +35,6 @@ public class Owner extends User {
     @OneToOne
     @JoinColumn(name = "DEFAULT_PREFERENCE_ID")
     private Preference defaultPreference;
-
-
-    /*@ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "user_saved_pets",
-            joinColumns = @JoinColumn(name = "USER_ID"),
-            inverseJoinColumns = @JoinColumn(name = "PET_ID")
-    )
-    @JsonIgnoreProperties({"usersWhoSaved", "petOwner"})
-    private Set<Pet> savedPets = new HashSet<>();*/
 
     @Column(name = "AGE")
     private int age;
@@ -114,17 +93,6 @@ public class Owner extends User {
         this.centerZip = centerZip;
         getLongAndLat(centerZip);
     }
-
-    /*
-    public Owner(String emailAddress, String password, UserType userType, int age, String phoneNumber,
-            Preference preference, String centerZip, Set<Long> savedPetIds) {
-        super(emailAddress, password, userType, phoneNumber);
-        this.defaultPreference = preference;
-        this.age = age;
-        this.savedPetIds = savedPetIds;
-        this.centerZip = centerZip;
-        getLongAndLat(centerZip);
-    }*/
 
     public void getLongAndLat(String centerZip) {
         try {
@@ -190,7 +158,5 @@ public class Owner extends User {
         this.preferenceWeights.setPreferenceWeightId(preferenceId);
     }
 
-/*    public void addPetToSavedPets(Long petId) {
-        //this.savedPetIds.add(petId);
-    }*/
+
 }

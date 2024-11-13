@@ -1,12 +1,10 @@
 package petadoption.api.pet;
-import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import lombok.*;
 import petadoption.api.user.AdoptionCenter.AdoptionCenter;
 import petadoption.api.user.User;
 import petadoption.api.user.Owner.Owner;
-import java.util.HashSet;
-import java.util.Set;
+
 
 @Entity
 @Getter

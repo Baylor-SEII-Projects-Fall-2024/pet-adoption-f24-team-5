@@ -8,7 +8,6 @@ import petadoption.api.pet.Pet;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @RequestMapping("/api/owner")
 @RestController

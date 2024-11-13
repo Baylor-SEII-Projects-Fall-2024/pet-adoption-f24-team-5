@@ -8,7 +8,6 @@ import petadoption.api.pet.Pet;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import petadoption.api.pet.PetRepository;
 import petadoption.api.preferences.Preference;
