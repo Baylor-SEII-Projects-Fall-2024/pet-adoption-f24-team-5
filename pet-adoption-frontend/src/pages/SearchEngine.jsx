@@ -116,7 +116,7 @@ const SearchEngine = () => {
                                     },
                                 }}
                             >
-                                Search
+                                Refresh Pets
                             </Button>
                         </Grid>
                         <Grid container justifyContent="center" spacing={2}>
