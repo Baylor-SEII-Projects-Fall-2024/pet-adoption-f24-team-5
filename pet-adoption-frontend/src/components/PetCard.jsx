@@ -49,14 +49,14 @@ const HoverOverlay = styled(Box)(({ theme }) => ({
 }));
 
 const PetCard = ({
-                     pet,
-                     onClick,
-                     expandable = true,
-                     saveable = true,
-                     likeable = true,
-                     onLike = null,
-                     onDelete = null,
-                 }) => {
+    pet,
+    onClick,
+    expandable = true,
+    saveable = true,
+    likeable = true,
+    onLike = null,
+    onDelete = null,
+}) => {
     const [loading, setLoading] = useState(true);
     const [isHovered, setIsHovered] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);

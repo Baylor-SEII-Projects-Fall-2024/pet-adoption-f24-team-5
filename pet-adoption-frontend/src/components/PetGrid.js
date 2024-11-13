@@ -61,7 +61,7 @@ const PetGrid = () => {
                 >
                     {pets.map((pet) => (
                         <Grid item xs={12} sm={6} md={4} lg={3} key={pet.petName}>
-                            <PetCard pet={pet} />
+                            <PetCard pet={pet} saveable={false} likeable={false} />
                         </Grid>
                     ))}
                 </Grid>
