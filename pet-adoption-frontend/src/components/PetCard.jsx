@@ -44,21 +44,33 @@ const PetCard = ({ pet, onClick, expandable = true, saveable = true, likeable = 
     const [isHovered, setIsHovered] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const token = useSelector((state) => state.user.token);
+    const email = getSubjectFromToken(token);
 
     const handleImageLoad = () => {
         setLoading(false);
     };
 
     const handleSavePetToOwner = async () => {
-        const email = getSubjectFromToken(token);
-        const updatedPet = {
-            email: email,
+        const formattedPet = {
             petId: pet.petId,
+            petOwner: pet.petOwner,
+            species: pet.species,
+            petName: pet.petName,
+            breed: pet.breed,
+            color: pet.color,
+            sex: pet.sex,
+            age: pet.age,
+            adoptionStatus: pet.adoptionStatus,
+            description: pet.description,
+            imageName: pet.imageName,
+            owner: pet.owner,
+            petWeightId: pet.petWeightId,
         };
         try {
-            await axios.put(`${API_URL}/api/update/Owner/addSavedPet`, updatedPet,
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
+            await axios.post(`${API_URL}/api/owner/save_pet_user`, formattedPet, {
+                params: { email: email },
+                headers: { Authorization: `Bearer ${token}` },
+            });
         } catch (error) {
             console.error(error);
         }
@@ -76,7 +88,6 @@ const PetCard = ({ pet, onClick, expandable = true, saveable = true, likeable = 
 
     const handleLikePet = async () => {
         const url = `${API_URL}/api/recommendation-engine/update-preference`;
-        const email = getSubjectFromToken(token);
         const preference = {
             preferredSpecies: pet.species,
             preferredBreed: pet.breed,

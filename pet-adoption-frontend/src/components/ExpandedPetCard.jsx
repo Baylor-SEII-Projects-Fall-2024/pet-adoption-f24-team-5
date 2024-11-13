@@ -11,8 +11,31 @@ const ExpandedPetCard = ({ pet, onClose, saveable = true, likeable = true, onLik
 
     const token = useSelector((state) => state.user.token);
 
-    const handleSavePetToOwner = () => {
-        console.log("Saving pet to owner");
+    const handleSavePetToOwner = async () => {
+        const email = getSubjectFromToken(token);
+        const formattedPet = {
+            petId: pet.petId,
+            petOwner: pet.petOwner,
+            species: pet.species,
+            petName: pet.petName,
+            breed: pet.breed,
+            color: pet.color,
+            sex: pet.sex,
+            age: pet.age,
+            adoptionStatus: pet.adoptionStatus,
+            description: pet.description,
+            imageName: pet.imageName,
+            owner: pet.owner,
+            petWeightId: pet.petWeightId,
+        };
+        try {
+            await axios.post(`${API_URL}/api/owner/save_pet_user`, formattedPet, {
+                params: { email: email },
+                headers: { Authorization: `Bearer ${token}` },
+            });
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     const handleLikePet = async () => {

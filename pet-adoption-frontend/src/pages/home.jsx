@@ -97,7 +97,7 @@ const HomePage = () => {
                 gap: 4,
                 padding: 4
             }}>
-                {pets.map((pet) => (
+                {pets.slice(0, 10).map((pet) => (
                     <PetCard pet={pet} key={pet.name} />
                 ))}
             </Box>
