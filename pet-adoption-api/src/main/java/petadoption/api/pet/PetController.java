@@ -1,5 +1,6 @@
 package petadoption.api.pet;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,24 +31,13 @@ public class PetController {
         return petService.getAllPets();
     }
 
-    @GetMapping("/search_engine")
-    public List<Pet> querySearchEngine() {
-        List<Pet> pets = petService.getAllPets();
-
-        // TODO: place holder logic just generates random of 3
-        // NOTE: no error checking here. There have to be at least 3 pets in the
-        // database.
-        return pets.stream().collect(Collectors.collectingAndThen(Collectors.toList(), collected -> {
-            Collections.shuffle(collected);
-            return collected.stream().limit(3).collect(Collectors.toList());
-        }));
-    }
-
     @GetMapping("/center")
     public ResponseEntity<?> getPetsCenter(@RequestParam String email) {
         try {
+            AdoptionCenter adoptionCenter = userService.findCenterByWorkerEmail(email);
+            List<Pet> pets = petService.getPetByAdoptionCenter(adoptionCenter);
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(petService.getPetByAdoptionCenter(userService.findCenterByWorkerEmail(email)));
+                    .body(pets);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
@@ -64,8 +54,11 @@ public class PetController {
         }
 
         try {
+            AdoptionCenter adoptionCenter = userService.findCenterByWorkerEmail(email);
+            double[] petVector = recommendationService.generatePreferenceVector(pet);
+            Pet savedPet = petService.savePet(pet, adoptionCenter, petVector);
             return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(petService.savePet(pet, userService.findCenterByWorkerEmail(email)));
+                    .body(savedPet);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }

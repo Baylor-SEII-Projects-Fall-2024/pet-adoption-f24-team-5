@@ -15,16 +15,16 @@ const SearchEngine = () => {
     const [savedPets, setSavedPets] = useState([]);
     const [loading, setLoading] = useState(false);
 
-
     const handleSearch = async () => {
         setPets([]);
+        const email = getSubjectFromToken(token);
 
-        const url = `${API_URL}/api/pets/search_engine`;
-
+        const url = `${API_URL}/api/recommendation-engine/generate-new-options`;
         try {
             const res = await axios.get(url, {
+                params: { email: email },
                 headers: {
-                    Authorization: `Bearer ${token}`,
+                    Authorization: `Bearer ${token}`, // Pass token in the header
                     'Content-Type': 'application/json'
                 },
             });
@@ -33,6 +33,11 @@ const SearchEngine = () => {
             console.error(error);
         }
     }
+
+    useEffect(() => {
+        handleSearch();
+    }, []);
+
 
     const handleSaveChange = () => {
         setShowSavedPets(!showSavedPets);
@@ -48,7 +53,7 @@ const SearchEngine = () => {
         setLoading(true);
         setSavedPets([]);
         const url = `${API_URL}/api/owner/get_saved_pets`;
-    
+
         try {
             const res = await axios.get(url, {
                 params: { email },
@@ -65,11 +70,11 @@ const SearchEngine = () => {
             setLoading(false);
         }
     }, [token, email]);
-    
+
     useEffect(() => {
         fetchSavedPets();
     }, [fetchSavedPets]);
-    
+
     return (
         <>
             <Box
@@ -84,14 +89,14 @@ const SearchEngine = () => {
                 {!showSavedPets && (
                     <Grid container spacing={2} sx={{ height: '100vh', width: '100vw', padding: 2 }}>
 
-                    <Grid container spacing={2}>
-                        {pets.length > 0 &&
-                            pets.map((pet) => (
-                                <Grid item xs={12} sm={6} md={4} key={pet.petName}>
-                                    <PetCard pet={pet} />
-                                </Grid>
-                            ))}
-                    </Grid>
+                <Grid container spacing={2}>
+                    {pets.length > 0 &&
+                        pets.map((pet) => (
+                            <Grid item xs={12} sm={6} md={4} key={pet.petName}>
+                                <PetCard pet={pet} onLike={handleSearch} />
+                            </Grid>
+                        ))}
+                </Grid>
 
                     <Grid item xs={12}>
                         <Grid container justifyContent="center" spacing={2}>
