@@ -84,7 +84,7 @@ const Messages = () => {
     const drawerWidth = 240;
 
     // Function to load messages for a conversation
-    const loadMessages = async (conversationId) => {
+    const loadMessages = async (conversationId, userId) => {
         try {
             const url = `${API_URL}/api/message/getMessages`;
 
@@ -92,7 +92,7 @@ const Messages = () => {
                 url,
                 null,
                 {
-                    params: { conversationId },
+                    params: { conversationId, userId },
                     headers: {
                         'Content-Type': 'application/json',
                         Authorization: `Bearer ${token}`,
@@ -101,14 +101,13 @@ const Messages = () => {
             );
 
             let messages = response.data;
-            // Sort messages by date
             messages.sort((a, b) => new Date(a.date) - new Date(b.date));
-
             setMessages(messages);
         } catch (error) {
             console.error('Failed to load messages', error);
         }
     };
+
 
     const drawer = (
         <Box sx={{ overflow: 'auto' }}>
@@ -120,7 +119,7 @@ const Messages = () => {
                         selected={conversation.conversationId === currentConversationId}
                         onClick={() => {
                             setCurrentConversationId(conversation.conversationId);
-                            loadMessages(conversation.conversationId); // Load messages when a conversation is selected
+                            loadMessages(conversation.conversationId, userData.id); // Include userId
                             if (isMobile) {
                                 setMobileOpen(false);
                             }
@@ -128,6 +127,7 @@ const Messages = () => {
                     >
                         <ListItemText primary={`Conversation ${conversation.conversationId}`} />
                     </ListItem>
+
                 ))}
             </List>
         </Box>
@@ -198,23 +198,47 @@ const Messages = () => {
     };
 
     // Add the startup function
+    // Add the startup function
     const startup = async () => {
         console.log('Messages component has loaded.');
 
         try {
+            // Fetch user information
             const response = await fetchUser(token);
             console.log('User data:', response.data);
             setUserData(response.data);
             setUserEmail(response.data.emailAddress);
 
-            const userId = response.data.id; // Use this directly
+            const userId = response.data.id; // Get the userId from the response
 
-            // Fill the drawer with conversations
-            await fillDrawer(userId);
+            // Fetch conversations and load the first conversation's messages
+            const conversationsResponse = await axios.post(
+                `${API_URL}/api/conversation/getAllConversations`,
+                null,
+                {
+                    params: { userId },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            const conversationsData = conversationsResponse.data;
+            console.log('Conversations fetched:', conversationsData);
+            setConversations(conversationsData);
+
+            // Set the first conversation as the current one and load its messages
+            if (conversationsData.length > 0) {
+                const firstConversationId = conversationsData[0].conversationId;
+                setCurrentConversationId(firstConversationId);
+                await loadMessages(firstConversationId, userId); // Load messages for the first conversation
+            }
         } catch (error) {
             console.error('Error during startup:', error);
         }
     };
+
 
     // Use useEffect to call startup when the component mounts
     useEffect(() => {

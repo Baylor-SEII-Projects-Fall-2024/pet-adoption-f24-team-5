@@ -1,5 +1,6 @@
 package petadoption.api.conversation.conversation;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -109,13 +110,12 @@ public class ConversationService {
         if (conversationId < 1) {
             throw new IllegalArgumentException("Id must be positive");
         }
-        try {
-            conversationRepository.resetUnreadMessagesCenter(conversationId);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
+        if (!conversationRepository.existsById(conversationId)) {
+            throw new EntityNotFoundException("Conversation not found with ID: " + conversationId);
         }
+        conversationRepository.resetUnreadMessagesCenter(conversationId);
     }
+
 
     @Transactional
     public void resetUnreadMessagesOwner(Long conversationId) throws SQLException {

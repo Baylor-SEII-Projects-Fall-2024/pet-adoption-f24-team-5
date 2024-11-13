@@ -27,11 +27,21 @@ public class MessageController {
 
 
     @PostMapping("/getMessages")
-    public ResponseEntity<List<Message>> getMessages(@RequestParam long conversationId)
+    public ResponseEntity<List<Message>> getMessages(@RequestParam long conversationId, @RequestParam long userId) throws SQLException
     {
         try {
             List<Message> returnMe;
             returnMe = messageService.findAllMessages(conversationId);
+
+            // Update the conversation with read messages
+            if (isSenderCenter(userId)) {
+                System.out.println("9 is a Center's Id");
+                conversationController.resetUnreadMessagesCenter(conversationId);
+            } else {
+                conversationController.resetUnreadMessagesOwner(conversationId);
+            }
+
+
             return new ResponseEntity<>(returnMe, HttpStatus.OK);
         }
         catch (Exception e) {
