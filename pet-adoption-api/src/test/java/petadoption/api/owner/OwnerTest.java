@@ -125,39 +125,4 @@ public class OwnerTest {
         assertTrue(result.get().isEmpty(), "The list should be empty."); // The list inside the Optional should be empty
     }
 
-/*    @Test
-    void removeSavedPetForOwnerByEmail_Success() {
-        String email = "test@example.com";
-        pet1.setPetId(1L);
-        pet2.setPetId(2L);
-
-        Set<Long> savedPets = new HashSet<>();
-        savedPets.add(pet1.getPetId());
-        savedPets.add(pet2.getPetId());
-
-        System.out.println("Initial savedPets: " + savedPets); // Debugging line
-
-
-        when(ownerRepository.findByEmailAddress(email)).thenReturn(Optional.of(owner));
-        when(owner.getSavedPets()).thenReturn(savedPets);
-
-        System.out.println("After removing pet1, savedPets: " + savedPets); // Debugging line
-
-
-        ownerService.removeSavedPetForOwnerByEmail(email, pet1);
-
-        verify(ownerRepository).save(owner);
-
-        assertFalse(savedPets.contains(pet1.getPetId()), "Pet1 should be removed from the owner's savedPets.");
-        assertTrue(savedPets.contains(pet2.getPetId()), "Pet2 should still be in the owner's savedPets.");
-
-        ownerService.removeSavedPetForOwnerByEmail(email, pet2);
-
-        verify(ownerRepository, times(2)).save(owner);
-
-        assertFalse(savedPets.contains(pet2.getPetId()), "Pet2 should be removed from the owner's savedPets.");
-    }*/
-
-
-
 }

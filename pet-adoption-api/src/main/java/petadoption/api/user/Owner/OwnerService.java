@@ -86,4 +86,9 @@ public class OwnerService {
         return false;
     }
 
+    public Long findOwnerIdByEmail(String email) {
+        Owner owner = ownerRepository.findByEmailAddress(email)
+                .orElseThrow(() -> new RuntimeException("Owner not found"));
+        return owner.getId();
+    }
 }

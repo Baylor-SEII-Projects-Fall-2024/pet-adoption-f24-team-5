@@ -29,26 +29,30 @@ public class RecommendationEngineController {
     private final RecommendationService recommendationService;
     private final OwnerService ownerService;
 
-    @PostMapping("/update-preference/{id}")
-    public ResponseEntity<?> updatePreference(@PathVariable long id, @RequestBody Preference preference) {
+    @PostMapping("/update-preference")
+    public ResponseEntity<?> updatePreference(@RequestParam String email, @RequestBody Preference preference) {
+
 
         try{
+
             List<String> cleanedPreferences = new ArrayList<>();
             cleanedPreferences.add(preference.getPreferredSpecies().toLowerCase().replaceAll("\\s+", ""));
             cleanedPreferences.add(preference.getPreferredBreed().toLowerCase().replaceAll("\\s+", ""));
             cleanedPreferences.add(preference.getPreferredColor().toLowerCase().replaceAll("\\s+", ""));
             cleanedPreferences.add(String.valueOf(preference.getPreferredAge()).toLowerCase().replaceAll("\\s+", ""));
-            double[] usersNewWeights = recommendationService.savePreferenceEmbedding(id, cleanedPreferences);
+            double[] usersNewWeights = recommendationService.savePreferenceEmbedding(ownerService.findOwnerIdByEmail(email)
+                    , cleanedPreferences);
             return new ResponseEntity<>(usersNewWeights, HttpStatus.OK);
 
-        }catch (IOException e){
+        }catch (Exception e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
-    @GetMapping("/generate-new-options/{id}")
-    public ResponseEntity<?> getNewPets(@PathVariable long id) {
+    @GetMapping("/generate-new-options")
+    public ResponseEntity<?> getNewPets(@RequestParam String email) {
         try{
+            Long id = ownerService.findOwnerIdByEmail(email);
             long userWeightID = ownerService.getPreferenceWeightsIdByOwnerID(id);
             int coldStartValue = recommendationService.getColdStartValue(id);
             double[] usersNewWeights = recommendationService.getUsersWeights(userWeightID);
