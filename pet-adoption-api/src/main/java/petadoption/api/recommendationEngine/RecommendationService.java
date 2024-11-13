@@ -6,8 +6,11 @@ import org.deeplearning4j.models.word2vec.Word2Vec;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.springframework.stereotype.Service;
+import org.springframework.context.annotation.Lazy;
 import petadoption.api.pet.Pet;
 import petadoption.api.pet.PetService;
+import petadoption.api.pet.PetWeightService;
+import petadoption.api.pet.PetWeights;
 import petadoption.api.preferences.Preference;
 import petadoption.api.preferences.PreferenceWeights;
 import petadoption.api.preferences.PreferenceWeightsService;
@@ -24,7 +27,7 @@ public class RecommendationService {
     private final OwnerService ownerService;
     private final Word2Vec word2Vec;
     private final PetService petService;
-
+    private final PetWeightService petWeightService;
 
 
     public double[] savePreferenceEmbedding(Long ownerId, List<String> newPreferences) throws IOException {
@@ -76,6 +79,17 @@ public class RecommendationService {
         return pref;
     }
 
+    public double[] generatePreferenceVector(Pet pet) throws IOException {
+        Preference petStats = new Preference();
+
+        petStats.setPreferredSpecies(pet.getSpecies());
+        petStats.setPreferredBreed(pet.getBreed());
+        petStats.setPreferredColor(pet.getColor());
+        petStats.setPreferredAge(pet.getAge());
+
+        return generatePreferenceVector(petStats);
+
+    }
     public double[] generatePreferenceVector(Preference preference) {
         List<String> newWords = new ArrayList<>();
 
@@ -123,6 +137,7 @@ public class RecommendationService {
         Map<Long, Double> allPetsWeights = new HashMap<>();
 
         for (Pet pet : allPets) {
+            PetWeights petWeights = petService.getPetWeights(pet);
             // Todo: potentially add a prefilter system.
             Long petID = pet.getPetId();
             Preference petStats = new Preference();
@@ -130,8 +145,7 @@ public class RecommendationService {
             petStats.setPreferredBreed(pet.getBreed());
             petStats.setPreferredColor(pet.getColor());
             petStats.setPreferredAge(pet.getAge());
-            double[] petVector = generatePreferenceVector(petStats);
-            allPetsWeights.put(petID, VectorUtils.cosineSimilarity(userWeights, petVector));
+            allPetsWeights.put(petID, VectorUtils.cosineSimilarity(userWeights, petWeights.getAllWeights()));
         }
 
         List<Long> kMatchedPets = allPetsWeights.entrySet().stream()

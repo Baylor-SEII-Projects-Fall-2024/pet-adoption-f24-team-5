@@ -1,11 +1,14 @@
 package petadoption.api.pet;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import petadoption.api.images.ImageController;
 import petadoption.api.images.ImageService;
+import petadoption.api.recommendationEngine.RecommendationService;
+import petadoption.api.user.AdoptionCenter.AdoptionCenter;
 import petadoption.api.user.UserService;
 
 import java.util.Collections;
@@ -14,21 +17,14 @@ import java.util.stream.Collectors;
 
 @RequestMapping("/api/pets")
 @RestController
+@RequiredArgsConstructor
 public class PetController {
-    @Autowired
+
     private final PetService petService;
-
-    @Autowired
     private final UserService userService;
-
-    @Autowired
     private final ImageService imageService;
+    private final RecommendationService recommendationService;
 
-    PetController(PetService petService, UserService userService, ImageService imageService) {
-        this.petService = petService;
-        this.userService = userService;
-        this.imageService = imageService;
-    }
 
     @GetMapping
     public List<Pet> getPets() {
@@ -51,8 +47,10 @@ public class PetController {
     @GetMapping("/center")
     public ResponseEntity<?> getPetsCenter(@RequestParam String email) {
         try {
+            AdoptionCenter adoptionCenter = userService.findCenterByWorkerEmail(email);
+            List<Pet> pets = petService.getPetByAdoptionCenter(adoptionCenter);
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(petService.getPetByAdoptionCenter(userService.findCenterByWorkerEmail(email)));
+                    .body(pets);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
@@ -69,8 +67,11 @@ public class PetController {
         }
 
         try {
+            AdoptionCenter adoptionCenter = userService.findCenterByWorkerEmail(email);
+            double[] petVector = recommendationService.generatePreferenceVector(pet);
+            Pet savedPet = petService.savePet(pet, adoptionCenter, petVector);
             return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(petService.savePet(pet, userService.findCenterByWorkerEmail(email)));
+                    .body(savedPet);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
@@ -89,7 +90,7 @@ public class PetController {
 
         try {
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(petService.savePet(pet, userService.findCenterByWorkerEmail(email)));
+                    .body(petService.savePet(pet, userService.findCenterByWorkerEmail(email), recommendationService.generatePreferenceVector(pet)));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }

@@ -1,5 +1,6 @@
 package petadoption.api.images;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -19,12 +20,12 @@ import java.util.Objects;
 
 @RequestMapping("api/images")
 @RestController
+@RequiredArgsConstructor
 public class ImageController {
 
     private final ImageService imageService;
 
-    @Autowired
-    public ImageController(ImageService imageService) { this.imageService = imageService; }
+
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) {
