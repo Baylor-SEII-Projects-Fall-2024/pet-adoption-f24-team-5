@@ -17,6 +17,7 @@ import petadoption.api.preferences.PreferenceWeightsService;
 import petadoption.api.user.Owner.OwnerService;
 import petadoption.api.user.Owner.SeenPetService;
 import petadoption.api.user.Owner.SeenPets;
+import java.util.Random;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -136,6 +137,19 @@ public class RecommendationService {
         try {
 
             List<Pet> allPets = petService.getAllPets();
+            Pet petToInject = new Pet();
+
+            int injectValue = (int)(Math.random() * 3);
+            boolean inject =  injectValue == 0;
+            System.out.println("Inject Value: " + injectValue);
+
+            if(inject){
+                //Inject random values for variability
+                Random rand = new Random();
+                int size = allPets.size();
+                petToInject = allPets.get(rand.nextInt() % size);
+                System.out.println("Injecting pet: " + petToInject.getPetName());
+            }
             if (allPets.isEmpty() || userWeights.length < k) {
                 return allPets;
             }
@@ -176,7 +190,9 @@ public class RecommendationService {
 
             List<Pet> matchedPets = new ArrayList<>();
             kMatchedPets.stream().forEach(x -> matchedPets.add(petService.getPetById(x).get()));
-
+            if(inject){
+                matchedPets.set(matchedPets.size() - 1, petToInject);
+            }
 
             //Add three new pets to the list of seen pets
             seenPetService.addSeenPets(ownerID, matchedPets);
