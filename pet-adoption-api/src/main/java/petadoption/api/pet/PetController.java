@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import petadoption.api.images.ImageController;
 import petadoption.api.images.ImageService;
+import petadoption.api.recommendationEngine.RecommendationService;
+import petadoption.api.user.AdoptionCenter.AdoptionCenter;
 import petadoption.api.user.UserService;
 
 import java.util.Collections;
@@ -14,21 +16,14 @@ import java.util.stream.Collectors;
 
 @RequestMapping("/api/pets")
 @RestController
+@RequiredArgsConstructor
 public class PetController {
-    @Autowired
+
     private final PetService petService;
-
-    @Autowired
     private final UserService userService;
-
-    @Autowired
     private final ImageService imageService;
+    private final RecommendationService recommendationService;
 
-    PetController(PetService petService, UserService userService, ImageService imageService) {
-        this.petService = petService;
-        this.userService = userService;
-        this.imageService = imageService;
-    }
 
     @GetMapping
     public List<Pet> getPets() {
@@ -89,7 +84,7 @@ public class PetController {
 
         try {
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(petService.savePet(pet, userService.findCenterByWorkerEmail(email)));
+                    .body(petService.savePet(pet, userService.findCenterByWorkerEmail(email), recommendationService.generatePreferenceVector(pet)));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
