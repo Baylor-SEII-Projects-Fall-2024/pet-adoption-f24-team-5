@@ -28,6 +28,8 @@ import Settings from './settings';
 import LocalAdoptionCenter from './LocalAdoptionCenter';
 import EventManager from "@/pages/EventManager";
 import PreferencesPage from "@/pages/preferences";
+import Messages from "@/pages/Messages";
+
 
 import ProtectedRoute from './protectedRoute';
 import AvailablePets from "@/pages/AvailablePets";
@@ -55,6 +57,7 @@ function AppRoutes() {
           <Route path="/AvailablePets" element={<ProtectedRoute><AvailablePets /></ProtectedRoute>} />
           <Route path="/preferences" element={<ProtectedRoute><PreferencesPage /></ProtectedRoute>} />
           <Route path="/SavedPets" element={<ProtectedRoute><SavedPets /></ProtectedRoute>} />
+          <Route path="/Messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
         </Route>
         <Route path="/Register" element={<Register />} />
         <Route path="/Login" element={<Login />} />
