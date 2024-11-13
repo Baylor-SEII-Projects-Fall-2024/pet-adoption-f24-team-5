@@ -108,11 +108,12 @@ public class EventController {
             return ResponseEntity.badRequest().body("Cannot create event: event not received");
         }
 
-        boolean checkIfAdoptionCenter = false;
+        boolean checkIfAdoptionCenter = true;
         AdoptionCenter center = null;
         try {
             center = userService.findCenterByWorkerEmail(email);
-            checkIfAdoptionCenter = true;
+            checkIfAdoptionCenter = false;
+            event.setCenterId(center.getId());
 
         } catch (SQLException e) {
             String message = e.getMessage();
