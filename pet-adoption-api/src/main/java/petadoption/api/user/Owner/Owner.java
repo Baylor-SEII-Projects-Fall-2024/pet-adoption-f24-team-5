@@ -1,9 +1,10 @@
 package petadoption.api.user.Owner;
 
+
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import petadoption.api.pet.Pet;
 import petadoption.api.preferences.Preference;
 import petadoption.api.preferences.PreferenceWeights;
 import petadoption.api.user.User;
@@ -15,9 +16,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @Getter
 @Setter
@@ -25,6 +24,8 @@ import java.util.List;
 @DiscriminatorValue("OWNER")
 @PrimaryKeyJoinColumn(name = "USER_ID")
 @EqualsAndHashCode(callSuper = true)
+@AllArgsConstructor
+@NoArgsConstructor
 public class Owner extends User {
 
     @OneToOne
@@ -53,14 +54,13 @@ public class Owner extends User {
     @Column(name = "LAST_NAME")
     protected String lastName;
 
+
     @ElementCollection
     @CollectionTable(name = "saved_pets", joinColumns = @JoinColumn(name = "owner_id"))
     @Column(name = "pet_id")
-    private List<Long> savedPetIds;
+    private Set<Long> savedPets = new HashSet<>();
 
-    public Owner() {
-        super();
-    }
+
 
     public Owner(String firstName, String lastName, String emailAddress, String password, UserType userType, int age,
             String phoneNumber, String centerZip) {
@@ -90,16 +90,6 @@ public class Owner extends User {
         this.age = age;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.centerZip = centerZip;
-        getLongAndLat(centerZip);
-    }
-
-    public Owner(String emailAddress, String password, UserType userType, int age, String phoneNumber,
-            Preference preference, String centerZip, List<Long> savedPetIds) {
-        super(emailAddress, password, userType, phoneNumber);
-        this.defaultPreference = preference;
-        this.age = age;
-        this.savedPetIds = savedPetIds;
         this.centerZip = centerZip;
         getLongAndLat(centerZip);
     }
@@ -168,7 +158,5 @@ public class Owner extends User {
         this.preferenceWeights.setPreferenceWeightId(preferenceId);
     }
 
-    public void addPetToSavedPets(Long petId) {
-        this.savedPetIds.add(petId);
-    }
+
 }

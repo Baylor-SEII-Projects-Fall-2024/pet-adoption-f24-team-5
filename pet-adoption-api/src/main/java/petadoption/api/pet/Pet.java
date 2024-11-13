@@ -1,10 +1,10 @@
 package petadoption.api.pet;
-
 import jakarta.persistence.*;
 import lombok.*;
 import petadoption.api.user.AdoptionCenter.AdoptionCenter;
 import petadoption.api.user.User;
 import petadoption.api.user.Owner.Owner;
+
 
 @Entity
 @Getter
@@ -14,6 +14,7 @@ import petadoption.api.user.Owner.Owner;
 @NoArgsConstructor
 @Table(name = Pet.TABLE_NAME)
 public class Pet {
+
     public static final String TABLE_NAME = "Pets";
 
     @Id

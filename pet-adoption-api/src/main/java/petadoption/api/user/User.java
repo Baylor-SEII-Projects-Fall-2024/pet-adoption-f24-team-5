@@ -1,6 +1,7 @@
 package petadoption.api.user;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
@@ -21,13 +22,6 @@ import java.util.List;
 @Table(name = User.TABLE_NAME)
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "USER_TYPE", discriminatorType = DiscriminatorType.STRING)
-/*
- * @JsonTypeInfo(
- * use = JsonTypeInfo.Id.NAME,
- * include = JsonTypeInfo.As.PROPERTY,
- * property = "userType"
- * )
- */
 @JsonSubTypes({
         @JsonSubTypes.Type(value = CenterWorker.class, name = "CenterWorker"),
         @JsonSubTypes.Type(value = Owner.class, name = "Owner")
