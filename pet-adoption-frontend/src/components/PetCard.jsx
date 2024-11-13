@@ -39,7 +39,7 @@ const HoverOverlay = styled(Box)(({ theme }) => ({
     },
 }));
 
-const PetCard = ({ pet, onClick, expandable = true, saveable = true, likeable = true }) => {
+const PetCard = ({ pet, onClick, expandable = true, saveable = true, likeable = true, onLike = null }) => {
     const [loading, setLoading] = useState(true);
     const [isHovered, setIsHovered] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -74,18 +74,40 @@ const PetCard = ({ pet, onClick, expandable = true, saveable = true, likeable = 
         setIsModalOpen(false);
     };
 
-    const handleLikePet = () => {
-
-        console.log("Liking pet");
+    const handleLikePet = async () => {
+        const url = `${API_URL}/api/recommendation-engine/update-preference`;
+        const email = getSubjectFromToken(token);
+        const preference = {
+            preferredSpecies: pet.species,
+            preferredBreed: pet.breed,
+            preferredColor: pet.color,
+            preferredAge: pet.age,
+        };
+        try {
+            await axios.post(url, preference, {
+                params: { email: email },
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            if (onLike) {
+                onLike(pet);
+            }
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     return (
-        <>
+        <Box
+            sx={{
+                width: '330px',
+                height: '600px',
+            }}
+        >
             <StyledCard
                 onClick={onClick}
                 sx={{
-                    width: 200,
-                    height: 300,
+                    width: '100%',
+                    height: '100%',
                     display: 'flex',
                     justifyContent: 'center',
                     "&:hover": {
@@ -161,23 +183,30 @@ const PetCard = ({ pet, onClick, expandable = true, saveable = true, likeable = 
                             Description: {pet.description}
                         </Typography>
                     </Box>
-                    {saveable && (
-                        <Button onClick={handleSavePetToOwner} variant="contained" color="primary">
-                            Save Pet
-                        </Button>
-                    )}
-                    {likeable && (
-                        <Button onClick={handleLikePet} variant="contained" color="primary">
-                            Like Pet
-                        </Button>
-                    )}
+                    <Box
+                        display="flex"
+                        justifyContent="center"
+                        alignItems="center"
+                        gap={2}
+                    >
+                        {saveable && (
+                            <Button onClick={handleSavePetToOwner} variant="contained" color="primary">
+                                Save Pet
+                            </Button>
+                        )}
+                        {likeable && (
+                            <Button onClick={handleLikePet} variant="contained" color="primary">
+                                Like Pet
+                            </Button>
+                        )}
+                    </Box>
                 </HoverOverlay>
             </StyledCard>
 
             {isModalOpen && (
-                <ExpandedPetCard pet={pet} saveable={saveable} likeable={likeable} onClose={handleCloseModal} />
+                <ExpandedPetCard pet={pet} saveable={saveable} likeable={likeable} onClose={handleCloseModal} onLike={onLike} />
             )}
-        </>
+        </Box>
     );
 };
 
