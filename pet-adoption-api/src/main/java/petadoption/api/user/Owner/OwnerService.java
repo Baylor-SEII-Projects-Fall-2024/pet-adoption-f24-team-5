@@ -1,17 +1,55 @@
 package petadoption.api.user.Owner;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import petadoption.api.pet.Pet;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import petadoption.api.pet.PetRepository;
 import petadoption.api.preferences.Preference;
 import petadoption.api.preferences.PreferenceWeights;
 
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class OwnerService {
+    
     private final OwnerRepository ownerRepository;
+    private final PetRepository petRepository;
 
+
+    public Optional<List<Pet>> getAllSavedPetsByEmail(String email) {
+        Owner owner = ownerRepository.findByEmailAddress(email)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid email address: " + email));
+
+        return petRepository.findByPetIdIn(owner.getSavedPets())
+                .filter(pets -> !pets.isEmpty()).or(() -> Optional.of(Collections.emptyList()));
+    }
+
+    @Transactional
+    public void savePetForOwnerByEmail(String email, Pet pet) {
+        Owner owner = ownerRepository.findByEmailAddress(email)
+                .orElseThrow(() -> new RuntimeException("Owner not found"));
+
+        owner.getSavedPets().add(pet.getPetId());
+
+        ownerRepository.save(owner);
+
+    }
+
+    @Transactional
+    public void removeSavedPetForOwnerByEmail(String email, Pet pet) {
+        Owner owner = ownerRepository.findByEmailAddress(email)
+                .orElseThrow(() -> new RuntimeException("Owner not found"));
+
+        owner.getSavedPets().remove(pet.getPetId());
+
+        ownerRepository.save(owner);
+    }
 
     public Long getPreferenceWeightsIdByOwnerID(Long id) {
         Optional<Owner> ownerOptional = ownerRepository.findById(id);
@@ -46,5 +84,11 @@ public class OwnerService {
         }
 
         return false;
+    }
+
+    public Long findOwnerIdByEmail(String email) {
+        Owner owner = ownerRepository.findByEmailAddress(email)
+                .orElseThrow(() -> new RuntimeException("Owner not found"));
+        return owner.getId();
     }
 }
