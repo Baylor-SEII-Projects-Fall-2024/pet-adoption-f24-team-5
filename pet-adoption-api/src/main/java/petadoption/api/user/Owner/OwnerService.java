@@ -35,6 +35,9 @@ public class OwnerService {
         Owner owner = ownerRepository.findByEmailAddress(email)
                 .orElseThrow(() -> new RuntimeException("Owner not found"));
 
+        petRepository.findByPetId(pet.getPetId())
+                .orElseThrow(() -> new RuntimeException("Pet not found"));
+
         owner.getSavedPets().add(pet.getPetId());
 
         ownerRepository.save(owner);
