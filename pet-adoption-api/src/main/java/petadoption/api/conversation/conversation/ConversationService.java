@@ -3,6 +3,7 @@ package petadoption.api.conversation.conversation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import petadoption.api.user.AdoptionCenter.AdoptionCenter;
 
 import java.sql.SQLException;
@@ -61,5 +62,73 @@ public class ConversationService {
             throw e; // Rethrow to be caught by the controller
         }
     }
+
+    @Transactional
+    public void addUnreadMessageCenter(Long conversationId) throws SQLException{
+        // make sure valid id
+        if(conversationId < 1)
+        {
+            throw new IllegalArgumentException("Id must be positive");
+        }
+        try {
+            conversationRepository.incrementUnreadMessagesCenter(conversationId);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    @Transactional
+    public void addUnreadMessageOwner(Long conversationId) throws SQLException {
+        // Ensure the ID is valid
+        if (conversationId < 1) {
+            throw new IllegalArgumentException("Id must be positive");
+        }
+        try {
+            conversationRepository.incrementUnreadMessagesOwner(conversationId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    public boolean isCenter(Long senderId) throws SQLException {
+        try {
+            // Check if the user is associated with a center (adjust logic based on your requirements)
+            return conversationRepository.existsByCenterId(senderId);
+        } catch (Exception e) {
+            e.printStackTrace(); // Log the error
+            throw new SQLException("Error checking if sender is a center", e);
+        }
+    }
+
+    @Transactional
+    public void resetUnreadMessagesCenter(Long conversationId) throws SQLException {
+        if (conversationId < 1) {
+            throw new IllegalArgumentException("Id must be positive");
+        }
+        try {
+            conversationRepository.resetUnreadMessagesCenter(conversationId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    @Transactional
+    public void resetUnreadMessagesOwner(Long conversationId) throws SQLException {
+        if (conversationId < 1) {
+            throw new IllegalArgumentException("Id must be positive");
+        }
+        try {
+            conversationRepository.resetUnreadMessagesOwner(conversationId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
 
 }

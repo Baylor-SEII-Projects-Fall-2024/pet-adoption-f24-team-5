@@ -69,4 +69,59 @@ public class ConversationController {
         }
     }
 
+    public ResponseEntity<Void> addUnreadMessageCenter(Long conversationId) {
+        try {
+            conversationService.addUnreadMessageCenter(conversationId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    public ResponseEntity<Void> addUnreadMessageOwner(Long conversationId) {
+        try {
+            conversationService.addUnreadMessageOwner(conversationId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/reset-center-unread/{conversationId}")
+    public ResponseEntity<Void> resetUnreadMessagesCenter(@PathVariable Long conversationId) {
+        try {
+            conversationService.resetUnreadMessagesCenter(conversationId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/reset-owner-unread/{conversationId}")
+    public ResponseEntity<Void> resetUnreadMessagesOwner(@PathVariable Long conversationId) {
+        try {
+            conversationService.resetUnreadMessagesOwner(conversationId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+
+
+    public boolean isCenter(Long senderId) throws SQLException {
+        try {
+            return conversationService.isCenter(senderId);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 }

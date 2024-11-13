@@ -5,7 +5,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import petadoption.api.conversation.conversation.Conversation;
+import petadoption.api.conversation.conversation.ConversationController;
 
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -15,8 +17,12 @@ public class MessageController {
     @Autowired
     private final MessageService messageService;
 
-    public MessageController(MessageService messageService) {
+    @Autowired
+    private final ConversationController conversationController;
+
+    public MessageController(MessageService messageService, ConversationController conversationController) {
         this.messageService = messageService;
+        this.conversationController = conversationController;
     }
 
 
@@ -34,21 +40,40 @@ public class MessageController {
         }
     }
     @PostMapping("/sendMessage")
-    public ResponseEntity<Message> sendMessage(@RequestBody Message message)
-    {
+    public ResponseEntity<Message> sendMessage(@RequestBody Message message) {
         try {
+            // Send the message using the service
             Message newMessage = this.messageService.sendMessage(message);
+
+            // Check if the message was successfully sent
             if (newMessage == null) {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
+            // Update the conversation with unread message
+            if (isSenderCenter(message.getSenderId())) {
+                this.conversationController.addUnreadMessageOwner(message.getConversationId());
+            } else {
+                this.conversationController.addUnreadMessageCenter(message.getConversationId());
+            }
+
             // Return the created message
             return new ResponseEntity<>(newMessage, HttpStatus.OK);
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace(); // Log the exception
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    private boolean isSenderCenter(Long senderId) throws SQLException {
+        try {
+            return conversationController.isCenter(senderId);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+
 
 }
