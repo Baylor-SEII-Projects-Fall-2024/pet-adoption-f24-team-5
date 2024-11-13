@@ -49,6 +49,7 @@ public class OwnerTest {
         when(ownerRepository.findByEmailAddress(email)).thenReturn(Optional.of(owner));
 
         when(owner.getSavedPets()).thenReturn(new HashSet<>());
+        when(petRepository.findByPetId(pet.getPetId())).thenReturn(Optional.of(pet));
 
         ownerService.savePetForOwnerByEmail(email, pet);
 
