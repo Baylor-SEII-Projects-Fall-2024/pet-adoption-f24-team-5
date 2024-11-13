@@ -48,6 +48,7 @@ public class ImageService {
         }
 
         Path imagePath = Path.of(uploadDir, uniqueImageName);
+        imagePath = Files.exists(imagePath) ? imagePath : Path.of("src/main/resources/defaultPictures/noPicture.jpg");
 
         if(Files.exists(imagePath)) {
             byte[] imageBytes = Files.readAllBytes(imagePath);
@@ -61,7 +62,6 @@ public class ImageService {
             return new AbstractMap.SimpleEntry<>(mimeType, encodedString);
         } else {
             throw new IOException("image not found");
-            ///TODO return standard image for not found when that is added to resources
         }
     }
 
