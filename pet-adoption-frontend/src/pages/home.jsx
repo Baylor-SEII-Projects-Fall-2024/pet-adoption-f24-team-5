@@ -33,16 +33,53 @@ const HomePage = () => {
 
     useEffect(() => {
         const fetchEvents = async () => {
+            //setLoading(true);
             try {
-                const response = await axios.get(`${API_URL}/api/events`, {
+                let response;
+                console.log("Fetching events...");
+
+                if (getAuthorityFromToken(token) === "Owner") {
+                    response = await axios.get(`${API_URL}/api/events`, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            'Content-Type': 'application/json',
+                        },
+                    });
+                } else {
+                    response = await axios.get(`${API_URL}/api/events/getCenterEvents/${getSubjectFromToken(token)}`, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            'Content-Type': 'application/json',
+                        },
+                    });
+                }
+
+                const eventsWithCenterNames = await Promise.all(
+                    response.data.map(async (event) => {
+                        const centerName = await fetchAdoptionCenterName(event.center_id);
+                        return { ...event, center_name: centerName };
+                    })
+                );
+
+                setEvents(eventsWithCenterNames);
+            } catch (error) {
+                console.error("Error fetching events:", error);
+            } finally {
+                //setLoading(false);
+            }
+        };
+        const fetchAdoptionCenterName = async (centerId) => {
+            try {
+                const response = await axios.get(`${API_URL}/api/users/getAdoptionCenter/${centerId}`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                         'Content-Type': 'application/json',
                     },
                 });
-                setEvents(response.data);
+                return response.data.centerName; // Assuming the response contains the name
             } catch (error) {
-                console.error('Error fetching events:', error);
+                console.error("Failed to fetch adoption center name:", error);
+                return "Unknown Center"; // Default value in case of an error
             }
         };
 
