@@ -51,10 +51,23 @@ const PetCard = ({ pet, onClick, expandable = true, saveable = true, likeable = 
     };
 
     const handleSavePetToOwner = async () => {
-
-        console.log(email);
+        const formattedPet = {
+            petId: pet.petId,
+            petOwner: pet.petOwner,
+            species: pet.species,
+            petName: pet.petName,
+            breed: pet.breed,
+            color: pet.color,
+            sex: pet.sex,
+            age: pet.age,
+            adoptionStatus: pet.adoptionStatus,
+            description: pet.description,
+            imageName: pet.imageName,
+            owner: pet.owner,
+            petWeightId: pet.petWeightId,
+        };
         try {
-            await axios.post(`${API_URL}/api/owner/save_pet_user`, pet, {
+            await axios.post(`${API_URL}/api/owner/save_pet_user`, formattedPet, {
                 params: { email: email },
                 headers: { Authorization: `Bearer ${token}` },
             });
@@ -62,7 +75,6 @@ const PetCard = ({ pet, onClick, expandable = true, saveable = true, likeable = 
             console.error(error);
         }
     };
-
 
     const handleExpandClick = () => {
         if (expandable) {
