@@ -75,9 +75,9 @@ public class RecommendationService {
             throw new IOException("Not enough arguments in the preference vector");
         }
         Preference pref = new Preference();
-        pref.setPreferredSpecies(preference.get(0));
-        pref.setPreferredBreed(preference.get(1));
-        pref.setPreferredColor(preference.get(2));
+        pref.setPreferredSpecies(preference.get(0).toLowerCase().replaceAll("\\s+", ""));
+        pref.setPreferredBreed(preference.get(1).toLowerCase().replaceAll("\\s+", ""));
+        pref.setPreferredColor(preference.get(2).toLowerCase().replaceAll("\\s+", ""));
         pref.setPreferredAge(Integer.parseInt(preference.get(3)));
 
         return pref;
@@ -86,9 +86,9 @@ public class RecommendationService {
     public double[] generatePreferenceVector(Pet pet) throws IOException {
         Preference petStats = new Preference();
 
-        petStats.setPreferredSpecies(pet.getSpecies());
-        petStats.setPreferredBreed(pet.getBreed());
-        petStats.setPreferredColor(pet.getColor());
+        petStats.setPreferredSpecies(pet.getSpecies().toLowerCase().replaceAll("\\s+", ""));
+        petStats.setPreferredBreed(pet.getBreed().toLowerCase().replaceAll("\\s+", ""));
+        petStats.setPreferredColor(pet.getColor().toLowerCase().replaceAll("\\s+", ""));
         petStats.setPreferredAge(pet.getAge());
 
         return generatePreferenceVector(petStats);
@@ -119,7 +119,7 @@ public class RecommendationService {
         }
 
         INDArray preferenceVector = speciesVec.add(breedVec).add(colorVec).add(ageVec)
-                            .div(speciesWeight + breedWeight + colorWeight + ageWeight);
+                .div(speciesWeight + breedWeight + colorWeight + ageWeight);
         return preferenceVector.toDoubleVector();
     }
 
