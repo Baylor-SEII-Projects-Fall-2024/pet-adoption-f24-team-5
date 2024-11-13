@@ -53,20 +53,22 @@ public class RecommendationEngineController {
     public ResponseEntity<?> getNewPets(@RequestParam String email) {
         try{
             Long id = ownerService.findOwnerIdByEmail(email);
-            long userWeightID = ownerService.getPreferenceWeightsIdByOwnerID(id);
-            int coldStartValue = recommendationService.getColdStartValue(id);
-            double[] usersNewWeights = recommendationService.getUsersWeights(userWeightID);
+            Long userWeightID = ownerService.getPreferenceWeightsIdByOwnerID(id);
+            if(userWeightID != null){
+                int coldStartValue = recommendationService.getColdStartValue(id);
+                double[] usersNewWeights = recommendationService.getUsersWeights(userWeightID);
 
 
-            // If the user's cold start is over give them valid recommendations
-            if(coldStartValue == 0){
-                return new ResponseEntity<>(recommendationService.findKthNearestNeighbors(id, usersNewWeights, 3)
-                        ,HttpStatus.OK);
+                // If the user's cold start is over give them valid recommendations
+                if(coldStartValue == 0){
+                    return new ResponseEntity<>(recommendationService.findKthNearestNeighbors(id, usersNewWeights, 3)
+                            ,HttpStatus.OK);
+                }
+
+                // Cold Start is not over -> Give them 3 random pets
+                coldStartValue--;
+                recommendationService.setColdStartValue(id, coldStartValue);
             }
-
-            // Cold Start is not over -> Give them 3 random pets
-            coldStartValue--;
-            recommendationService.setColdStartValue(id, coldStartValue);
             List<Pet> allPets = petService.getAllPets();
             if(allPets.size() <= 3 ){
                 return new ResponseEntity<>(allPets, HttpStatus.OK);
