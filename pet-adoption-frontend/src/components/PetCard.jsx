@@ -3,6 +3,7 @@ import ImageComponent from "@/components/ImageComponent";
 import { useState } from "react";
 import { getSubjectFromToken } from "@/utils/tokenUtils";
 import { useSelector } from "react-redux";
+import { getAuthorityFromToken } from "@/utils/tokenUtils";
 import axios from "@/utils/axiosConfig";
 import { API_URL } from "@/constants";
 import ExpandedPetCard from "@/components/ExpandedPetCard";
@@ -45,6 +46,12 @@ const PetCard = ({ pet, onClick, expandable = true, saveable = true, likeable = 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const token = useSelector((state) => state.user.token);
     const email = getSubjectFromToken(token);
+    const authority = getAuthorityFromToken(token);
+
+    if (authority !== "Owner") {
+        saveable = false;
+        likeable = false;
+    }
 
     const handleImageLoad = () => {
         setLoading(false);
