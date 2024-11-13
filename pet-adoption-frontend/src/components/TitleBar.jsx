@@ -78,7 +78,7 @@ const TitleBar = () => {
 
                 {(authority === 'Owner') && (
                     <>
-                        <Button color="inherit" component={Link} to="/SearchEngine">Search Engine</Button>
+                        <Button color="inherit" component={Link} to="/SearchEngine">Recommendation Engine</Button>
                         <Button color="inherit" component={Link} to="/AvailablePets">All Pets</Button>
                         <Button color="inherit" component={Link} to="/LocalAdoptionCenter">Local Adoption Center</Button>
                         <Button color="inherit" component={Link} to="/EventManager">All Events</Button>

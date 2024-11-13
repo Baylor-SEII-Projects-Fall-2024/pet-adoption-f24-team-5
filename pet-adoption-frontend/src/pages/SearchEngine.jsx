@@ -38,15 +38,13 @@ const SearchEngine = () => {
         handleSearch();
     }, []);
 
+    const handleOpenSavedPets = () => {
+        setShowSavedPets(true);
+        fetchSavedPets();
+    }
 
-    const handleSaveChange = () => {
-        setShowSavedPets(!showSavedPets);
-        if (!showSavedPets){
-            handleSearch();
-        }
-        else{
-            fetchSavedPets();
-        }
+    const handleCloseSavedPets = () => {
+        setShowSavedPets(false);
     }
 
     const fetchSavedPets = useCallback(async () => {
@@ -66,14 +64,14 @@ const SearchEngine = () => {
         } catch (error) {
             console.error('Error fetching saved pets:', error);
         }
-        finally{
+        finally {
             setLoading(false);
         }
     }, [token, email]);
 
-    useEffect(() => {
-        fetchSavedPets();
-    }, [fetchSavedPets]);
+    // useEffect(() => {
+    //     fetchSavedPets();
+    // }, [fetchSavedPets]);
 
     return (
         <>
@@ -89,127 +87,129 @@ const SearchEngine = () => {
                 {!showSavedPets && (
                     <Grid container spacing={2} sx={{ height: '100vh', width: '100vw', padding: 2 }}>
 
-                <Grid container spacing={2}>
-                    {pets.length > 0 &&
-                        pets.map((pet) => (
-                            <Grid item xs={12} sm={6} md={4} key={pet.petName}>
-                                <PetCard pet={pet} onLike={handleSearch} />
-                            </Grid>
-                        ))}
-                </Grid>
-
-                    <Grid item xs={12}>
-                        <Grid container justifyContent="center" spacing={2}>
-                            <Button
-                                onClick={handleSearch}
-                                type="submit"
-                                variant="contained"
-                                sx={{
-                                    background: 'linear-gradient(90deg, #43cea2, #246e56)',
-                                    color: 'white',
-                                    width: '450px',
-                                    padding: '10px 0',
-                                    borderRadius: '50px',
-                                    marginTop: 2,
-                                    '&:hover': {
-                                        background: 'linear-gradient(90deg, #246e56, #43cea2)',
-                                    },
-                                }}
-                            >
-                                Search
-                            </Button>
+                        <Grid container spacing={2}>
+                            {pets.length > 0 &&
+                                pets.map((pet) => (
+                                    <Grid item xs={12} sm={6} md={4} key={pet.petName}>
+                                        <PetCard pet={pet} onLike={handleSearch} />
+                                    </Grid>
+                                ))}
                         </Grid>
-                        <Grid container justifyContent="center" spacing={2}>
-                        <Button
-                                onClick={handleSaveChange}
-                                type="submit"
-                                variant="contained"
-                                sx={{
-                                    background: 'linear-gradient(90deg, #43cea2, #246e56)',
-                                    color: 'white',
-                                    width: '450px',
-                                    padding: '10px 0',
-                                    borderRadius: '50px',
-                                    marginTop: 2,
-                                    '&:hover': {
-                                        background: 'linear-gradient(90deg, #246e56, #43cea2)',
-                                    },
-                                }}
-                            >
-                                View Saved Pets
-                            </Button>
+
+                        <Grid item xs={12}>
+                            <Grid container justifyContent="center" spacing={2}>
+                                <Button
+                                    onClick={handleSearch}
+                                    type="submit"
+                                    variant="contained"
+                                    sx={{
+                                        background: 'linear-gradient(90deg, #43cea2, #246e56)',
+                                        color: 'white',
+                                        width: '450px',
+                                        padding: '10px 0',
+                                        borderRadius: '50px',
+                                        marginTop: 2,
+                                        '&:hover': {
+                                            background: 'linear-gradient(90deg, #246e56, #43cea2)',
+                                        },
+                                    }}
+                                >
+                                    Refresh Pets
+                                </Button>
+                            </Grid>
+                            <Grid container justifyContent="center" spacing={2}>
+                                <Button
+                                    onClick={handleOpenSavedPets}
+                                    type="submit"
+                                    variant="contained"
+                                    sx={{
+                                        background: 'linear-gradient(90deg, #43cea2, #246e56)',
+                                        color: 'white',
+                                        width: '450px',
+                                        padding: '10px 0',
+                                        borderRadius: '50px',
+                                        marginTop: 2,
+                                        '&:hover': {
+                                            background: 'linear-gradient(90deg, #246e56, #43cea2)',
+                                        },
+                                    }}
+                                >
+                                    View Saved Pets
+                                </Button>
+                            </Grid>
                         </Grid>
                     </Grid>
-                </Grid>
                 )}
-                <Modal
-                    open={showSavedPets}
-                    onClose={handleSaveChange}
-                    sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                    }}
-                >
-                    <Box
+                {showSavedPets && (
+                    <Modal
+                        open={showSavedPets}
+                        onClose={handleCloseSavedPets}
                         sx={{
-                            width: '80%',
-                            height: '550px',
-                            backgroundColor: 'white',
-                            borderRadius: 4,
-                            boxShadow: 24,
-                            p: 4,
                             display: 'flex',
-                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
                         }}
                     >
                         <Box
                             sx={{
-                                flex: 1,
-                                overflowY: 'auto',
-                                mb: 2,
-                            }}
-                        >
-                            <Typography variant="h6" sx={{ mb: 2 }} textAlign="center">
-                                Saved Pets
-                            </Typography>
-                            {loading ? (
-                                <Typography>Loading saved pets...</Typography>
-                            ) : savedPets.length > 0 ? (
-                                <Grid container spacing={2}>
-                                    {savedPets.map((pet) => (
-                                        <Grid item xs={12} sm={6} md={4} key={pet.id}>
-                                            <PetCard pet={pet} />
-                                        </Grid>
-                                    ))}
-                                </Grid>
-                            ) : (
-                                <Typography>No saved pets found</Typography>
-                            )}
-                        </Box>
-                        <Box
-                            sx={{
+                                width: '80%',
+                                height: '550px',
+                                backgroundColor: 'white',
+                                borderRadius: 4,
+                                boxShadow: 24,
+                                p: 4,
                                 display: 'flex',
-                                justifyContent: 'center',
-                                mt: 2,
+                                flexDirection: 'column',
                             }}
                         >
-                            <Button
-                                onClick={handleSaveChange}
-                                variant="contained"
+                            <Box
                                 sx={{
-                                    background: 'linear-gradient(90deg, #43cea2, #246e56)',
-                                    color: 'white',
-                                    '&:hover': {
-                                        background: 'linear-gradient(90deg, #246e56, #43cea2)',
-                                    },
+                                    flex: 1,
+                                    overflowY: 'auto',
+                                    mb: 2,
                                 }}
                             >
-                                Close
-                            </Button>
+                                <Typography variant="h6" sx={{ mb: 2 }} textAlign="center">
+                                    Saved Pets
+                                </Typography>
+                                {loading ? (
+                                    <Typography>Loading saved pets...</Typography>
+                                ) : savedPets.length > 0 ? (
+                                    <Grid container spacing={2}>
+                                        {savedPets.map((pet) => (
+                                            <Grid item xs={12} sm={6} md={4} key={pet.id}>
+                                                <PetCard pet={pet} />
+                                            </Grid>
+                                        ))}
+                                    </Grid>
+                                ) : (
+                                    <Typography>No saved pets found</Typography>
+                                )}
+                            </Box>
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    mt: 2,
+                                }}
+                            >
+                                <Button
+                                    onClick={handleCloseSavedPets}
+                                    variant="contained"
+                                    sx={{
+                                        background: 'linear-gradient(90deg, #43cea2, #246e56)',
+                                        color: 'white',
+                                        '&:hover': {
+                                            background: 'linear-gradient(90deg, #246e56, #43cea2)',
+                                        },
+                                    }}
+                                >
+                                    Close
+                                </Button>
+                            </Box>
                         </Box>
-                    </Box>
-                </Modal>
+                    </Modal>
+                )}
             </Box>
         </>
     )
