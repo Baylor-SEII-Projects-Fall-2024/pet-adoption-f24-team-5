@@ -11,6 +11,7 @@ const PetGrid = () => {
     const [loading, setLoading] = useState(true); // State for loading
     const token = useSelector((state) => state.user.token); // Get the token from Redux
 
+
     // Fetch pets from API
     const getAllPets = async () => {
         try {
@@ -59,7 +60,7 @@ const PetGrid = () => {
                     alignItems="stretch"
                     sx={{ gap: '20px' }}
                 >
-                    {pets.map((pet) => (
+                    {pets.slice(0,50).map((pet) => (
                         <Grid item xs={12} sm={6} md={4} lg={3} key={pet.petName}>
                             <PetCard pet={pet} saveable={false} likeable={false} />
                         </Grid>
