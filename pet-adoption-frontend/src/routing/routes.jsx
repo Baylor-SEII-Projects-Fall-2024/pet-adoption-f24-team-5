@@ -2,9 +2,7 @@ import { useSelector } from 'react-redux';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from './protectedRoute';
 import dynamic from 'next/dynamic';
-
 import Layout from '@/components/Layout';
-import HomePage from '@/pages/HomePage';
 import PetManager from '@/pages/PetManagerPage';
 import EventManager from '@/pages/EventManagerPage';
 import FindAPetPage from '@/pages/FindAPetPage';
@@ -19,6 +17,7 @@ import SavedPets from '@/pages/SavedPetsPage';
 import Register from '@/pages/RegisterUserPage';
 import Login from '@/pages/LoginPage';
 import SessionExpired from '@/pages/SessionExpiredPage';
+import { getAuthorityFromToken } from "@/utils/redux/tokenUtils";
 
 const BrowserRouter = dynamic(
     () => import('react-router-dom').then((mod) => mod.BrowserRouter),
@@ -26,12 +25,13 @@ const BrowserRouter = dynamic(
 );
 export default function AppRoutes() {
     const token = useSelector((state) => state.user.token);
+    const userType = getAuthorityFromToken(token);
 
     return (
         <BrowserRouter>
             <Routes>
                 <Route element={<Layout />}>
-                    <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+                    <Route path="/" element={<ProtectedRoute>{userType === "Owner" ? <FindAPetPage /> : <PetManager />}</ProtectedRoute>} />
                     <Route path="/PetManager" element={<ProtectedRoute><PetManager /></ProtectedRoute>} />
                     <Route path="/EventManager" element={<ProtectedRoute><EventManager /></ProtectedRoute>} />
                     <Route path="/FindAPet" element={<ProtectedRoute><FindAPetPage /></ProtectedRoute>} />

@@ -64,6 +64,20 @@ const TitleBar = () => {
         navigate('/Login');
     };
 
+    // Navigation menus based on user type
+    const ownerNavItems = [
+        { label: 'Adoption Centers', path: '/LocalAdoptionCenter' },
+        { label: 'Available Pets', path: '/AvailablePets' },
+        { label: 'Find A Pet', path: '/FindAPet' },
+        { label: 'Saved Pets', path: '/SavedPets' },
+    ];
+
+    const centerNavItems = [
+        { label: 'Pets', path: '/PetManager' },
+        { label: 'Events', path: '/EventManager' },
+        { label: 'Workers', path: '/ManageAccounts' },
+    ];
+
     return (
         <AppBar
             position="static"
@@ -72,49 +86,54 @@ const TitleBar = () => {
                 boxShadow: 'none',
             }}
         >
-            <Toolbar>
-                <Typography variant="h6" sx={{ flexGrow: 1 }}>
-                    <Button color="inherit" component={Link} to="/">DogPile Solutions</Button>
-                </Typography>
-                <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'center' }}>
-                    Welcome {displayName || 'User'}!
-                </Typography>
-
-                {/* Add navigation for Center and Owner */}
-                {(authority === 'CenterOwner' || authority === 'CenterWorker') && (
-                    <>
-                        <Button color="inherit" component={Link} to="/EventManager">Event Manager</Button>
-                        <Button color="inherit" component={Link} to="/PetManager">Pet Manager</Button>
-                        <Button color="inherit" component={Link} to="/ManageAccounts">Manage Worker Accounts</Button>
-                    </>
-                )}
-
-                {(authority === 'Owner') && (
-                    <>
-                        <Button color="inherit" component={Link} to="/FindAPet">Recommendation Engine</Button>
-                        <Button color="inherit" component={Link} to="/AvailablePets">All Pets</Button>
-                        <Button color="inherit" component={Link} to="/LocalAdoptionCenter">Local Adoption Center</Button>
-                        <Button color="inherit" component={Link} to="/EventManager">All Events</Button>
-                        <Button color="inherit" component={Link} to="/preferences">Preferences</Button>
-                        <Button color="inherit" component={Link} to="/SavedPets">Saved Pets</Button>
-                    </>
-                )}
-
-                {/* Messages Button with Unread Count (Hide badge when on Messages page) */}
-                <Button color="inherit" component={Link} to="/Messages">
-                    {location.pathname !== '/Messages' &&
-                        (unreadMessagesCount === null ? (
-                            <CircularProgress size={20} color="inherit" />
-                        ) : (
-                            <Badge badgeContent={unreadMessagesCount} color="error">
-                                Messages
-                            </Badge>
-                        ))}
-                    {location.pathname === '/Messages' && <span>Messages</span>}
+            <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                {/* Logo/Home Section */}
+                <Button color="inherit" component={Link} to="/" sx={{ mr: 2 }}>
+                    DogPile Solutions
                 </Button>
 
-                <Button color="inherit" component={Link} to="/Settings">Settings</Button>
-                <Button color="inherit" onClick={handleLogout}>Log Out</Button>
+                {/* Navigation Section */}
+                <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+                    {authority === 'Owner' && ownerNavItems.map((item) => (
+                        <Button
+                            key={item.path}
+                            color="inherit"
+                            component={Link}
+                            to={item.path}
+                        >
+                            {item.label}
+                        </Button>
+                    ))}
+
+                    {(authority === 'CenterOwner' || authority === 'CenterWorker') &&
+                        centerNavItems.map((item) => (
+                            <Button
+                                key={item.path}
+                                color="inherit"
+                                component={Link}
+                                to={item.path}
+                            >
+                                {item.label}
+                            </Button>
+                        ))}
+                </div>
+
+                {/* User Section */}
+                <div>
+                    <Button color="inherit" component={Link} to="/Messages">
+                        {location.pathname !== '/Messages' &&
+                            (unreadMessagesCount === null ? (
+                                <CircularProgress size={20} color="inherit" />
+                            ) : (
+                                <Badge badgeContent={unreadMessagesCount} color="error">
+                                    Messages
+                                </Badge>
+                            ))}
+                        {location.pathname === '/Messages' && <span>Messages</span>}
+                    </Button>
+                    <Button color="inherit" component={Link} to="/Settings">Settings</Button>
+                    <Button color="inherit" onClick={handleLogout}>Log Out</Button>
+                </div>
             </Toolbar>
         </AppBar>
     );

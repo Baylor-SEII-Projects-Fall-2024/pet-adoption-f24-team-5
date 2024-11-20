@@ -1,182 +1,60 @@
-import React, { useState } from 'react';
-import { Card, CardContent, Typography, Modal, Box, Tooltip, Button } from '@mui/material';
-import { useSelector } from 'react-redux';
-import axios from 'axios';
-import { API_URL } from '@/constants';
-import { getSubjectFromToken } from '@/utils/redux/tokenUtils';
-import { useNavigate } from 'react-router-dom';
-import { startConversation } from '@/utils/message/startConversation';
-import { getUser } from '@/utils/user/getUser';
+import React from 'react';
+import {
+    Card,
+    CardContent,
+    Typography,
+    Box,
+    Chip,
+    Stack
+} from '@mui/material';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import PetsIcon from '@mui/icons-material/Pets';
 
-const AdoptionCenterCard = ({ center }) => {
-    const [open, setOpen] = useState(false);
-    const [tooltipPhone, setTooltipPhone] = useState('Click to copy phone number');
-    const [tooltipEmail, setTooltipEmail] = useState('Click to copy email');
-
-    const token = useSelector((state) => state.user.token);
-    const navigate = useNavigate();
-
-    const handleClick = () => {
-        setOpen(true); // Open the modal when the card is clicked
-    };
-
-    const handleClose = () => {
-        setOpen(false); // Close the modal
-    };
-
-    const copyToClipboard = (text, type) => {
-        navigator.clipboard.writeText(text).then(() => {
-            if (type === 'phone') {
-                setTooltipPhone('Copied!');
-                setTimeout(() => setTooltipPhone('Click to copy phone number'), 1500);
-            } else {
-                setTooltipEmail('Copied!');
-                setTimeout(() => setTooltipEmail('Click to copy email'), 1500);
-            }
-        });
-    };
-
-    // Function to fetch user data
-    const fetchUser = async (token) => {
-        try {
-            let email = '';
-
-            // Extract user email (subject) from the token
-            if (token) {
-                const subject = getSubjectFromToken(token);
-                if (subject) {
-                    email = subject;
-                } else {
-                    throw new Error('Invalid token: Subject not found.');
-                }
-            } else {
-                throw new Error('Token is required to fetch user information.');
-            }
-
-            const response = await getUser(token, email);
-
-            // Return the user data
-            return response;
-        } catch (error) {
-            console.error('Failed to fetch user', error);
-            throw error;
-        }
-    };
-
-    // Function to handle contacting the adoption center
-    const handleContactCenter = async () => {
-        try {
-            // Fetch user data to get userId
-            const userData = await fetchUser(token);
-            const userId = userData.id;
-
-            const centerID = center.id; // Use center.centerId if that's the correct property
-
-            const response = await startConversation(token, userId, centerID);
-
-            console.log('Conversation started:', response);
-
-            // Navigate to the Messages page
-            navigate('/Messages');
-        } catch (error) {
-            console.error('Failed to start conversation', error);
-            // Optionally, display an error message to the user
-        }
-    };
-
+const AdoptionCenterCard = ({ center, distance }) => {
     return (
-        <>
-            {/* Smaller Card */}
-            <Card
-                onClick={handleClick}
-                sx={{
-                    width: '100%',
-                    backgroundColor: '#3f51b5',
-                    color: '#fff',
-                    transition: '0.3s',
-                    boxSizing: 'border-box',
-                    '&:hover': {
-                        boxShadow: 8,
-                        transform: 'scale(1.05)',
-                    },
-                    cursor: 'pointer',
-                }}
-                elevation={4}
-            >
-                <CardContent>
-                    <Typography variant="h5" align="center">
-                        {center.centerName}
-                    </Typography>
-                    <Typography variant="h6" align="center">
-                        City: {center.centerCity}, State: {center.centerState}, ZipCode: {center.centerZip}
-                    </Typography>
-                    <Typography variant="h5" align="center">
-                        Show More Information
-                    </Typography>
-                </CardContent>
-            </Card>
+        <Card
+            elevation={3}
+            sx={{
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                transition: 'transform 0.2s ease-in-out',
+                '&:hover': {
+                    transform: 'translateY(-4px)',
+                }
+            }}
+        >
+            <CardContent>
+                <Typography variant="h6" gutterBottom component="div">
+                    {center.centerName}
+                </Typography>
 
-            {/* Modal for the larger card */}
-            <Modal
-                open={open}
-                onClose={handleClose}
-                sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-            >
-                <Box
-                    sx={{
-                        width: '80%',
-                        maxWidth: 600,
-                        backgroundColor: '#fff',
-                        p: 4,
-                        borderRadius: 2,
-                        boxShadow: 24,
-                    }}
-                >
-                    <Typography variant="h4" align="center" gutterBottom>
-                        {center.centerName}
-                    </Typography>
-                    <Typography variant="h6" align="center" gutterBottom>
-                        City: {center.centerCity}, State: {center.centerState}, ZipCode: {center.centerZip}
-                    </Typography>
-                    <Typography variant="body1" align="center">
-                        Address: {center.centerAddress}
-                    </Typography>
-
-                    {/* Highlighted and underlined phone number and email with tooltip */}
-                    <Tooltip title={tooltipPhone}>
-                        <Typography
-                            variant="body1"
-                            align="center"
-                            sx={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline', mt: 2 }}
-                            onClick={() => copyToClipboard(center.phoneNumber, 'phone')}
-                        >
-                            Phone: {center.phoneNumber}
+                <Stack spacing={1.5}>
+                    <Box display="flex" alignItems="center" gap={1}>
+                        <LocationOnIcon color="action" fontSize="small" />
+                        <Typography variant="body2" color="text.secondary">
+                            {center.centerAddress}, {center.centerCity}, {center.centerState} {center.centerZip}
                         </Typography>
-                    </Tooltip>
+                    </Box>
 
-                    <Tooltip title={tooltipEmail}>
-                        <Typography
-                            variant="body1"
-                            align="center"
-                            sx={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline', mt: 1 }}
-                            onClick={() => copyToClipboard(center.emailAddress, 'email')}
-                        >
-                            Email: {center.emailAddress}
+                    <Box display="flex" alignItems="center" gap={1}>
+                        <PetsIcon color="action" fontSize="small" />
+                        <Typography variant="body2" color="text.secondary">
+                            {center.centerPetCount} pets available
                         </Typography>
-                    </Tooltip>
+                    </Box>
 
-                    {/* Contact Adoption Center Button */}
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handleContactCenter}
-                        sx={{ mt: 2 }}
-                    >
-                        Contact Adoption Center
-                    </Button>
-                </Box>
-            </Modal>
-        </>
+                    {distance && (
+                        <Chip
+                            label={`${distance.toFixed(1)} miles away`}
+                            size="small"
+                            color="primary"
+                            sx={{ alignSelf: 'flex-start' }}
+                        />
+                    )}
+                </Stack>
+            </CardContent>
+        </Card>
     );
 };
 
