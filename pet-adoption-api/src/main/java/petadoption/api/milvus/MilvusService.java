@@ -1,5 +1,7 @@
 package petadoption.api.milvus;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import io.milvus.param.ConnectParam;
 import io.milvus.v2.client.ConnectConfig;
 import io.milvus.v2.client.MilvusClientV2;
@@ -9,9 +11,14 @@ import io.milvus.v2.service.collection.request.AddFieldReq;
 import io.milvus.v2.service.collection.request.CreateCollectionReq;
 import io.milvus.v2.service.collection.request.DropCollectionReq;
 import io.milvus.v2.service.collection.request.HasCollectionReq;
+import io.milvus.v2.service.vector.request.InsertReq;
+import io.milvus.v2.service.vector.request.UpsertReq;
+import io.milvus.v2.service.vector.response.InsertResp;
+import io.milvus.v2.service.vector.response.UpsertResp;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +26,8 @@ import java.util.Map;
 public class MilvusService {
 
     String CLUSTER_ENDPOINT = "http://localhost:19530";
+    final String idName = "id";
+    final String vectorField = "preference_weight";
 
     private MilvusClientV2 milvusClient;
 
@@ -30,17 +39,16 @@ public class MilvusService {
         milvusClient = new MilvusClientV2(connectConfig);
     }
 
-    public void CreateMilvusCollection(String collectionName) {
+    public void CreateCollection(String collectionName) {
         CreateCollectionReq.CollectionSchema schema = milvusClient.createSchema();
-        final String idName = "id";
-        final String vectorField = "preference_weight";
+
 
         //below specifies the data types in the id and vector fields
         schema.addField(AddFieldReq.builder()
                 .fieldName(idName)
                 .dataType(DataType.Int64)
                 .isPrimaryKey(true)
-                .autoID(true)
+                .autoID(false)
                 .build()
         );
 
@@ -98,4 +106,23 @@ public class MilvusService {
         }
     }
 
+    public UpsertResp insertData(long id, ArrayList<Float> vector, String collectionName) {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty(idName, id);
+
+        JsonArray vectorArray = new JsonArray();
+        for (Float v : vector) {
+            vectorArray.add(v);
+        }
+        jsonObject.add(vectorField, vectorArray);
+
+        List<JsonObject> data = Arrays.asList(jsonObject);
+
+        UpsertReq upsertReq = UpsertReq.builder()
+                .collectionName(collectionName)
+                .data(data)
+                .build();
+
+        return milvusClient.upsert(upsertReq);
+    }
 }
