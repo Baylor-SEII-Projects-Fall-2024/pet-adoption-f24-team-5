@@ -2,7 +2,6 @@ package petadoption.api.milvus;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import io.milvus.param.ConnectParam;
 import io.milvus.v2.client.ConnectConfig;
 import io.milvus.v2.client.MilvusClientV2;
 import io.milvus.v2.common.DataType;
@@ -11,16 +10,15 @@ import io.milvus.v2.service.collection.request.AddFieldReq;
 import io.milvus.v2.service.collection.request.CreateCollectionReq;
 import io.milvus.v2.service.collection.request.DropCollectionReq;
 import io.milvus.v2.service.collection.request.HasCollectionReq;
-import io.milvus.v2.service.vector.request.InsertReq;
+import io.milvus.v2.service.vector.request.DeleteReq;
+import io.milvus.v2.service.vector.request.GetReq;
 import io.milvus.v2.service.vector.request.UpsertReq;
-import io.milvus.v2.service.vector.response.InsertResp;
+import io.milvus.v2.service.vector.response.DeleteResp;
+import io.milvus.v2.service.vector.response.GetResp;
 import io.milvus.v2.service.vector.response.UpsertResp;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class MilvusService {
@@ -124,5 +122,23 @@ public class MilvusService {
                 .build();
 
         return milvusClient.upsert(upsertReq);
+    }
+
+    public DeleteResp deleteData(long id, String collectionName) {
+        DeleteReq deleteReq = DeleteReq.builder()
+                .collectionName(collectionName)
+                .ids(Arrays.asList(id))
+                .build();
+
+        return milvusClient.delete(deleteReq);
+    }
+
+    public GetResp getData(long id, String collectionName) {
+        GetReq getReq = GetReq.builder()
+                .collectionName(collectionName)
+                .ids(Collections.singletonList(id))
+                .build();
+
+        return milvusClient.get(getReq);
     }
 }
