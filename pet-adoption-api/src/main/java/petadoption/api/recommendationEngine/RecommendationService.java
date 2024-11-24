@@ -7,6 +7,7 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.springframework.stereotype.Service;
 import org.springframework.context.annotation.Lazy;
+import petadoption.api.milvus.MilvusService;
 import petadoption.api.pet.Pet;
 import petadoption.api.pet.PetService;
 import petadoption.api.pet.PetWeightService;
@@ -33,6 +34,9 @@ public class RecommendationService {
     private final PetService petService;
     private final PetWeightService petWeightService;
     private final SeenPetService seenPetService;
+    private final MilvusService milvusService;
+
+    private final String preference_collection = "preference_collection";
 
 
     public double[] savePreferenceEmbedding(Long ownerId, List<String> newPreferences) throws IOException {
@@ -55,6 +59,13 @@ public class RecommendationService {
                 //No existing weights so create new weights
                 preferenceWeightsService.savePreferenceWeights(newWeights);
                 ownerService.savePreferenceWeights(ownerId, newWeights);
+
+                //TODO add values to milvus
+                if(!milvusService.CollectionExists(preference_collection)){
+                    milvusService.CreateCollection(preference_collection, 50);
+                }
+                milvusService.insertData(ownerId,embeddingVector,preference_collection);
+
             }else{
                 // Incorperates new preference into the existing one
                 double weightOfOld = 0.7;

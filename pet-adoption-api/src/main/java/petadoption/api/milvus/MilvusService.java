@@ -37,7 +37,7 @@ public class MilvusService {
         milvusClient = new MilvusClientV2(connectConfig);
     }
 
-    public void CreateCollection(String collectionName) {
+    public void CreateCollection(String collectionName, int dimension) {
         CreateCollectionReq.CollectionSchema schema = milvusClient.createSchema();
 
 
@@ -53,7 +53,7 @@ public class MilvusService {
         schema.addField(AddFieldReq.builder()
                 .fieldName(vectorField)
                 .dataType(DataType.FloatVector)
-                .dimension(50)
+                .dimension(dimension)
                 .build()
         );
 
@@ -104,12 +104,12 @@ public class MilvusService {
         }
     }
 
-    public UpsertResp insertData(long id, ArrayList<Float> vector, String collectionName) {
+    public UpsertResp insertData(long id, double[] vector, String collectionName) {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty(idName, id);
 
         JsonArray vectorArray = new JsonArray();
-        for (Float v : vector) {
+        for (double v : vector) {
             vectorArray.add(v);
         }
         jsonObject.add(vectorField, vectorArray);
