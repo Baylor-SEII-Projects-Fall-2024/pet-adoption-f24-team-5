@@ -61,10 +61,10 @@ public class RecommendationService {
                 ownerService.savePreferenceWeights(ownerId, newWeights);
 
                 //TODO add values to milvus
-                if(!milvusService.CollectionExists(preference_collection)){
-                    milvusService.CreateCollection(preference_collection, 50);
+                if(!milvusService.collectionExists(preference_collection)){
+                    milvusService.createCollection(preference_collection, 50);
                 }
-                milvusService.insertData(ownerId,embeddingVector,preference_collection);
+                milvusService.insertData(ownerId,embeddingVector,preference_collection, "PLACE_HOLDER");
 
             }else{
                 // Incorperates new preference into the existing one

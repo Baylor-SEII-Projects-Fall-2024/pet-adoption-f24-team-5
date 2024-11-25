@@ -1,5 +1,6 @@
 package petadoption.api.milvus;
 
+import com.codahale.metrics.MetricRegistryListener;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import io.milvus.v2.client.ConnectConfig;
@@ -10,15 +11,23 @@ import io.milvus.v2.service.collection.request.AddFieldReq;
 import io.milvus.v2.service.collection.request.CreateCollectionReq;
 import io.milvus.v2.service.collection.request.DropCollectionReq;
 import io.milvus.v2.service.collection.request.HasCollectionReq;
+import io.milvus.v2.service.partition.request.CreatePartitionReq;
+import io.milvus.v2.service.partition.request.DropPartitionReq;
+import io.milvus.v2.service.partition.request.HasPartitionReq;
 import io.milvus.v2.service.vector.request.DeleteReq;
 import io.milvus.v2.service.vector.request.GetReq;
+import io.milvus.v2.service.vector.request.SearchReq;
 import io.milvus.v2.service.vector.request.UpsertReq;
+import io.milvus.v2.service.vector.request.data.BaseVector;
+import io.milvus.v2.service.vector.request.data.FloatVec;
 import io.milvus.v2.service.vector.response.DeleteResp;
 import io.milvus.v2.service.vector.response.GetResp;
+import io.milvus.v2.service.vector.response.SearchResp;
 import io.milvus.v2.service.vector.response.UpsertResp;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class MilvusService {
@@ -29,7 +38,6 @@ public class MilvusService {
 
     private MilvusClientV2 milvusClient;
 
-
     public MilvusService() {
         ConnectConfig connectConfig = ConnectConfig.builder()
                 .uri(CLUSTER_ENDPOINT).build();
@@ -37,7 +45,7 @@ public class MilvusService {
         milvusClient = new MilvusClientV2(connectConfig);
     }
 
-    public void CreateCollection(String collectionName, int dimension) {
+    public void createCollection(String collectionName, int dimension) {
         CreateCollectionReq.CollectionSchema schema = milvusClient.createSchema();
 
 
@@ -86,14 +94,14 @@ public class MilvusService {
         }
     }
 
-    public boolean CollectionExists(String collectionName) {
+    public boolean collectionExists(String collectionName) {
         HasCollectionReq collection = HasCollectionReq.builder()
                         .collectionName(collectionName).build();
 
         return milvusClient.hasCollection(collection);
     }
 
-    public void DropCollection(String collectionName) {
+    public void dropCollection(String collectionName) {
         DropCollectionReq collection = DropCollectionReq.builder()
                 .collectionName(collectionName).build();
 
@@ -104,7 +112,7 @@ public class MilvusService {
         }
     }
 
-    public UpsertResp insertData(long id, double[] vector, String collectionName) {
+    public UpsertResp insertData(long id, double[] vector, String collectionName, String partitionName) {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty(idName, id);
 
@@ -119,26 +127,84 @@ public class MilvusService {
         UpsertReq upsertReq = UpsertReq.builder()
                 .collectionName(collectionName)
                 .data(data)
+                .partitionName(partitionName)
                 .build();
 
         return milvusClient.upsert(upsertReq);
     }
 
-    public DeleteResp deleteData(long id, String collectionName) {
+    public DeleteResp deleteData(long id, String collectionName, String partitionName) {
         DeleteReq deleteReq = DeleteReq.builder()
                 .collectionName(collectionName)
                 .ids(Arrays.asList(id))
+                .partitionName(partitionName)
                 .build();
 
         return milvusClient.delete(deleteReq);
     }
 
-    public GetResp getData(long id, String collectionName) {
+    public GetResp getData(long id, String collectionName, String partitionName) {
         GetReq getReq = GetReq.builder()
                 .collectionName(collectionName)
                 .ids(Collections.singletonList(id))
+                .partitionName(partitionName)
                 .build();
 
         return milvusClient.get(getReq);
+    }
+
+    public void  createPartition(String collectionName, String partitionName) {
+        CreatePartitionReq createPartitionReq = CreatePartitionReq.builder()
+                .collectionName(collectionName)
+                .partitionName(partitionName)
+                .build();
+        try {
+            milvusClient.createPartition(createPartitionReq);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public boolean partitionExists(String collectionName, String partitionName) {
+        HasPartitionReq partitionReq = HasPartitionReq.builder()
+                .collectionName(collectionName)
+                .partitionName(partitionName)
+                .build();
+
+        return milvusClient.hasPartition(partitionReq);
+    }
+
+    public void dropPartition(String collectionName, String partitionName) {
+        DropPartitionReq dropPartitionReq = DropPartitionReq.builder()
+                .collectionName(collectionName)
+                .partitionName(partitionName)
+                .build();
+
+        try {
+            milvusClient.dropPartition(dropPartitionReq);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public SearchResp findKthNearest(double [] queryArray, int k, String collectionName, String partitionName) {
+        float[] floatArray = new float[queryArray.length];
+        for (int i = 0; i < queryArray.length; i++) {
+            floatArray[i] = (float) queryArray[i];
+        }
+
+        FloatVec floatVec = new FloatVec(floatArray);
+
+        List<BaseVector> queryVec = Arrays.asList(floatVec);
+
+
+        SearchReq searchReq = SearchReq.builder()
+                .collectionName(collectionName)
+                .data(queryVec)
+                .partitionNames(Arrays.asList(partitionName))
+                .topK(k)
+                .build();
+
+        return milvusClient.search(searchReq);
     }
 }
