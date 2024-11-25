@@ -10,6 +10,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import petadoption.api.milvus.MilvusService;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 @Controller
 @RequiredArgsConstructor
 public class MockMilvusController {
@@ -20,7 +24,7 @@ public class MockMilvusController {
     public ResponseEntity<?> saveMilvus(){
         String collectionName = "test2";
         int dim = 50;
-        String partitionName = "owners";
+        String partitionName = "pets";
 
         if(!milvusService.collectionExists(collectionName)){
             milvusService.createCollection(collectionName, dim);
@@ -30,11 +34,21 @@ public class MockMilvusController {
             milvusService.createPartition(collectionName, partitionName);
         }
 
-        double[] list = {1.23, 4.56, 7.89, 10.11, 13.14, 16.17, 19.20, 22.23, 25.26, 28.29, 31.32, 34.35, 37.38, 40.41, 43.44, 46.47, 49.50, 52.53, 55.56, 58.59, 61.62, 64.65, 67.68, 70.71, 73.74, 76.77, 79.80, 82.83, 85.86, 88.89, 91.92, 94.95, 97.98, 100.01, 103.04, 106.07, 109.10, 112.13, 115.16, 118.19, 121.22, 124.25, 127.28, 130.31, 133.34, 136.37, 139.40, 142.43, 145.46, 148.49
-        };
+        List<double[]> vectors = new ArrayList<>();
+        Random random = new Random();
+        for (int i = 0; i < 1000000; i++) {
+            double[] vector = new double[50]; // Create a 50-dimensional array
+            for (int j = 0; j < 50; j++) {
+                vector[j] = random.nextDouble() * 10; // Random value between 0 and 10
+            }
+            vectors.add(vector);
+        }
 
         try {
-            return new ResponseEntity<>(milvusService.insertData(1l, list, collectionName, partitionName), HttpStatus.OK);
+            for (int i = 0; i < 1000; i++) {
+                milvusService.insertData(i, vectors.get(i), collectionName, partitionName);
+            }
+            return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -79,6 +93,20 @@ public class MockMilvusController {
 
     @GetMapping("/api/milvus/nearest/{k}")
     public ResponseEntity<?> getMilvusNearest(@PathVariable("k") int k){
+        String collectionName = "test2";
+        String partitionName = "pets";
+        double[] searchVector = {
+                4.5, 3.2, 7.8, 1.9, 5.6, 8.1, 2.3, 6.7, 4.8, 9.0,
+                3.4, 5.7, 7.1, 2.8, 6.2, 4.9, 8.4, 1.2, 9.6, 3.3,
+                7.5, 2.1, 5.8, 6.3, 8.9, 4.1, 3.6, 7.2, 2.7, 9.3,
+                5.4, 1.5, 6.6, 8.8, 3.1, 4.3, 7.4, 2.9, 9.7, 5.1,
+                8.5, 6.4, 3.8, 1.6, 4.7, 9.4, 2.5, 7.9, 5.3, 6.1
+        };
 
+        try {
+            return new ResponseEntity<>(milvusService.findKthNearest(searchVector,k, collectionName, partitionName), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }
