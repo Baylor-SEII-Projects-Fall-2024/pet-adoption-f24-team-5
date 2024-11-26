@@ -8,12 +8,10 @@ import org.springframework.stereotype.Service;
 import petadoption.api.milvus.MilvusServiceAdapter;
 import petadoption.api.pet.Pet;
 import petadoption.api.pet.PetService;
-//import petadoption.api.pet.PetWeightService;
 import petadoption.api.preferences.Preference;
-//import petadoption.api.preferences.PreferenceWeights;
-//import petadoption.api.preferences.PreferenceWeightsService;
 import petadoption.api.user.Owner.OwnerService;
 import petadoption.api.user.Owner.SeenPetService;
+import petadoption.api.user.Owner.SeenPets;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -24,53 +22,32 @@ import java.util.*;
 @RequiredArgsConstructor
 public class RecommendationService {
     private final AttributeEmbedding attributeEmbedding;
-//    private final PreferenceWeightsService preferenceWeightsService;
     private final OwnerService ownerService;
     private final Word2Vec word2Vec;
     private final PetService petService;
-//    private final PetWeightService petWeightService;
     private final SeenPetService seenPetService;
     private final MilvusServiceAdapter milvusServiceAdapter;
 
-    public final String PET_PARTITION = "PET_PARTITION";
+    public static final String PET_PARTITION = "PET_PARTITION";
     public final String OWNER_PARTITION = "OWNER_PARTITION";
 
     public double[] savePreferenceEmbedding(Long ownerId, List<String> newPreferences) throws IOException {
-//        Long preferenceID = ownerService.getPreferenceWeightsIdByOwnerID(ownerId);
-//        PreferenceWeights oldPref = null;
-        boolean isNewPreference = false;
-
         double[] preferences = milvusServiceAdapter.getData(ownerId, OWNER_PARTITION);
 
-//        if (preferenceID != null) {
-//            oldPref = preferenceWeightsService.getPreferenceWeights(preferenceID);
-//        }
-        if (preferences == null){
-            // No existing preference, create a new one.
-            isNewPreference = true;
-        }
         Preference newPref = extractArgsFromString(newPreferences);
         double[] embeddingVector = generatePreferenceVector(newPref);
-//        PreferenceWeights newWeights = new PreferenceWeights(embeddingVector);
 
         try{
-            if(!isNewPreference){
-                //No existing weights so create new weights
-//                preferenceWeightsService.savePreferenceWeights(newWeights);
-//                ownerService.savePreferenceWeights(ownerId, newWeights);
+            if(!(preferences == null)){
 
-//                milvusServiceAdapter.upsertData(ownerId,embeddingVector,embeddingVector.length,OWNER_PARTITION);
                 double weightOfOld = 0.7;
                 double weightOfNew= 0.3;
 
                 embeddingVector = VectorUtils.combineVectors(preferences, weightOfOld, embeddingVector, weightOfNew);
             }
-                // Incorperates new preference into the existing one
 
-//                preferenceWeightsService.updatePreferenceWeights(preferenceID, new PreferenceWeights(embeddingVector));
             milvusServiceAdapter.upsertData(ownerId,embeddingVector,embeddingVector.length,OWNER_PARTITION);
 
-            //preferenceRepository.updatePreferences(id, newPref); updatePreferences
         }catch (Exception e){
             throw new IOException(e.getMessage(), e);
         }
@@ -140,7 +117,7 @@ public class RecommendationService {
         }
     }
 
-    public List<Pet> findKthNearestNeighbors(double[] userWeights, int k) throws Exception{
+    public List<Pet> findKthNearestNeighbors(long ownerid, double[] userWeights, int k) throws Exception{
         try {
 
            /* List<Pet> allPets = petService.getAllPets();
@@ -204,52 +181,26 @@ public class RecommendationService {
             //Add three new pets to the list of seen pets
             seenPetService.addSeenPets(ownerID, matchedPets);
 */
-            List<Long> matchedPetIds = milvusServiceAdapter.findKthNearest(userWeights,k,PET_PARTITION);
+//            List<SeenPets> seenPets = seenPetService.getSeenPets(ownerID);*/
+
+           /* if (seenPets.size() >= allPets.size()) {
+                //User has seen all pets, restart their seen pets
+                seenPetService.resetSeenPets(ownerID);
+                seenPets = new ArrayList<>();
+            }*/
+
+//            List<Long> matchedPetIds = milvusServiceAdapter.findKthNearest(userWeights, ownerid, k,PET_PARTITION);
 
             List<Pet> matchedPets = new ArrayList<>();
 
-            for(Long petId : matchedPetIds){
-                petService.getPetById(petId).ifPresent(matchedPets::add);
-            }
-
+//            for(Long petId : matchedPetIds){
+//                petService.getPetById(petId).ifPresent(matchedPets::add);
+//            }
+//
             return matchedPets;
         }catch (Exception e){
             throw new SQLException("Error creating kth nearest neighbors: ", e);
         }
 
     }
-
-  /*  public boolean isFirstRound(long ownerId) {
-        return milvusServiceAdapter.getData(ownerId, OWNER_PARTITION) == null;
-    }*/
-/*
-    public int getColdStartValue(long userId) throws IOException{
-        Long weightID = ownerService.getPreferenceWeightsIdByOwnerID(userId);
-        if(weightID == null){
-            throw new IOException("Did not find user with ID: " + userId);
-        }
-        Optional<Integer> coldStartResult = preferenceWeightsService.getColdStartValue(weightID);
-        if(coldStartResult.isPresent()){
-            return coldStartResult.get();
-        }
-        throw new IOException("Did not find weight with ID: " + weightID);
-    }*/
-
-   /* public int setColdStartValue(long userId, int coldStartValue) throws IOException{
-
-        Long weightID = ownerService.getPreferenceWeightsIdByOwnerID(userId);
-        if(weightID == null){
-            throw new IOException("Did not find user with ID: " + userId);
-        }
-
-        return preferenceWeightsService.setColdStartValue(weightID, coldStartValue);
-    }*/
-
-/*    public double[] getUsersWeights(long id) {
-        PreferenceWeights preferenceWeights = preferenceWeightsService.getPreferenceWeights(id);
-        if(preferenceWeights != null){
-            return preferenceWeights.getAllWeights();
-        }
-        return null;
-    }*/
 }

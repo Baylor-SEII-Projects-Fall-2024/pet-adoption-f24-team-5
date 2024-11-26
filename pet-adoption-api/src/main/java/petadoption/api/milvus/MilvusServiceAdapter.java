@@ -1,12 +1,15 @@
 package petadoption.api.milvus;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import io.milvus.param.dml.InsertParam;
 import io.milvus.v2.service.vector.request.data.BaseVector;
 import io.milvus.v2.service.vector.request.data.FloatVec;
 import io.milvus.v2.service.vector.response.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import petadoption.api.recommendationEngine.RecommendationService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -60,7 +63,7 @@ public class MilvusServiceAdapter {
     public double[] getData(long id, String partitionName) {
         try {
             GetResp resp = milvusService.getDataById(id, collectionName, partitionName);
-            if(resp == null) {
+            if(resp.getGetResults().isEmpty()) {
                 return null;
             } else {
                 return this.parseGetRespForVector(resp);
@@ -70,7 +73,7 @@ public class MilvusServiceAdapter {
         }
     }
 
-    public List<Long> findKthNearest(double[] queryArray, int k, String partitionName) {
+    public List<Long> findKthNearest(double[] queryArray, List<Long> petIds, int k, String partitionName) {
         try {
             float[] floatArray = new float[queryArray.length];
             for (int i = 0; i < queryArray.length; i++) {
@@ -81,7 +84,7 @@ public class MilvusServiceAdapter {
 
             List<BaseVector> queryVec = Arrays.asList(floatVec);
 
-            return this.parseSearchRespForId(milvusService.findKthNearest(queryVec, k, collectionName, partitionName));
+            return this.parseSearchRespForId(milvusService.findKthNearest(queryVec, petIds, k, collectionName, partitionName));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

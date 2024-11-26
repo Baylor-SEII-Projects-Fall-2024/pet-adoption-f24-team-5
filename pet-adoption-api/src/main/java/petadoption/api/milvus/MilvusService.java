@@ -1,6 +1,8 @@
 package petadoption.api.milvus;
 
 import com.google.gson.JsonObject;
+import io.milvus.param.MetricType;
+import io.milvus.param.dml.SearchParam;
 import io.milvus.v2.client.ConnectConfig;
 import io.milvus.v2.client.MilvusClientV2;
 import io.milvus.v2.common.DataType;
@@ -31,6 +33,7 @@ public class MilvusService {
     String CLUSTER_ENDPOINT = "http://localhost:19530";
     final protected String idName = "id";
     final protected String vectorField = "preference_weight";
+    final protected String ownerIdField = "owner_ids";
 
     private MilvusClientV2 milvusClient;
 
@@ -43,7 +46,6 @@ public class MilvusService {
 
     public void createCollection(String collectionName, int dimension) {
         CreateCollectionReq.CollectionSchema schema = milvusClient.createSchema();
-
 
         //below specifies the data types in the id and vector fields
         schema.addField(AddFieldReq.builder()
@@ -60,6 +62,7 @@ public class MilvusService {
                 .dimension(dimension)
                 .build()
         );
+
 
         //here I am setting indexing to use cosine similarity and IV_FLAT indexing for efficient kth nearest search
         IndexParam indexParamForIdField = IndexParam.builder()
@@ -172,14 +175,20 @@ public class MilvusService {
         }
     }
 
-    public SearchResp findKthNearest(List<BaseVector> queryVec, int k, String collectionName, String partitionName) {
+    public SearchResp findKthNearest(List<BaseVector> queryVec,List<Long> petIds, int k, String collectionName, String partitionName) {
+        String filterExpression = (petIds == null || petIds.isEmpty())
+                ? ""
+                : String.format("id not in %s", petIds);
+
         SearchReq searchReq = SearchReq.builder()
                 .collectionName(collectionName)
                 .data(queryVec)
                 .partitionNames(Arrays.asList(partitionName))
                 .topK(k)
+                .filter(filterExpression)
                 .build();
 
         return milvusClient.search(searchReq);
     }
+
 }

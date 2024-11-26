@@ -19,11 +19,7 @@ import java.util.List;
 @RequestMapping("/api/recommendation-engine")
 @RequiredArgsConstructor
 public class RecommendationEngineController {
-/*    INDArray userPreference = word2Vec.getWordVectorMatrix("dog")
-            .add(word2Vec.getWordVectorMatrix("Labrador"))
-            .add(word2Vec.getWordVectorMatrix("young"))
-            .add(word2Vec.getWordVectorMatrix("black"))
-            .div(4); // Average out the vectors*/
+
     private final PetService petService;
     private final RecommendationService recommendationService;
     private final OwnerService ownerService;
@@ -51,30 +47,19 @@ public class RecommendationEngineController {
     public ResponseEntity<?> getNewPets(@RequestParam String email) {
         try{
             Long ownerId = ownerService.findOwnerIdByEmail(email);
-//            Long userWeightID = ownerService.getPreferenceWeightsIdByOwnerID(id);
 
             double[] userWeights = milvusServiceAdapter.getData(ownerId, recommendationService.OWNER_PARTITION);
 
             if(userWeights != null){
 
-                //TODO: update cold start to store with owner instead.
-                //should be done
-
-//                int coldStartValue = recommendationService.getColdStartValue(id);
                 int coldStartValue = ownerService.getColdStartValue(ownerId).get();
-//                double[] usersNewWeights = recommendationService.getUsersWeights(userWeightID);*/
 
-
-                // If the user's cold start is over give them valid recommendations
-                //TODO: figure out a good injection method.
                 if(coldStartValue == 0){
-                    return new ResponseEntity<>(recommendationService.findKthNearestNeighbors(userWeights, 3)
+                    return new ResponseEntity<>(recommendationService.findKthNearestNeighbors(ownerId, userWeights, 3)
                             ,HttpStatus.OK);
                 }
 
-                // Cold Start is not over -> Give them 3 random pets
                 coldStartValue--;
-//                recommendationService.setColdStartValue(id, coldStartValue);
                 ownerService.setColdStartValue(ownerId, coldStartValue);
             }
             List<Pet> allPets = petService.getAllPets();

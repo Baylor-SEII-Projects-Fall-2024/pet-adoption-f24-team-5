@@ -1,6 +1,7 @@
-/*
+
 package petadoption.api.recommendationEngine;
 
+import io.milvus.v2.service.vector.response.UpsertResp;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,10 +10,12 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import petadoption.api.milvus.MilvusRepo;
 import petadoption.api.milvus.MilvusService;
+import petadoption.api.milvus.MilvusService;
+import petadoption.api.milvus.MilvusServiceAdapter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -20,13 +23,15 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class MockMilvusController {
 
-    private final MilvusRepo milvusRepo;
+    private final MilvusServiceAdapter milvusServiceAdapter;
     private final MilvusService milvusService;
 
-    private final int DIMENSIONS = 5;
-    private final int vectorCt = 20;
+    private final int DIMENSIONS = 50;
+    private final int vectorCt = 1050;
     private final String collectionName = "test3";
     private final String partitionName = "pets";
+    public final String PET_PARTITION = "PET_PARTITION";
+
 
     @PostMapping("api/milvus/save")
     public ResponseEntity<?> saveMilvus(){
@@ -41,10 +46,12 @@ public class MockMilvusController {
         }
 
         try {
+            List<UpsertResp> resp = new ArrayList<>();
             for (int i = 0; i < vectorCt; i++) {
-                milvusService.upsertData(i, vectors.get(i), DIMENSIONS, collectionName, partitionName);
+                resp.add(milvusServiceAdapter.upsertData(i, vectors.get(i), DIMENSIONS, PET_PARTITION));
             }
-            return new ResponseEntity<>(HttpStatus.OK);
+
+            return new ResponseEntity<>(resp, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -54,31 +61,28 @@ public class MockMilvusController {
     @GetMapping("/api/milvus/get/{id}")
     public ResponseEntity<?> getMilvusById(@PathVariable("id") long id){
         try{
-            return new ResponseEntity<>(milvusService.getData(id, collectionName, partitionName), HttpStatus.OK);
+            return new ResponseEntity<>(milvusServiceAdapter.getData(id, PET_PARTITION), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-   */
-/* @DeleteMapping("/api/milvus/deleteid/{id}")
+    @DeleteMapping("/api/milvus/deleteid/{id}")
     public ResponseEntity<?> deleteMilvusById(@PathVariable("id") long id){
-        String collectionName = "test2";
-        String partitionName = "owners";
 
         try {
-            return new ResponseEntity<>(milvusRepo.deleteData(id, collectionName, partitionName), HttpStatus.OK);
+            return new ResponseEntity<>(milvusServiceAdapter.deleteData(id, PET_PARTITION), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-    }*//*
+    }
 
 
     @DeleteMapping("api/milvus/delete/{name}")
     public ResponseEntity<?> dropCollection(@PathVariable("name") String name){
         try {
-            milvusRepo.dropCollection(name);
+            milvusService.dropCollection(name);
             return new ResponseEntity<>("Drop Success", HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -95,11 +99,35 @@ public class MockMilvusController {
             vector[j] = random.nextDouble() * 10;
         }
 
+        List<Long> petids = Arrays.asList(1L,4L,5L);
+
+
         try {
-            return new ResponseEntity<>(milvusService.findKthNearest(vector,k, collectionName, partitionName), HttpStatus.OK);
+            return new ResponseEntity<>(milvusServiceAdapter.findKthNearest(vector,null,k, PET_PARTITION), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+/*
+    @PostMapping("/api/milvus/seen/{id}")
+    public ResponseEntity<?> tryAddOwnerId(@PathVariable("id") long id) {
+        List<Long> petids = Arrays.asList(1L,4L,5L);
+        try {
+            return new ResponseEntity<>(milvusServiceAdapter.addOwnerIdToSeen(petids,id,PET_PARTITION), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+*/
+    @GetMapping("/api/milvus/getresp/{id}")
+    public ResponseEntity<?> getMilvusRespById(@PathVariable("id") long id){
+        try{
+            return new ResponseEntity<>(milvusService.getDataById(id, "preference_weight_collection", PET_PARTITION).toString(), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
-*/
+
