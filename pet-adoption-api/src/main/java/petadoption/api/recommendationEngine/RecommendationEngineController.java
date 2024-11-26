@@ -31,8 +31,6 @@ public class RecommendationEngineController {
 
     @PostMapping("/update-preference")
     public ResponseEntity<?> updatePreference(@RequestParam String email, @RequestBody Preference preference) {
-
-
         try{
 
             List<String> cleanedPreferences = new ArrayList<>();
@@ -55,11 +53,15 @@ public class RecommendationEngineController {
             Long id = ownerService.findOwnerIdByEmail(email);
             Long userWeightID = ownerService.getPreferenceWeightsIdByOwnerID(id);
             if(userWeightID != null){
+
+                //TODO: update cold start to store with owner instead.
+
                 int coldStartValue = recommendationService.getColdStartValue(id);
                 double[] usersNewWeights = recommendationService.getUsersWeights(userWeightID);
 
 
                 // If the user's cold start is over give them valid recommendations
+                //TODO: figure out a good injection method.
                 if(coldStartValue == 0){
                     return new ResponseEntity<>(recommendationService.findKthNearestNeighbors(id, usersNewWeights, 3)
                             ,HttpStatus.OK);
@@ -83,7 +85,7 @@ public class RecommendationEngineController {
         }
     }
 
-    @PostMapping("/test-preference")
+   /* @PostMapping("/test-preference")
     public ResponseEntity<?> updatePreference(@RequestBody String[] inputPreferences) {
         List<String> pref1 = new ArrayList<>(Arrays.asList("dog", "goldenretriever", "brown", "10"));
         List<String> pref2 = new ArrayList<>(Arrays.asList(inputPreferences));
@@ -97,7 +99,7 @@ public class RecommendationEngineController {
         }catch(Exception e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-    }
+    }*/
 
 
 

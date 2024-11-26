@@ -4,5 +4,5 @@ public enum UserType {
     Owner,
     CenterWorker,
     CenterOwner,
-    Admin
+    PARTITION_NAME, Admin
 }

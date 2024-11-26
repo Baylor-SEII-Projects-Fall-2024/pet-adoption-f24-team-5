@@ -1,12 +1,11 @@
 package petadoption.api.recommendationEngine;
 
-import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.RequiredArgsConstructor;
 import org.deeplearning4j.models.word2vec.Word2Vec;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.springframework.stereotype.Service;
-import org.springframework.context.annotation.Lazy;
+import petadoption.api.milvus.MilvusRepo;
 import petadoption.api.milvus.MilvusService;
 import petadoption.api.pet.Pet;
 import petadoption.api.pet.PetService;
@@ -18,11 +17,14 @@ import petadoption.api.preferences.PreferenceWeightsService;
 import petadoption.api.user.Owner.OwnerService;
 import petadoption.api.user.Owner.SeenPetService;
 import petadoption.api.user.Owner.SeenPets;
+import petadoption.api.user.UserType;
+
 import java.util.Random;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
+
 
 @Service
 @RequiredArgsConstructor
@@ -36,47 +38,47 @@ public class RecommendationService {
     private final SeenPetService seenPetService;
     private final MilvusService milvusService;
 
-    private final String preference_collection = "preference_collection";
-
+    private final String PET_PARTITION = "PET_PARTITION";
+    private final String OWNER_PARTITION = "OWNER_PARTITION";
 
     public double[] savePreferenceEmbedding(Long ownerId, List<String> newPreferences) throws IOException {
-        Long preferenceID = ownerService.getPreferenceWeightsIdByOwnerID(ownerId);
-        PreferenceWeights oldPref = null;
+//        Long preferenceID = ownerService.getPreferenceWeightsIdByOwnerID(ownerId);
+//        PreferenceWeights oldPref = null;
         boolean isNewPreference = false;
 
-        if (preferenceID != null) {
-            oldPref = preferenceWeightsService.getPreferenceWeights(preferenceID);
-        }
-        if (oldPref == null){
+        double[] preferences = milvusService.getData(ownerId, OWNER_PARTITION);
+
+//        if (preferenceID != null) {
+//            oldPref = preferenceWeightsService.getPreferenceWeights(preferenceID);
+//        }
+        if (preferences == null){
             // No existing preference, create a new one.
             isNewPreference = true;
         }
         Preference newPref = extractArgsFromString(newPreferences);
         double[] embeddingVector = generatePreferenceVector(newPref);
-        PreferenceWeights newWeights = new PreferenceWeights(embeddingVector);
+//        PreferenceWeights newWeights = new PreferenceWeights(embeddingVector);
+
         try{
-            if(isNewPreference){
+            if(!isNewPreference){
                 //No existing weights so create new weights
-                preferenceWeightsService.savePreferenceWeights(newWeights);
-                ownerService.savePreferenceWeights(ownerId, newWeights);
+//                preferenceWeightsService.savePreferenceWeights(newWeights);
+//                ownerService.savePreferenceWeights(ownerId, newWeights);
 
-                //TODO add values to milvus
-                if(!milvusService.collectionExists(preference_collection)){
-                    milvusService.createCollection(preference_collection, 50);
-                }
-                milvusService.insertData(ownerId,embeddingVector,preference_collection, "PLACE_HOLDER");
-
-            }else{
-                // Incorperates new preference into the existing one
+//                milvusService.upsertData(ownerId,embeddingVector,embeddingVector.length,OWNER_PARTITION);
                 double weightOfOld = 0.7;
                 double weightOfNew= 0.3;
 
-                embeddingVector = VectorUtils.combineVectors(oldPref.getAllWeights(), weightOfOld, newWeights.getAllWeights(), weightOfNew);
-                preferenceWeightsService.updatePreferenceWeights(preferenceID, new PreferenceWeights(embeddingVector));
+                embeddingVector = VectorUtils.combineVectors(preferences, weightOfOld, embeddingVector, weightOfNew);
             }
+                // Incorperates new preference into the existing one
+
+//                preferenceWeightsService.updatePreferenceWeights(preferenceID, new PreferenceWeights(embeddingVector));
+            milvusService.upsertData(ownerId,embeddingVector,embeddingVector.length,OWNER_PARTITION);
+
             //preferenceRepository.updatePreferences(id, newPref); updatePreferences
         }catch (Exception e){
-            throw new IOException("Error saving preference: ", e);
+            throw new IOException(e.getMessage(), e);
         }
         return embeddingVector;
     }

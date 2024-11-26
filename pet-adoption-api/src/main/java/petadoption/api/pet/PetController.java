@@ -54,6 +54,7 @@ public class PetController {
         }
 
         try {
+            //TODO: change this to use milvus
             AdoptionCenter adoptionCenter = userService.findCenterByWorkerEmail(email);
             double[] petVector = recommendationService.generatePreferenceVector(pet);
             Pet savedPet = petService.savePet(pet, adoptionCenter, petVector);
