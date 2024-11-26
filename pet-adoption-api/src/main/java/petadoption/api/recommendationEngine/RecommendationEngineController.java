@@ -76,21 +76,7 @@ public class RecommendationEngineController {
         }
     }
 
-   /* @PostMapping("/test-preference")
-    public ResponseEntity<?> updatePreference(@RequestBody String[] inputPreferences) {
-        List<String> pref1 = new ArrayList<>(Arrays.asList("dog", "goldenretriever", "brown", "10"));
-        List<String> pref2 = new ArrayList<>(Arrays.asList(inputPreferences));
 
-        try{
-            double[] vector1 = recommendationService.savePreferenceEmbedding(3L, pref1);
-            double[] vector2 = recommendationService.savePreferenceEmbedding(5L, pref2);
-
-            return new ResponseEntity<>(VectorUtils.cosineSimilarity(vector1, vector2), HttpStatus.OK);
-
-        }catch(Exception e){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-    }*/
 
 
 

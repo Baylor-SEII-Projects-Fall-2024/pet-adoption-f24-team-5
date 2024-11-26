@@ -11,7 +11,6 @@ import petadoption.api.pet.PetService;
 import petadoption.api.preferences.Preference;
 import petadoption.api.user.Owner.OwnerService;
 import petadoption.api.user.Owner.SeenPetService;
-import petadoption.api.user.Owner.SeenPets;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -22,7 +21,6 @@ import java.util.*;
 @RequiredArgsConstructor
 public class RecommendationService {
     private final AttributeEmbedding attributeEmbedding;
-    private final OwnerService ownerService;
     private final Word2Vec word2Vec;
     private final PetService petService;
     private final SeenPetService seenPetService;
@@ -54,7 +52,6 @@ public class RecommendationService {
         return embeddingVector;
     }
 
-
     private Preference extractArgsFromString(List<String> preference) throws IOException{
         if(preference.size() < 4){
             throw new IOException("Not enough arguments in the preference vector");
@@ -79,6 +76,7 @@ public class RecommendationService {
         return generatePreferenceVector(petStats);
 
     }
+
     public double[] generatePreferenceVector(Preference preference) {
         List<String> newWords = new ArrayList<>();
 
@@ -119,67 +117,6 @@ public class RecommendationService {
 
     public List<Pet> findKthNearestNeighbors(long ownerId, double[] userWeights, int k) throws Exception{
         try {
-
-           /* List<Pet> allPets = petService.getAllPets();
-            Pet petToInject = new Pet();
-
-            int injectValue = (int)(Math.random() * 3);
-            boolean inject =  injectValue == 0;
-            System.out.println("Inject Value: " + injectValue);
-
-            if(inject){
-                //Inject random values for variability
-                Random rand = new Random();
-                int size = allPets.size();
-                petToInject = allPets.get(rand.nextInt() % size);
-                System.out.println("Injecting pet: " + petToInject.getPetName());
-            }
-            if (allPets.isEmpty() || userWeights.length < k) {
-                return allPets;
-            }
-
-            Map<Long, Double> allPetsWeights = new HashMap<>();
-            List<SeenPets> seenPets = seenPetService.getSeenPets(ownerID);
-
-            if (seenPets.size() >= allPets.size()) {
-                //User has seen all pets, restart their seen pets
-                seenPetService.resetSeenPets(ownerID);
-                seenPets = new ArrayList<>();
-            }
-
-            for (Pet pet : allPets) {
-                boolean hasBeenSeen = false;
-                for (SeenPets seenPet : seenPets) {
-                    hasBeenSeen = seenPet.getSeenPetId() == pet.getPetId();
-                    if (hasBeenSeen) {
-                        break;
-                    }
-                }
-                if (!hasBeenSeen) {
-                    PetWeights petWeights = petService.getPetWeights(pet);
-                    Long petID = pet.getPetId();
-                    Preference petStats = new Preference();
-                    petStats.setPreferredSpecies(pet.getSpecies());
-                    petStats.setPreferredBreed(pet.getBreed());
-                    petStats.setPreferredColor(pet.getColor());
-                    petStats.setPreferredAge(pet.getAge());
-                    allPetsWeights.put(petID, VectorUtils.cosineSimilarity(userWeights, petWeights.getAllWeights()));
-                }
-            }
-
-            List<Long> kMatchedPets = allPetsWeights.entrySet().stream()
-                    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                    .limit(k).map(Map.Entry::getKey).toList();
-
-
-            List<Pet> matchedPets = new ArrayList<>();
-            kMatchedPets.stream().forEach(x -> matchedPets.add(petService.getPetById(x).get()));
-            if(inject){
-                matchedPets.set(matchedPets.size() - 1, petToInject);
-            }
-
-            //Add three new pets to the list of seen pets
-            */
 
             List<Long> seenPets = seenPetService.getSeenPets(ownerId);
 

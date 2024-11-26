@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import petadoption.api.milvus.MilvusService;
-import petadoption.api.milvus.MilvusService;
 import petadoption.api.milvus.MilvusServiceAdapter;
 
 import java.util.ArrayList;
@@ -28,8 +27,6 @@ public class MockMilvusController {
 
     private final int DIMENSIONS = 50;
     private final int vectorCt = 1050;
-    private final String collectionName = "test3";
-    private final String partitionName = "pets";
     public final String PET_PARTITION = "PET_PARTITION";
 
 
@@ -109,18 +106,6 @@ public class MockMilvusController {
         }
     }
 
-/*
-    @PostMapping("/api/milvus/seen/{id}")
-    public ResponseEntity<?> tryAddOwnerId(@PathVariable("id") long id) {
-        List<Long> petids = Arrays.asList(1L,4L,5L);
-        try {
-            return new ResponseEntity<>(milvusServiceAdapter.addOwnerIdToSeen(petids,id,PET_PARTITION), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-*/
     @GetMapping("/api/milvus/getresp/{id}")
     public ResponseEntity<?> getMilvusRespById(@PathVariable("id") long id){
         try{
