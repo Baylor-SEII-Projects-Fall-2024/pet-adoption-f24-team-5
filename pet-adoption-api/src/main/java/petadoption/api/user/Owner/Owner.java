@@ -36,6 +36,9 @@ public class Owner extends User {
     @JoinColumn(name = "DEFAULT_PREFERENCE_ID")
     private Preference defaultPreference;
 
+    @Column(name = "COLD_START_VALUE", columnDefinition = "int default 3")
+    private int coldStartValue;
+
     @Column(name = "AGE")
     private int age;
 

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import petadoption.api.milvus.MilvusService;
 import petadoption.api.pet.Pet;
 import petadoption.api.pet.PetService;
 import petadoption.api.preferences.Preference;
@@ -28,6 +29,7 @@ public class RecommendationEngineController {
     private final PetService petService;
     private final RecommendationService recommendationService;
     private final OwnerService ownerService;
+    private final MilvusService milvusService;
 
     @PostMapping("/update-preference")
     public ResponseEntity<?> updatePreference(@RequestParam String email, @RequestBody Preference preference) {
@@ -50,26 +52,32 @@ public class RecommendationEngineController {
     @GetMapping("/generate-new-options")
     public ResponseEntity<?> getNewPets(@RequestParam String email) {
         try{
-            Long id = ownerService.findOwnerIdByEmail(email);
-            Long userWeightID = ownerService.getPreferenceWeightsIdByOwnerID(id);
-            if(userWeightID != null){
+            Long ownerId = ownerService.findOwnerIdByEmail(email);
+//            Long userWeightID = ownerService.getPreferenceWeightsIdByOwnerID(id);
+
+            double[] userWeights = milvusService.getData(ownerId, recommendationService.OWNER_PARTITION);
+
+            if(userWeights != null){
 
                 //TODO: update cold start to store with owner instead.
+                //should be done
 
-                int coldStartValue = recommendationService.getColdStartValue(id);
-                double[] usersNewWeights = recommendationService.getUsersWeights(userWeightID);
+//                int coldStartValue = recommendationService.getColdStartValue(id);
+                int coldStartValue = ownerService.getColdStartValue(ownerId).get();
+//                double[] usersNewWeights = recommendationService.getUsersWeights(userWeightID);*/
 
 
                 // If the user's cold start is over give them valid recommendations
                 //TODO: figure out a good injection method.
                 if(coldStartValue == 0){
-                    return new ResponseEntity<>(recommendationService.findKthNearestNeighbors(id, usersNewWeights, 3)
+                    return new ResponseEntity<>(recommendationService.findKthNearestNeighbors(ownerId, userWeights, 3)
                             ,HttpStatus.OK);
                 }
 
                 // Cold Start is not over -> Give them 3 random pets
                 coldStartValue--;
-                recommendationService.setColdStartValue(id, coldStartValue);
+//                recommendationService.setColdStartValue(id, coldStartValue);
+                ownerService.setColdStartValue(ownerId, coldStartValue);
             }
             List<Pet> allPets = petService.getAllPets();
             if(allPets.size() <= 3 ){

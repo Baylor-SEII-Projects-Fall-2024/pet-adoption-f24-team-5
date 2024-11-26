@@ -38,8 +38,8 @@ public class RecommendationService {
     private final SeenPetService seenPetService;
     private final MilvusService milvusService;
 
-    private final String PET_PARTITION = "PET_PARTITION";
-    private final String OWNER_PARTITION = "OWNER_PARTITION";
+    public final String PET_PARTITION = "PET_PARTITION";
+    public final String OWNER_PARTITION = "OWNER_PARTITION";
 
     public double[] savePreferenceEmbedding(Long ownerId, List<String> newPreferences) throws IOException {
 //        Long preferenceID = ownerService.getPreferenceWeightsIdByOwnerID(ownerId);
@@ -217,7 +217,10 @@ public class RecommendationService {
 
     }
 
-
+  /*  public boolean isFirstRound(long ownerId) {
+        return milvusService.getData(ownerId, OWNER_PARTITION) == null;
+    }*/
+/*
     public int getColdStartValue(long userId) throws IOException{
         Long weightID = ownerService.getPreferenceWeightsIdByOwnerID(userId);
         if(weightID == null){
@@ -228,9 +231,9 @@ public class RecommendationService {
             return coldStartResult.get();
         }
         throw new IOException("Did not find weight with ID: " + weightID);
-    }
+    }*/
 
-    public int setColdStartValue(long userId, int coldStartValue) throws IOException{
+   /* public int setColdStartValue(long userId, int coldStartValue) throws IOException{
 
         Long weightID = ownerService.getPreferenceWeightsIdByOwnerID(userId);
         if(weightID == null){
@@ -238,7 +241,7 @@ public class RecommendationService {
         }
 
         return preferenceWeightsService.setColdStartValue(weightID, coldStartValue);
-    }
+    }*/
 
     public double[] getUsersWeights(long id) {
         PreferenceWeights preferenceWeights = preferenceWeightsService.getPreferenceWeights(id);
