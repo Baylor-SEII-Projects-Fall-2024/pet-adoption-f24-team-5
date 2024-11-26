@@ -61,8 +61,8 @@ public class Pet {
     @JoinColumn(name = "OWNER_ID")
     private Owner owner;
 
-    @Column(name = "PET_WEIGHT_ID")
-    long petWeightId;
+    /*@Column(name = "PET_WEIGHT_ID")
+    long petWeightId;*/
 
     public Pet(String species, String petName, String breed, String color, String sex, Integer age,
             Boolean adoptionStatus,

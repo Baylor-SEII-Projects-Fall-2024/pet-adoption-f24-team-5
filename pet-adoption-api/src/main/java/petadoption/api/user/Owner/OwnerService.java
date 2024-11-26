@@ -11,7 +11,7 @@ import java.util.Optional;
 
 import petadoption.api.pet.PetRepository;
 import petadoption.api.preferences.Preference;
-import petadoption.api.preferences.PreferenceWeights;
+//import petadoption.api.preferences.PreferenceWeights;
 
 
 @Service

@@ -4,16 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import petadoption.api.milvus.MilvusService;
+import petadoption.api.milvus.MilvusServiceAdapter;
 import petadoption.api.pet.Pet;
 import petadoption.api.pet.PetService;
 import petadoption.api.preferences.Preference;
-import petadoption.api.preferences.PreferenceWeightsService;
 import petadoption.api.user.Owner.OwnerService;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -29,7 +27,7 @@ public class RecommendationEngineController {
     private final PetService petService;
     private final RecommendationService recommendationService;
     private final OwnerService ownerService;
-    private final MilvusService milvusService;
+    private final MilvusServiceAdapter milvusServiceAdapter;
 
     @PostMapping("/update-preference")
     public ResponseEntity<?> updatePreference(@RequestParam String email, @RequestBody Preference preference) {
@@ -55,7 +53,7 @@ public class RecommendationEngineController {
             Long ownerId = ownerService.findOwnerIdByEmail(email);
 //            Long userWeightID = ownerService.getPreferenceWeightsIdByOwnerID(id);
 
-            double[] userWeights = milvusService.getData(ownerId, recommendationService.OWNER_PARTITION);
+            double[] userWeights = milvusServiceAdapter.getData(ownerId, recommendationService.OWNER_PARTITION);
 
             if(userWeights != null){
 
@@ -70,7 +68,7 @@ public class RecommendationEngineController {
                 // If the user's cold start is over give them valid recommendations
                 //TODO: figure out a good injection method.
                 if(coldStartValue == 0){
-                    return new ResponseEntity<>(recommendationService.findKthNearestNeighbors(ownerId, userWeights, 3)
+                    return new ResponseEntity<>(recommendationService.findKthNearestNeighbors(userWeights, 3)
                             ,HttpStatus.OK);
                 }
 

@@ -1,3 +1,4 @@
+/*
 package petadoption.api.preferences;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -13,7 +14,8 @@ public class PreferenceWeightsService {
 
     private final PreferenceWeightsRepository preferenceRepository;
 
-    /*public Preference getPreferences(Long preferenceId) {
+    */
+/*public Preference getPreferences(Long preferenceId) {
         return preferenceRepository.findById(preferenceId).orElse(null);
     }
 
@@ -31,7 +33,8 @@ public class PreferenceWeightsService {
             return preferenceRepository.save(existingPreferences);
         }
         return null;
-    }*/
+    }*//*
+
 
     public PreferenceWeights getPreferenceWeights(Long id) {
         return preferenceRepository.findById(id).orElse(null);
@@ -64,3 +67,4 @@ public class PreferenceWeightsService {
         return preferenceRepository.save(preferenceWeights).getColdStartValue();
     }
 }
+*/

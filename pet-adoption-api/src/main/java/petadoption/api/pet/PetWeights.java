@@ -1,3 +1,4 @@
+/*
 package petadoption.api.pet;
 
 import jakarta.persistence.*;
@@ -295,3 +296,4 @@ public class PetWeights {
 
 }
 
+*/

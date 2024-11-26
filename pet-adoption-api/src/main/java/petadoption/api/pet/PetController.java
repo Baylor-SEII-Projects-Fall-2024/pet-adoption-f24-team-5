@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import petadoption.api.images.ImageController;
 import petadoption.api.images.ImageService;
+import petadoption.api.milvus.MilvusServiceAdapter;
 import petadoption.api.recommendationEngine.RecommendationService;
 import petadoption.api.user.AdoptionCenter.AdoptionCenter;
 import petadoption.api.user.UserService;
@@ -24,6 +25,7 @@ public class PetController {
     private final UserService userService;
     private final ImageService imageService;
     private final RecommendationService recommendationService;
+    private final MilvusServiceAdapter milvusServiceAdapter;
 
 
     @GetMapping
@@ -57,7 +59,8 @@ public class PetController {
             //TODO: change this to use milvus
             AdoptionCenter adoptionCenter = userService.findCenterByWorkerEmail(email);
             double[] petVector = recommendationService.generatePreferenceVector(pet);
-            Pet savedPet = petService.savePet(pet, adoptionCenter, petVector);
+            Pet savedPet = petService.savePet(pet, adoptionCenter);
+            milvusServiceAdapter.upsertData(savedPet.petId, petVector,petVector.length, recommendationService.PET_PARTITION);
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(savedPet);
         } catch (Exception e) {
@@ -77,8 +80,10 @@ public class PetController {
         }
 
         try {
+            double [] petVector = recommendationService.generatePreferenceVector(pet);
+            milvusServiceAdapter.upsertData(pet.petId, petVector,petVector.length, recommendationService.PET_PARTITION);
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(petService.savePet(pet, userService.findCenterByWorkerEmail(email), recommendationService.generatePreferenceVector(pet)));
+                    .body(petService.savePet(pet, userService.findCenterByWorkerEmail(email)));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
@@ -101,6 +106,7 @@ public class PetController {
 
         try {
             petService.deletePet(pet);
+            milvusServiceAdapter.deleteData(pet.petId, recommendationService.PET_PARTITION);
             return ResponseEntity.status(HttpStatus.OK).body("Pet deleted successfully");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());

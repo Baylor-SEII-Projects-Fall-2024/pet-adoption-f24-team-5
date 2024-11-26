@@ -108,11 +108,11 @@ public class UserService {
         return new ResponseEntity<>(userRepository.save(newUser), HttpStatus.OK);
     }*/
 
-    public ResponseEntity<Owner> updateOwnerPreferenceId(Owner owner) {
+ /*   public ResponseEntity<Owner> updateOwnerPreferenceId(Owner owner) {
         Owner newUser = (Owner) findUser(owner.getEmailAddress()).get();
         newUser.setPreferenceWeights(owner.getPreferenceWeights());
         return new ResponseEntity<>(userRepository.save(newUser), HttpStatus.OK);
-    }
+    }*/
 
     public AdoptionCenter updateAdoptionCenter(AdoptionCenter adoptionCenter, String oldPassword)
             throws IllegalAccessException {

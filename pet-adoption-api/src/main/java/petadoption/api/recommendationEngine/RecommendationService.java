@@ -5,21 +5,15 @@ import org.deeplearning4j.models.word2vec.Word2Vec;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.springframework.stereotype.Service;
-import petadoption.api.milvus.MilvusRepo;
-import petadoption.api.milvus.MilvusService;
+import petadoption.api.milvus.MilvusServiceAdapter;
 import petadoption.api.pet.Pet;
 import petadoption.api.pet.PetService;
-import petadoption.api.pet.PetWeightService;
-import petadoption.api.pet.PetWeights;
+//import petadoption.api.pet.PetWeightService;
 import petadoption.api.preferences.Preference;
-import petadoption.api.preferences.PreferenceWeights;
-import petadoption.api.preferences.PreferenceWeightsService;
+//import petadoption.api.preferences.PreferenceWeights;
+//import petadoption.api.preferences.PreferenceWeightsService;
 import petadoption.api.user.Owner.OwnerService;
 import petadoption.api.user.Owner.SeenPetService;
-import petadoption.api.user.Owner.SeenPets;
-import petadoption.api.user.UserType;
-
-import java.util.Random;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -30,13 +24,13 @@ import java.util.*;
 @RequiredArgsConstructor
 public class RecommendationService {
     private final AttributeEmbedding attributeEmbedding;
-    private final PreferenceWeightsService preferenceWeightsService;
+//    private final PreferenceWeightsService preferenceWeightsService;
     private final OwnerService ownerService;
     private final Word2Vec word2Vec;
     private final PetService petService;
-    private final PetWeightService petWeightService;
+//    private final PetWeightService petWeightService;
     private final SeenPetService seenPetService;
-    private final MilvusService milvusService;
+    private final MilvusServiceAdapter milvusServiceAdapter;
 
     public final String PET_PARTITION = "PET_PARTITION";
     public final String OWNER_PARTITION = "OWNER_PARTITION";
@@ -46,7 +40,7 @@ public class RecommendationService {
 //        PreferenceWeights oldPref = null;
         boolean isNewPreference = false;
 
-        double[] preferences = milvusService.getData(ownerId, OWNER_PARTITION);
+        double[] preferences = milvusServiceAdapter.getData(ownerId, OWNER_PARTITION);
 
 //        if (preferenceID != null) {
 //            oldPref = preferenceWeightsService.getPreferenceWeights(preferenceID);
@@ -65,7 +59,7 @@ public class RecommendationService {
 //                preferenceWeightsService.savePreferenceWeights(newWeights);
 //                ownerService.savePreferenceWeights(ownerId, newWeights);
 
-//                milvusService.upsertData(ownerId,embeddingVector,embeddingVector.length,OWNER_PARTITION);
+//                milvusServiceAdapter.upsertData(ownerId,embeddingVector,embeddingVector.length,OWNER_PARTITION);
                 double weightOfOld = 0.7;
                 double weightOfNew= 0.3;
 
@@ -74,7 +68,7 @@ public class RecommendationService {
                 // Incorperates new preference into the existing one
 
 //                preferenceWeightsService.updatePreferenceWeights(preferenceID, new PreferenceWeights(embeddingVector));
-            milvusService.upsertData(ownerId,embeddingVector,embeddingVector.length,OWNER_PARTITION);
+            milvusServiceAdapter.upsertData(ownerId,embeddingVector,embeddingVector.length,OWNER_PARTITION);
 
             //preferenceRepository.updatePreferences(id, newPref); updatePreferences
         }catch (Exception e){
@@ -146,10 +140,10 @@ public class RecommendationService {
         }
     }
 
-    public List<Pet> findKthNearestNeighbors(Long ownerID, double[] userWeights, int k) throws Exception{
+    public List<Pet> findKthNearestNeighbors(double[] userWeights, int k) throws Exception{
         try {
 
-            List<Pet> allPets = petService.getAllPets();
+           /* List<Pet> allPets = petService.getAllPets();
             Pet petToInject = new Pet();
 
             int injectValue = (int)(Math.random() * 3);
@@ -209,6 +203,14 @@ public class RecommendationService {
 
             //Add three new pets to the list of seen pets
             seenPetService.addSeenPets(ownerID, matchedPets);
+*/
+            List<Long> matchedPetIds = milvusServiceAdapter.findKthNearest(userWeights,k,PET_PARTITION);
+
+            List<Pet> matchedPets = new ArrayList<>();
+
+            for(Long petId : matchedPetIds){
+                petService.getPetById(petId).ifPresent(matchedPets::add);
+            }
 
             return matchedPets;
         }catch (Exception e){
@@ -218,7 +220,7 @@ public class RecommendationService {
     }
 
   /*  public boolean isFirstRound(long ownerId) {
-        return milvusService.getData(ownerId, OWNER_PARTITION) == null;
+        return milvusServiceAdapter.getData(ownerId, OWNER_PARTITION) == null;
     }*/
 /*
     public int getColdStartValue(long userId) throws IOException{
@@ -243,11 +245,11 @@ public class RecommendationService {
         return preferenceWeightsService.setColdStartValue(weightID, coldStartValue);
     }*/
 
-    public double[] getUsersWeights(long id) {
+/*    public double[] getUsersWeights(long id) {
         PreferenceWeights preferenceWeights = preferenceWeightsService.getPreferenceWeights(id);
         if(preferenceWeights != null){
             return preferenceWeights.getAllWeights();
         }
         return null;
-    }
+    }*/
 }

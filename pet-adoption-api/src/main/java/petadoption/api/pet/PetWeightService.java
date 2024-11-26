@@ -1,4 +1,4 @@
-package petadoption.api.pet;
+/*package petadoption.api.pet;
 
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -31,4 +31,4 @@ public class PetWeightService {
     public void deletePet(long petWeightId) {
         petWeightsRepository.deleteById(petWeightId);
     }
-}
+}*/

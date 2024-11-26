@@ -84,11 +84,11 @@ public class UserController {
 
 
 
-    @PutMapping("/update/Owner/preferenceId")
+  /*  @PutMapping("/update/Owner/preferenceId")
     public ResponseEntity<Owner> updateOwnerPreferenceId(@RequestBody Owner user) {
 
         return userService.updateOwnerPreferenceId(user);
-    }
+    }*/
 
     @PutMapping("/update/CenterWorker")
     public ResponseEntity<CenterWorker> updateCenterWorker(@RequestBody CenterWorker user,
