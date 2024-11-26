@@ -117,7 +117,7 @@ public class RecommendationService {
         }
     }
 
-    public List<Pet> findKthNearestNeighbors(long ownerid, double[] userWeights, int k) throws Exception{
+    public List<Pet> findKthNearestNeighbors(long ownerId, double[] userWeights, int k) throws Exception{
         try {
 
            /* List<Pet> allPets = petService.getAllPets();
@@ -179,27 +179,28 @@ public class RecommendationService {
             }
 
             //Add three new pets to the list of seen pets
-            seenPetService.addSeenPets(ownerID, matchedPets);
-*/
-//            List<SeenPets> seenPets = seenPetService.getSeenPets(ownerID);*/
+            */
 
-           /* if (seenPets.size() >= allPets.size()) {
-                //User has seen all pets, restart their seen pets
-                seenPetService.resetSeenPets(ownerID);
+            List<Long> seenPets = seenPetService.getSeenPets(ownerId);
+
+            if (seenPets.size() >= petService.numberOfPets()) {
+                seenPetService.resetSeenPets(ownerId);
                 seenPets = new ArrayList<>();
-            }*/
+            }
 
-//            List<Long> matchedPetIds = milvusServiceAdapter.findKthNearest(userWeights, ownerid, k,PET_PARTITION);
+            List<Long> matchedPetIds = milvusServiceAdapter.findKthNearest(userWeights, seenPets, k,PET_PARTITION);
 
             List<Pet> matchedPets = new ArrayList<>();
 
-//            for(Long petId : matchedPetIds){
-//                petService.getPetById(petId).ifPresent(matchedPets::add);
-//            }
-//
+            for(Long petId : matchedPetIds){
+                petService.getPetById(petId).ifPresent(matchedPets::add);
+            }
+
+            seenPetService.addSeenPets(ownerId, matchedPets);
+
             return matchedPets;
         }catch (Exception e){
-            throw new SQLException("Error creating kth nearest neighbors: ", e);
+            throw new SQLException(e.getMessage(), e);
         }
 
     }

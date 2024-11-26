@@ -42,5 +42,9 @@ public class PetService {
         return petRepository.findByPetId(id);
     }
 
+    public long numberOfPets() {
+        return petRepository.count();
+    }
+
 
 }
