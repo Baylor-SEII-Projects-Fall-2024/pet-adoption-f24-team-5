@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Grid, CircularProgress, Box, Typography } from '@mui/material';
 import PetCard from './PetCard';
-import TitleBar from "@/components/titleBar/TitleBar";
-import { API_URL } from "@/constants";
-import axios from "../../utils/redux/axiosConfig";
 import { useSelector } from 'react-redux'; // For accessing the token
 import { getAllPets } from '@/utils/pet/getAllPets';
 
@@ -42,26 +39,20 @@ const PetGrid = () => {
     }
 
     return (
-        <Box sx={{ height: '100vh', width: '100vw', display: 'flex', flexDirection: 'column' }}>
-            {/* Title bar */}
-
-
-            {/* Pet Grid */}
-            <Box sx={{ flexGrow: 1, padding: 4 }}>
-                <Grid
-                    container
-                    spacing={3}
-                    justifyContent="center"
-                    alignItems="stretch"
-                    sx={{ gap: '20px' }}
-                >
-                    {pets.slice(0, 10).map((pet) => (
-                        <Grid item xs={12} sm={6} md={4} lg={3} key={pet.petName}>
-                            <PetCard pet={pet} saveable={false} likeable={false} />
-                        </Grid>
-                    ))}
-                </Grid>
-            </Box>
+        <Box sx={{ flexGrow: 1, padding: 4 }}>
+            <Grid
+                container
+                spacing={3}
+                justifyContent="center"
+                alignItems="stretch"
+                sx={{ gap: '20px' }}
+            >
+                {pets.slice(0, 10).map((pet) => (
+                    <Grid item xs={12} sm={6} md={4} lg={3} key={pet.petName}>
+                        <PetCard pet={pet} saveable={false} likeable={false} />
+                    </Grid>
+                ))}
+            </Grid>
         </Box>
     );
 };
