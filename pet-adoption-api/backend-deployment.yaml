@@ -20,6 +20,8 @@ spec:
           env:
             - name: MYSQL_HOST
               value: "mysql"
+#            - name: MILVUS_ENDPOINT
+#              value: "http://milvus-standalone.default.svc.cluster.local:19530"
             - name: FILE_UPLOAD_DIR
               value: "/tmp/uploads"
           volumeMounts:
