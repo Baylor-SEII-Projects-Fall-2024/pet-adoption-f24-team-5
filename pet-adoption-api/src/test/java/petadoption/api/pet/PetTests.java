@@ -7,11 +7,15 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 
+import io.milvus.v2.client.MilvusClientV2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import petadoption.api.PetAdoptionApplicationTests;
+import petadoption.api.milvus.MilvusService;
+import petadoption.api.milvus.MilvusServiceAdapter;
 import petadoption.api.user.UserService;
 import petadoption.api.user.AdoptionCenter.AdoptionCenter;
 
@@ -21,16 +25,17 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.context.annotation.Profile;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest
-@ActiveProfiles("testdb")
-public class PetTests {
+//@ExtendWith(SpringExtension.class)
+//@SpringBootTest
+//@ActiveProfiles("testdb")
+public class PetTests extends PetAdoptionApplicationTests {
 
     @MockBean
     private UserService userService;
 
     @MockBean
     private PetService petService;
+
 
     @Test
     @DisplayName("save pet success")

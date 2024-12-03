@@ -1,9 +1,11 @@
 package petadoption.api.recommendationEngine;
 
+import io.milvus.v2.client.MilvusClientV2;
 import lombok.RequiredArgsConstructor;
 import org.deeplearning4j.models.word2vec.Word2Vec;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Service;
 import petadoption.api.milvus.MilvusServiceAdapter;
 import petadoption.api.pet.Pet;
@@ -19,6 +21,7 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
+@ConditionalOnBean(MilvusServiceAdapter.class)
 public class RecommendationService {
     private final AttributeEmbedding attributeEmbedding;
     private final Word2Vec word2Vec;

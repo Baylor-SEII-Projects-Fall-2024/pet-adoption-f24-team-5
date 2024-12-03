@@ -1,12 +1,17 @@
-package petadoption.api.event;
+package petadoption.api.Event;
 
+import io.milvus.v2.client.MilvusClientV2;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import petadoption.api.Event.Event;
 import petadoption.api.Event.EventRepository;
+import petadoption.api.PetAdoptionApplicationTests;
+import petadoption.api.milvus.MilvusService;
+import petadoption.api.milvus.MilvusServiceAdapter;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -14,9 +19,9 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 @Transactional
-@SpringBootTest
-@ActiveProfiles("testdb")
-public class EventRepositoryTest {
+//@SpringBootTest
+//@ActiveProfiles("testdb")
+public class EventRepositoryTest extends PetAdoptionApplicationTests {
     private final LocalDate localDate = LocalDate.now();
     private final LocalTime localTime = LocalTime.now();
     private final Event newEvent = new Event(
@@ -26,6 +31,7 @@ public class EventRepositoryTest {
             localTime,
             "Event description"
     );
+
 
     @Autowired
     private EventRepository eventRepository;

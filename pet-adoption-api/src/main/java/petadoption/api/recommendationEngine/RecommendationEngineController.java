@@ -1,6 +1,8 @@
 package petadoption.api.recommendationEngine;
 
+import io.milvus.v2.client.MilvusClientV2;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/recommendation-engine")
 @RequiredArgsConstructor
+@ConditionalOnBean(MilvusServiceAdapter.class)
 public class RecommendationEngineController {
 
     private final PetService petService;
