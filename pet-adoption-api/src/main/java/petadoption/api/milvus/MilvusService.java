@@ -1,6 +1,7 @@
 package petadoption.api.milvus;
 
 import com.google.gson.JsonObject;
+import io.milvus.client.MilvusClient;
 import io.milvus.param.MetricType;
 import io.milvus.param.dml.SearchParam;
 import io.milvus.v2.client.ConnectConfig;
@@ -23,6 +24,7 @@ import io.milvus.v2.service.vector.response.DeleteResp;
 import io.milvus.v2.service.vector.response.GetResp;
 import io.milvus.v2.service.vector.response.SearchResp;
 import io.milvus.v2.service.vector.response.UpsertResp;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -30,18 +32,15 @@ import java.util.*;
 @Service
 public class MilvusService {
 
-    String CLUSTER_ENDPOINT = "http://localhost:19530";
+
     final protected String idName = "id";
     final protected String vectorField = "preference_weight";
-    final protected String ownerIdField = "owner_ids";
 
-    private MilvusClientV2 milvusClient;
 
-    public MilvusService() {
-        ConnectConfig connectConfig = ConnectConfig.builder()
-                .uri(CLUSTER_ENDPOINT).build();
+    private final MilvusClientV2 milvusClient;
 
-        milvusClient = new MilvusClientV2(connectConfig);
+    public MilvusService(MilvusClientV2 milvusClient) {
+        this.milvusClient = milvusClient;
     }
 
     public void createCollection(String collectionName, int dimension) {
