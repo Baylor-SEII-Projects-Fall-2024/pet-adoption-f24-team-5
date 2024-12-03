@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: react-frontend
-          image: us-south1-docker.pkg.dev/possible-cocoa-438319-m0/dogpile-repo/react-frontend:latest
+          image: us-south1-docker.pkg.dev/dogpile-solutions/dogpile-repo/react-frontend:latest
           ports:
             - containerPort: 3000
 ---
