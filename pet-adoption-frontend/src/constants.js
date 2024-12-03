@@ -1,6 +1,6 @@
 
-export const API_URL = "http://34.66.92.107";
-export const FRONTEND_URL = "http://34.173.46.146";
+export const API_URL = "http://34.122.198.55";
+export const FRONTEND_URL = "http://34.72.46.121";
 
 
 
