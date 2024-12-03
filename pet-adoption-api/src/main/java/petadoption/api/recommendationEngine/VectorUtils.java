@@ -1,5 +1,5 @@
 package petadoption.api.recommendationEngine;
-
+/*
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
@@ -50,4 +50,4 @@ public class VectorUtils {
 
         return combinedVector;
     }
-}
+}*/

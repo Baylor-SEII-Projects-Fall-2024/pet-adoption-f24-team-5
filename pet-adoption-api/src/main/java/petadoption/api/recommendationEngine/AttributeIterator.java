@@ -1,5 +1,5 @@
 package petadoption.api.recommendationEngine;
-
+/*
 import org.deeplearning4j.text.sentenceiterator.CollectionSentenceIterator;
 import org.deeplearning4j.text.sentenceiterator.SentenceIterator;
 
@@ -338,4 +338,4 @@ public class AttributeIterator {
     public List<String> getAllSentences() {
         return new ArrayList<>(userInteractions);
     }
-}
+}*/

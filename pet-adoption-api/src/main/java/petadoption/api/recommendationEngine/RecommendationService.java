@@ -1,5 +1,5 @@
 package petadoption.api.recommendationEngine;
-
+/*
 import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.RequiredArgsConstructor;
 import org.deeplearning4j.models.word2vec.Word2Vec;
@@ -234,4 +234,4 @@ public class RecommendationService {
         }
         return null;
     }
-}
+}*/

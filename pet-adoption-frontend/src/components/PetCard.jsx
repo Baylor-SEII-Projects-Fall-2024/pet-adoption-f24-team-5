@@ -52,6 +52,7 @@ const PetCard = ({
     pet,
     onClick,
     expandable = true,
+    adoptable = true,
     saveable = true,
     likeable = true,
     onLike = null,
@@ -68,6 +69,10 @@ const PetCard = ({
     if (authority !== "Owner") {
         saveable = false;
         likeable = false;
+    }
+
+    if (pet.adoptionStatus === true) {
+        adoptable = false;
     }
 
     const handleImageLoad = () => {
@@ -109,6 +114,34 @@ const PetCard = ({
     const handleCloseModal = () => {
         setIsModalOpen(false);
     };
+
+    const handleAdoptPet = async () => {
+        const formattedPet = {
+            petId: pet.petId,
+            petOwner: pet.petOwner,
+            species: pet.species,
+            petName: pet.petName,
+            breed: pet.breed,
+            color: pet.color,
+            sex: pet.sex,
+            age: pet.age,
+            adoptionStatus: pet.adoptionStatus,
+            description: pet.description,
+            imageName: pet.imageName,
+            owner: pet.owner,
+            petWeightId: pet.petWeightId,
+        };
+        axios.post(`${API_URL}/api/pets/adopt`, formattedPet, {
+            params: { email: email },
+            headers: { Authorization: `Bearer ${token}`},
+        })
+        .then((res) => {
+            console.log(res.data);
+        })
+        .catch(error => {
+            console.log(error)
+        });
+    }
 
     const handleLikePet = async () => {
         const url = `${API_URL}/api/recommendation-engine/update-preference`;
@@ -195,6 +228,9 @@ const PetCard = ({
     // Extract the Adoption Center's name
     const adoptionCenterName = pet.adoptionCenter?.centerName || "Adoption Center";
 
+    // Get adoption status to display
+    const adoptionStatus = pet.adoptionStatus ? "Not Available" : "Available";
+
     return (
         <Box
             sx={{
@@ -259,10 +295,12 @@ const PetCard = ({
                                 onLoad={handleImageLoad}
                             />
                         </Box>
-
                         {/* Display Adoption Center's Name */}
                         <Typography variant="h6" align="left">
                             Center: {adoptionCenterName}
+                        </Typography>
+                        <Typography variant="h6" align="left">
+                                Adoption Status: <span style={{ color: adoptable ? "green" : "red" }}>{adoptionStatus}</span>
                         </Typography>
                     </CardContent>
                 </BlurredContent>
@@ -303,6 +341,16 @@ const PetCard = ({
                                 Save Pet
                             </Button>
                         )}
+                        {adoptable && authority === 'owner' && (
+                            <Button
+                                onClick={handleAdoptPet}
+                                variant="contained"
+                                color="primary"
+                                fullWidth
+                            >
+                                Adopt Pet
+                            </Button>
+                        )}
                         {likeable && (
                             <Button
                                 onClick={handleLikePet}
@@ -313,7 +361,7 @@ const PetCard = ({
                                 Like Pet
                             </Button>
                         )}
-                        {authority === "Owner" && (
+                        {authority === "Owner" && adoptable && (
                             <Button
                                 onClick={handleContactCenter}
                                 variant="contained"
@@ -340,6 +388,7 @@ const PetCard = ({
             {isModalOpen && (
                 <ExpandedPetCard
                     pet={pet}
+                    adoptable={adoptable}
                     saveable={saveable}
                     likeable={likeable}
                     onClose={handleCloseModal}

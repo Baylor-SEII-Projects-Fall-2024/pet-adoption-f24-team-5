@@ -1,5 +1,5 @@
 package petadoption.api.recommendationEngine;
-
+/*
 import org.deeplearning4j.models.word2vec.Word2Vec;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -23,3 +23,4 @@ public class RecommendationEngineConfig {
         };
     }
 }
+*/

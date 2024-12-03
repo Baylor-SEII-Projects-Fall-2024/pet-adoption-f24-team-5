@@ -1,5 +1,5 @@
 package petadoption.api.recommendationEngine;
-
+/*
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +24,7 @@ public class RecommendationEngineController {
             .add(word2Vec.getWordVectorMatrix("Labrador"))
             .add(word2Vec.getWordVectorMatrix("young"))
             .add(word2Vec.getWordVectorMatrix("black"))
-            .div(4); // Average out the vectors*/
+            .div(4); // Average out the vectors
     private final PetService petService;
     private final RecommendationService recommendationService;
     private final OwnerService ownerService;
@@ -102,3 +102,4 @@ public class RecommendationEngineController {
 
 
 }
+*/

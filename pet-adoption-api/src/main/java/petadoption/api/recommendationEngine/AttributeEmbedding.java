@@ -1,5 +1,5 @@
 package petadoption.api.recommendationEngine;
-
+/*
 import lombok.Getter;
 import lombok.Setter;
 import org.deeplearning4j.models.word2vec.Word2Vec;
@@ -62,3 +62,4 @@ public class AttributeEmbedding {
         additionalSentences.clear(); // Clear after retraining
     }
 }
+*/
