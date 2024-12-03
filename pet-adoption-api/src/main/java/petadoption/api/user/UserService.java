@@ -97,23 +97,6 @@ public class UserService {
         return userRepository.save(newUser);
     }
 
-    /*public ResponseEntity<Owner> addPetToSavedPets(String email, Long petId) {
-        Owner newUser = (Owner) findUser(email).get();
-
-        List<Long> savedPetIds = newUser.getSavedPetIds();
-        if (!savedPetIds.contains(petId)) {
-            newUser.addPetToSavedPets(petId);
-        }
-
-        return new ResponseEntity<>(userRepository.save(newUser), HttpStatus.OK);
-    }*/
-
-    public ResponseEntity<Owner> updateOwnerPreferenceId(Owner owner) {
-        Owner newUser = (Owner) findUser(owner.getEmailAddress()).get();
-        newUser.setPreferenceWeights(owner.getPreferenceWeights());
-        return new ResponseEntity<>(userRepository.save(newUser), HttpStatus.OK);
-    }
-
     public AdoptionCenter updateAdoptionCenter(AdoptionCenter adoptionCenter, String oldPassword)
             throws IllegalAccessException {
         if (findUser(adoptionCenter.getEmailAddress()).isEmpty()) {

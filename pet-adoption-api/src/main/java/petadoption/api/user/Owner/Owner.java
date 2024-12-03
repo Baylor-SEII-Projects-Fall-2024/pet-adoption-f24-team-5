@@ -4,9 +4,7 @@ package petadoption.api.user.Owner;
 import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import lombok.*;
-import petadoption.api.pet.Pet;
 import petadoption.api.preferences.Preference;
-import petadoption.api.preferences.PreferenceWeights;
 import petadoption.api.user.User;
 import petadoption.api.user.UserType;
 
@@ -27,14 +25,12 @@ import java.util.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Owner extends User {
-
-    @OneToOne
-    @JoinColumn(name = "PREFERENCE_WEIGHTS_ID")
-    private PreferenceWeights preferenceWeights;
-
     @OneToOne
     @JoinColumn(name = "DEFAULT_PREFERENCE_ID")
     private Preference defaultPreference;
+
+    @Column(name = "COLD_START_VALUE", columnDefinition = "int default 3")
+    private int coldStartValue;
 
     @Column(name = "AGE")
     private int age;
@@ -73,9 +69,8 @@ public class Owner extends User {
     }
 
     public Owner(String emailAddress, String password, UserType userType, int age, String phoneNumber,
-                 PreferenceWeights preferenceWeights, String centerZip) {
+                  String centerZip) {
         super(emailAddress, password, userType, phoneNumber);
-        this.preferenceWeights = preferenceWeights;
         this.age = age;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -84,9 +79,8 @@ public class Owner extends User {
     }
 
     public Owner(Long id, String firstName, String lastName, String emailAddress, String password, UserType userType,
-                 int age, String phoneNumber, PreferenceWeights preferenceWeights, String centerZip) {
+                 int age, String phoneNumber,  String centerZip) {
         super(id, emailAddress, password, userType, phoneNumber);
-        this.preferenceWeights = preferenceWeights;
         this.age = age;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -154,9 +148,7 @@ public class Owner extends User {
         }
     }
 
-    public void setPreferenceId(Long preferenceId) {
-        this.preferenceWeights.setPreferenceWeightId(preferenceId);
-    }
+
 
 
 }

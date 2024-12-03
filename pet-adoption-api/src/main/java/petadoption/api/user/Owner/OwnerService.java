@@ -11,7 +11,6 @@ import java.util.Optional;
 
 import petadoption.api.pet.PetRepository;
 import petadoption.api.preferences.Preference;
-import petadoption.api.preferences.PreferenceWeights;
 
 
 @Service
@@ -54,27 +53,21 @@ public class OwnerService {
         ownerRepository.save(owner);
     }
 
-    public Long getPreferenceWeightsIdByOwnerID(Long id) {
-        Optional<Owner> ownerOptional = ownerRepository.findById(id);
-        if (ownerOptional.isPresent()) {
-            PreferenceWeights pref =  ownerOptional.get().getPreferenceWeights();
-            return pref == null ? null : pref.getPreferenceWeightId();
+    public Optional<Integer> getColdStartValue(long id) {
+        Optional<Owner> owner = ownerRepository.findById(id);
+        if(owner.isPresent()) {
+            return Optional.of(owner.get().getColdStartValue());
         }
-        return null;
-
+        throw new RuntimeException("Owner not found");
     }
 
-    //True if save properly, false if no user is under that ID
-    public boolean savePreferenceWeights(long id, PreferenceWeights preference) {
-        Optional<Owner> ownerOptional = ownerRepository.findById(id);
-        if (ownerOptional.isPresent()) {
-            Owner owner = ownerOptional.get();
-            owner.setPreferenceWeights(preference);
-            ownerRepository.save(owner);
-            return true;
+    public int setColdStartValue(long id, int value) {
+        Optional<Owner> owner = ownerRepository.findById(id);
+        if(owner.isPresent()) {
+            owner.get().setColdStartValue(value);
+            return ownerRepository.save(owner.get()).getColdStartValue();
         }
-
-        return false;
+        throw new RuntimeException("Owner not found");
     }
 
     public boolean saveDefaultPreferences(long id, Preference preference) {
