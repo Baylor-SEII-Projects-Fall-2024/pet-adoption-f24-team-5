@@ -9,8 +9,6 @@ const PetGrid = () => {
     const [loading, setLoading] = useState(true); // State for loading
     const token = useSelector((state) => state.user.token); // Get the token from Redux
 
-
-
     // Fetch pets on component mount
     useEffect(() => {
         const fetchPets = async () => {

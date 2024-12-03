@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import PetGrid from '@/components/petCard/PetGrid';
-import { Box, TextField, MenuItem, Select, FormControl, InputLabel } from "@mui/material";
-
-
-const petsData = [];
+import { Box, TextField, MenuItem, Select, FormControl, InputLabel, Grid, CircularProgress, Typography } from "@mui/material";
+import PetCard from '@/components/petCard/PetCard';
+import { getAllPets } from '@/utils/pet/getAllPets';
+import { useSelector } from 'react-redux';
 
 const AvailablePets = () => {
     const [loading, setLoading] = useState(true);
@@ -13,14 +12,21 @@ const AvailablePets = () => {
     const [colorFilter, setColorFilter] = useState('');
     const [sexFilter, setSexFilter] = useState('');
     const [ageFilter, setAgeFilter] = useState('');
+    const token = useSelector((state) => state.user.token);
 
     useEffect(() => {
-        // Simulating API fetch
-        setTimeout(() => {
-            setPets(petsData);
-            setLoading(false);
-        }, 2000); // Delay for effect
-    }, []);
+        const fetchPets = async () => {
+            try {
+                const response = await getAllPets(token);
+                setPets(response);
+                setLoading(false);
+            } catch (error) {
+                console.error(`Error getting pets: ${error}`);
+                setLoading(false);
+            }
+        };
+        fetchPets();
+    }, [token]);
 
     const filteredPets = pets.filter(pet =>
         (speciesFilter ? pet.species.toLowerCase() === speciesFilter.toLowerCase() : true) &&
@@ -30,8 +36,12 @@ const AvailablePets = () => {
         (ageFilter ? pet.age.toString() === ageFilter : true)
     );
 
+    if (loading) {
+        return <CircularProgress style={{ margin: 'auto', display: 'block' }} />;
+    }
+
     return (
-        <Box sx={{ height: '92vh', display: 'flex' }}>
+        <Box sx={{ height: '92vh', display: 'flex', flexDirection: 'column' }}>
             <FormControl fullWidth sx={{ mb: 2 }}>
                 <InputLabel>Species</InputLabel>
                 <Select
@@ -41,7 +51,6 @@ const AvailablePets = () => {
                     <MenuItem value="">All</MenuItem>
                     <MenuItem value="Dog">Dog</MenuItem>
                     <MenuItem value="Cat">Cat</MenuItem>
-                    {/* Add more species as needed */}
                 </Select>
             </FormControl>
 
@@ -53,7 +62,6 @@ const AvailablePets = () => {
                 >
                     <MenuItem value="">All</MenuItem>
                     <MenuItem value="Labrador">Labrador</MenuItem>
-                    {/* Add more breeds as needed */}
                 </Select>
             </FormControl>
 
@@ -65,7 +73,6 @@ const AvailablePets = () => {
                 >
                     <MenuItem value="">All</MenuItem>
                     <MenuItem value="Brown">Brown</MenuItem>
-                    {/* Add more colors as needed */}
                 </Select>
             </FormControl>
 
@@ -78,7 +85,6 @@ const AvailablePets = () => {
                     <MenuItem value="">All</MenuItem>
                     <MenuItem value="Male">Male</MenuItem>
                     <MenuItem value="Female">Female</MenuItem>
-                    {/* Add more sexes as needed */}
                 </Select>
             </FormControl>
 
@@ -91,13 +97,26 @@ const AvailablePets = () => {
                     <MenuItem value="">All</MenuItem>
                     <MenuItem value="1">1</MenuItem>
                     <MenuItem value="2">2</MenuItem>
-                    {/* Add more ages as needed */}
                 </Select>
             </FormControl>
 
-            <PetGrid pets={filteredPets} loading={loading} />
+            <Box sx={{ flexGrow: 1, padding: 4 }}>
+                <Grid
+                    container
+                    spacing={3}
+                    justifyContent="center"
+                    alignItems="stretch"
+                    sx={{ gap: '20px' }}
+                >
+                    {filteredPets.slice(0, 10).map((pet) => (
+                        <Grid item xs={12} sm={6} md={4} lg={3} key={pet.petName}>
+                            <PetCard pet={pet} saveable={false} likeable={false} />
+                        </Grid>
+                    ))}
+                </Grid>
+            </Box>
         </Box>
-    )
+    );
 };
 
 export default AvailablePets;
