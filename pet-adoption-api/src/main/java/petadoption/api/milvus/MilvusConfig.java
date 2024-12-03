@@ -16,9 +16,14 @@ public class MilvusConfig {
 
     @Bean
     public MilvusClientV2 milvusClient() {
-        ConnectConfig connectConfig = ConnectConfig.builder()
-                .uri(milvusEndpoint).build();
+        try {
+            ConnectConfig connectConfig = ConnectConfig.builder()
+                    .uri(milvusEndpoint).build();
 
-        return new MilvusClientV2(connectConfig);
+            return new MilvusClientV2(connectConfig);
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
 }

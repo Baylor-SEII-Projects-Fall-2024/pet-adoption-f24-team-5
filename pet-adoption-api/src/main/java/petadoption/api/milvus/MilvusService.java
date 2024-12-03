@@ -72,7 +72,7 @@ public class MilvusService {
         IndexParam indexParamForVectorField = IndexParam.builder()
                 .fieldName(vectorField)
                 .indexType(IndexParam.IndexType.IVF_FLAT)
-                .metricType(IndexParam.MetricType.COSINE)
+                .metricType(IndexParam.MetricType.IP) //TRY IP metric. It is faster, but also finds distance between high dimensional vectors.
                 .extraParams(Map.of("nlist", 1024))
                 .build();
 
