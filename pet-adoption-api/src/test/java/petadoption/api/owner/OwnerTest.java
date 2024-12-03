@@ -3,11 +3,14 @@ package petadoption.api.owner;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import io.milvus.v2.client.MilvusClientV2;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
+import petadoption.api.milvus.MilvusService;
+import petadoption.api.milvus.MilvusServiceAdapter;
 import petadoption.api.pet.Pet;
 import petadoption.api.pet.PetRepository;
 import petadoption.api.user.Owner.Owner;

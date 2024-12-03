@@ -4,10 +4,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import io.milvus.param.dml.InsertParam;
+import io.milvus.v2.client.MilvusClientV2;
 import io.milvus.v2.service.vector.request.data.BaseVector;
 import io.milvus.v2.service.vector.request.data.FloatVec;
 import io.milvus.v2.service.vector.response.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Service;
 import petadoption.api.recommendationEngine.RecommendationService;
 
@@ -17,6 +19,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@ConditionalOnBean(MilvusService.class)
 public class MilvusServiceAdapter {
 
     private final MilvusService milvusService;

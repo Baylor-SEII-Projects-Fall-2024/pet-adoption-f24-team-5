@@ -1,8 +1,10 @@
 
 package petadoption.api.recommendationEngine;
 
+import io.milvus.v2.client.MilvusClientV2;
 import io.milvus.v2.service.vector.response.UpsertResp;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -20,6 +22,7 @@ import java.util.Random;
 
 @Controller
 @RequiredArgsConstructor
+@ConditionalOnBean({MilvusService.class, MilvusServiceAdapter.class})
 public class MockMilvusController {
 
     private final MilvusServiceAdapter milvusServiceAdapter;

@@ -5,8 +5,10 @@ import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
+import petadoption.api.PetAdoptionApplicationTests;
 import petadoption.api.user.AdoptionCenter.AdoptionCenter;
 import petadoption.api.user.AdoptionCenter.CenterWorker;
 import petadoption.api.user.Owner.Owner;
@@ -18,10 +20,11 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
-@ActiveProfiles("testdb") // make these tests use the H2 in-memory DB instead of your actual DB
+//@SpringBootTest
+//@ActiveProfiles("testdb") // make these tests use the H2 in-memory DB instead of your actual DB
 @Transactional // make these tests revert their DB changes after the test is complete
-public class UserServiceTests {
+
+public class UserServiceTests extends PetAdoptionApplicationTests {
     @Autowired
     private UserService userService;
     @Autowired
