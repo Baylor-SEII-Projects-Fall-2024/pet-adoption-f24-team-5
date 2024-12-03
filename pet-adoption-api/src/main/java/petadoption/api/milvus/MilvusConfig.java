@@ -23,6 +23,7 @@ public class MilvusConfig {
             return new MilvusClientV2(connectConfig);
         } catch (Exception e) {
             System.err.println(e.getMessage());
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
