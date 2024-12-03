@@ -73,23 +73,6 @@ public class UserController {
         }
     }
 
-   /* @PutMapping("/update/Owner/addSavedPet")
-    public ResponseEntity<Owner> addSavedPet(@RequestParam String email, @RequestParam Long petId) {
-        Owner ownerOpt = (Owner) userService.findUser(email).get();
-        if (ownerOpt == null) {
-            return null;
-        }
-        return userService.addPetToSavedPets(email, petId);
-    }*/
-
-
-
-    @PutMapping("/update/Owner/preferenceId")
-    public ResponseEntity<Owner> updateOwnerPreferenceId(@RequestBody Owner user) {
-
-        return userService.updateOwnerPreferenceId(user);
-    }
-
     @PutMapping("/update/CenterWorker")
     public ResponseEntity<CenterWorker> updateCenterWorker(@RequestBody CenterWorker user,
             @RequestParam("oldPassword") String oldPassword) {

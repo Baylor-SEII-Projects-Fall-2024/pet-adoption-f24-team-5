@@ -1,38 +1,35 @@
 package petadoption.api.recommendationEngine;
 
+import io.milvus.v2.client.MilvusClientV2;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import petadoption.api.milvus.MilvusServiceAdapter;
 import petadoption.api.pet.Pet;
 import petadoption.api.pet.PetService;
 import petadoption.api.preferences.Preference;
-import petadoption.api.preferences.PreferenceWeightsService;
 import petadoption.api.user.Owner.OwnerService;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/recommendation-engine")
 @RequiredArgsConstructor
+@ConditionalOnBean(MilvusServiceAdapter.class)
 public class RecommendationEngineController {
-/*    INDArray userPreference = word2Vec.getWordVectorMatrix("dog")
-            .add(word2Vec.getWordVectorMatrix("Labrador"))
-            .add(word2Vec.getWordVectorMatrix("young"))
-            .add(word2Vec.getWordVectorMatrix("black"))
-            .div(4); // Average out the vectors*/
+
     private final PetService petService;
     private final RecommendationService recommendationService;
     private final OwnerService ownerService;
+    private final MilvusServiceAdapter milvusServiceAdapter;
 
     @PostMapping("/update-preference")
     public ResponseEntity<?> updatePreference(@RequestParam String email, @RequestBody Preference preference) {
-
-
         try{
 
             List<String> cleanedPreferences = new ArrayList<>();
@@ -52,22 +49,21 @@ public class RecommendationEngineController {
     @GetMapping("/generate-new-options")
     public ResponseEntity<?> getNewPets(@RequestParam String email) {
         try{
-            Long id = ownerService.findOwnerIdByEmail(email);
-            Long userWeightID = ownerService.getPreferenceWeightsIdByOwnerID(id);
-            if(userWeightID != null){
-                int coldStartValue = recommendationService.getColdStartValue(id);
-                double[] usersNewWeights = recommendationService.getUsersWeights(userWeightID);
+            Long ownerId = ownerService.findOwnerIdByEmail(email);
 
+            double[] userWeights = milvusServiceAdapter.getData(ownerId, recommendationService.OWNER_PARTITION);
 
-                // If the user's cold start is over give them valid recommendations
+            if(userWeights != null){
+
+                int coldStartValue = ownerService.getColdStartValue(ownerId).get();
+
                 if(coldStartValue == 0){
-                    return new ResponseEntity<>(recommendationService.findKthNearestNeighbors(id, usersNewWeights, 3)
+                    return new ResponseEntity<>(recommendationService.findKthNearestNeighbors(ownerId, userWeights, 3)
                             ,HttpStatus.OK);
                 }
 
-                // Cold Start is not over -> Give them 3 random pets
                 coldStartValue--;
-                recommendationService.setColdStartValue(id, coldStartValue);
+                ownerService.setColdStartValue(ownerId, coldStartValue);
             }
             List<Pet> allPets = petService.getAllPets();
             if(allPets.size() <= 3 ){
@@ -83,21 +79,7 @@ public class RecommendationEngineController {
         }
     }
 
-    @PostMapping("/test-preference")
-    public ResponseEntity<?> updatePreference(@RequestBody String[] inputPreferences) {
-        List<String> pref1 = new ArrayList<>(Arrays.asList("dog", "goldenretriever", "brown", "10"));
-        List<String> pref2 = new ArrayList<>(Arrays.asList(inputPreferences));
 
-        try{
-            double[] vector1 = recommendationService.savePreferenceEmbedding(3L, pref1);
-            double[] vector2 = recommendationService.savePreferenceEmbedding(5L, pref2);
-
-            return new ResponseEntity<>(VectorUtils.cosineSimilarity(vector1, vector2), HttpStatus.OK);
-
-        }catch(Exception e){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-    }
 
 
 

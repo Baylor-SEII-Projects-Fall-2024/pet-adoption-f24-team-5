@@ -1,5 +1,6 @@
-package petadoption.api.event;
+package petadoption.api.Event;
 
+import io.milvus.v2.client.MilvusClientV2;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -7,8 +8,12 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Mockito;
 
+import org.springframework.boot.test.mock.mockito.MockBean;
 import petadoption.api.Event.Event;
 import petadoption.api.Event.EventService;
+import petadoption.api.PetAdoptionApplicationTests;
+import petadoption.api.milvus.MilvusService;
+import petadoption.api.milvus.MilvusServiceAdapter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -18,7 +23,8 @@ import static org.mockito.Mockito.doThrow;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-public class EventTests {
+public class EventTests extends PetAdoptionApplicationTests {
+
 
     @Mock
     private EventService eventService;

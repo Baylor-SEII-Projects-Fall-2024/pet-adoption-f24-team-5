@@ -64,7 +64,7 @@ const PetManager = () => {
                     <Button onClick={handlePostNewPet} color='inherit' variant='contained'>Post Pet</Button>
 
                     {loading ? <CircularProgress /> :
-                        ((pets.length > 0) && pets.slice(0, 10).map((pet) => (
+                        ((pets.length > 0) && pets.slice(0, 50).map((pet) => (
                             <PetCard pet={pet} expandable={false} saveable={false} likeable={false} key={pet.petName} onClick={() => handleCardClick(pet)} />
                         )))
                     }

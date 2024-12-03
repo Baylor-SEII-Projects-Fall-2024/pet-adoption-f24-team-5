@@ -1,11 +1,7 @@
 package petadoption.api.pet;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.amqp.RabbitConnectionDetails;
 import org.springframework.stereotype.Service;
-import petadoption.api.preferences.Preference;
-import petadoption.api.recommendationEngine.RecommendationService;
 import petadoption.api.user.AdoptionCenter.AdoptionCenter;
 
 import java.util.List;
@@ -16,7 +12,6 @@ import java.util.Optional;
 public class PetService {
 
     private final PetRepository petRepository;
-    private final PetWeightService petWeightService;
 
 
     public List<Pet> getAllPets() { return petRepository.findAll(); }
@@ -26,25 +21,6 @@ public class PetService {
             throw new IllegalArgumentException("Adoption center is null");
         }
         pet.setAdoptionCenter(adoptionCenter);
-        return petRepository.save(pet);
-
-    }
-
-    public Pet savePet(Pet pet, AdoptionCenter adoptionCenter, double[] petVector) {
-        if(adoptionCenter == null) {
-            throw new IllegalArgumentException("Adoption center is null");
-        }
-        pet.setAdoptionCenter(adoptionCenter);
-
-        Preference petStats = new Preference();
-
-        petStats.setPreferredSpecies(pet.getSpecies());
-        petStats.setPreferredBreed(pet.getBreed());
-        petStats.setPreferredColor(pet.getColor());
-        petStats.setPreferredAge(pet.getAge());
-
-        long petWeightID = petWeightService.savePet(pet, petVector);
-        pet.setPetWeightId(petWeightID);
         return petRepository.save(pet);
 
     }
@@ -59,7 +35,6 @@ public class PetService {
             throw new IllegalArgumentException("Pet is null");
         }
 
-        petWeightService.deletePet(pet.getPetWeightId());
         petRepository.delete(pet);
     }
 
@@ -67,8 +42,9 @@ public class PetService {
         return petRepository.findByPetId(id);
     }
 
-
-    public PetWeights getPetWeights(Pet pet) {
-        return petWeightService.getPetWeights(pet.getPetWeightId());
+    public long numberOfPets() {
+        return petRepository.count();
     }
+
+
 }
