@@ -9,7 +9,7 @@ COPY . .
 WORKDIR /build/pet-adoption-api
 
 # Run the Gradle build to generate the JAR file
-RUN ./gradlew clean build --no-daemon
+RUN ./gradlew clean build --no-daemon --stacktrace --info
 
 # Stage 2: Create a lightweight image with the built JAR and setup volume directory
 FROM openjdk:22
