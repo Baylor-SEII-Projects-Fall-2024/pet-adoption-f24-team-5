@@ -1,4 +1,4 @@
-export const API_URL = "http://34.122.198.55";
+export const API_URL = "https://api.dogpilesolutions.com";
 export const FRONTEND_URL = "http://34.72.46.121";
 
 // export const API_URL = "http://localhost:8080";
