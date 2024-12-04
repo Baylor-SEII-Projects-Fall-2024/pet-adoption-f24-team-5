@@ -29,6 +29,15 @@ public class PetController {
         return petService.getAllPets();
     }
 
+    @GetMapping("/available-species")
+    public ResponseEntity<?> getAvailableSpecies() {
+        try {
+            return new ResponseEntity<>(petService.distinctSpecies(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping("/center")
     public ResponseEntity<?> getPetsCenter(@RequestParam String email) {
         try {

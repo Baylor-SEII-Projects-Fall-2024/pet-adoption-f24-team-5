@@ -34,11 +34,19 @@ public class RecommendationService {
     public static final String PET_PARTITION = "PET_PARTITION";
     public final String OWNER_PARTITION = "OWNER_PARTITION";
 
-    public double[] savePreferenceEmbedding(Long ownerId, List<String> newPreferences) throws IOException {
+    public double[] savePreferenceEmbedding(Long ownerId, List<String> newPreferences) {
+        try {
+            return savePreferenceEmbedding(ownerId, newPreferences, 1.0);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public double[] savePreferenceEmbedding(Long ownerId, List<String> newPreferences, double skewBias) throws IOException {
         double[] preferences = milvusServiceAdapter.getData(ownerId, OWNER_PARTITION);
 
         Preference newPref = extractArgsFromString(newPreferences);
-        double[] embeddingVector = generatePreferenceVector(newPref);
+        double[] embeddingVector = generatePreferenceVector(newPref, skewBias);
 
         try{
             if(!(preferences == null)){
@@ -52,7 +60,7 @@ public class RecommendationService {
             milvusServiceAdapter.upsertData(ownerId,embeddingVector,embeddingVector.length,OWNER_PARTITION);
 
         }catch (Exception e){
-            throw new IOException(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         }
         return embeddingVector;
     }
@@ -83,6 +91,10 @@ public class RecommendationService {
     }
 
     public double[] generatePreferenceVector(Preference preference) {
+        return generatePreferenceVector(preference, 1.0);
+    }
+
+    public double[] generatePreferenceVector(Preference preference, double skewBias) {
         List<String> newWords = new ArrayList<>();
 
         double[] speciesVector = getOrAddWordVector(word2Vec, preference.getPreferredSpecies(), newWords);
@@ -90,7 +102,7 @@ public class RecommendationService {
         double[] colorVector = getOrAddWordVector(word2Vec, preference.getPreferredColor(), newWords);
         double[] ageVector = getOrAddWordVector(word2Vec, String.valueOf(preference.getPreferredAge()), newWords);
 
-        double speciesWeight = 1.5;
+        double speciesWeight = 1.5 * skewBias;
         double breedWeight = 1.2;
         double colorWeight = 1.0;
         double ageWeight = 1.0;
