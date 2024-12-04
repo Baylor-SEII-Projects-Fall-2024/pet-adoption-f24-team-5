@@ -30,7 +30,7 @@ public class Owner extends User {
     private Preference defaultPreference;
 
     @Column(name = "COLD_START_VALUE", columnDefinition = "int default 3")
-    private int coldStartValue;
+    private int coldStartValue = 3;
 
     @Column(name = "AGE")
     private int age;
