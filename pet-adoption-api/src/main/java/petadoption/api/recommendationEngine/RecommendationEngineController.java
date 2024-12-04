@@ -28,6 +28,27 @@ public class RecommendationEngineController {
     private final OwnerService ownerService;
     private final MilvusServiceAdapter milvusServiceAdapter;
 
+    @PostMapping("/skew-results")
+    public ResponseEntity<?> skewResults(@RequestParam String species, @RequestParam String email) {
+        String breed = "any";
+        String color = "multicolor";
+        int age = 6;
+
+        try {
+            List<String> cleanedPreferences = new ArrayList<>();
+            cleanedPreferences.add(species.toLowerCase().replaceAll("\\s+", ""));
+            cleanedPreferences.add(breed.toLowerCase().replaceAll("\\s+", ""));
+            cleanedPreferences.add(color.toLowerCase().replaceAll("\\s+", ""));
+            cleanedPreferences.add(String.valueOf(age).toLowerCase().replaceAll("\\s+", ""));
+
+            double[] userNewWeights = recommendationService.savePreferenceEmbedding(ownerService.findOwnerIdByEmail(email), cleanedPreferences, 1.5);
+            return new ResponseEntity<>(userNewWeights, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
     @PostMapping("/update-preference")
     public ResponseEntity<?> updatePreference(@RequestParam String email, @RequestBody Preference preference) {
         try{
