@@ -96,7 +96,20 @@ public class RecommendationEngineController {
         }
     }
 
+    @PostMapping("/reset-engine")
+    public ResponseEntity<?> resetEngine(@RequestParam String email) {
+        try {
+            long ownerId = ownerService.findOwnerIdByEmail(email);
 
+            milvusServiceAdapter.deleteData(ownerId, recommendationService.OWNER_PARTITION);
+
+            ownerService.setColdStartValue(ownerId, 3);
+
+            return new ResponseEntity<>("Reset Successful", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
 
 
 
