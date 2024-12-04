@@ -20,6 +20,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static java.lang.Math.abs;
+import static java.lang.Math.floor;
+
 
 @Service
 @RequiredArgsConstructor
@@ -34,25 +37,35 @@ public class RecommendationService {
     public static final String PET_PARTITION = "PET_PARTITION";
     public final String OWNER_PARTITION = "OWNER_PARTITION";
 
-    public double[] savePreferenceEmbedding(Long ownerId, List<String> newPreferences) {
+    public double[] savePreferenceEmbedding(Long ownerId, List<String> newPreferences, int coldStart) {
         try {
-            return savePreferenceEmbedding(ownerId, newPreferences, 1.0);
+            return savePreferenceEmbedding(ownerId, newPreferences, 1.0, coldStart);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    public double[] savePreferenceEmbedding(Long ownerId, List<String> newPreferences, double skewBias) throws IOException {
+    public double[] savePreferenceEmbedding(Long ownerId, List<String> newPreferences, double skewBias) {
+        try {
+            return savePreferenceEmbedding(ownerId, newPreferences, skewBias, 0);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public double[] savePreferenceEmbedding(Long ownerId, List<String> newPreferences, double skewBias, int coldStart) throws IOException {
         double[] preferences = milvusServiceAdapter.getData(ownerId, OWNER_PARTITION);
 
         Preference newPref = extractArgsFromString(newPreferences);
-        double[] embeddingVector = generatePreferenceVector(newPref, skewBias);
+        double[] embeddingVector = (skewBias == 1.0 ?
+                 generatePreferenceVector(newPref, coldStart) :
+                 generatePreferenceVector(newPref, skewBias));
 
         try{
-            if(!(preferences == null)){
+            if(preferences != null){
 
-                double weightOfOld = 0.7;
-                double weightOfNew= 0.3;
+                double weightOfOld = 0.75;
+                double weightOfNew= 0.25;
 
                 embeddingVector = VectorUtils.combineVectors(preferences, weightOfOld, embeddingVector, weightOfNew);
             }
@@ -90,11 +103,41 @@ public class RecommendationService {
 
     }
 
+    public double[] generatePreferenceVector(Preference preference, int coldStart) {
+        int adjustmentRounds = 5;
+        double[] speciesWeights = {1.6, 1.55, 1.50, 1.45, 1.40};
+        double[] breedWeights =   {1.2, 1.25, 1.3 , 1.35, 1.35};
+        double[] colorWeights =   {1.0, 1.0,  1.15, 1.20, 1.25};
+        double [] ageWeights=     {1.0, 1.0,  1.15, 1.20, 1.25};
+        double speciesWeight, breedWeight, colorWeight, ageWeight;
+
+        double incrementFactor = 2.0;
+        int ndx = (int)floor(abs(coldStart)/incrementFactor);
+
+        if(ndx > adjustmentRounds - 1){
+            ndx = adjustmentRounds - 1;
+        }
+
+        System.out.println("ndx: " + ndx);
+
+        speciesWeight = speciesWeights[ndx];
+        breedWeight = breedWeights[ndx];
+        colorWeight = colorWeights[ndx];
+        ageWeight = ageWeights[ndx];
+
+        return generatePreferenceVector(preference, speciesWeight, breedWeight, colorWeight, ageWeight);
+    }
+
     public double[] generatePreferenceVector(Preference preference) {
-        return generatePreferenceVector(preference, 1.0);
+        return generatePreferenceVector(preference, 1.5, 1.2, 1.0, 1.0);
     }
 
     public double[] generatePreferenceVector(Preference preference, double skewBias) {
+        return generatePreferenceVector(preference, skewBias, 1.0, 1.0, 1.0);
+    }
+
+    public double[] generatePreferenceVector(Preference preference,
+                                             double speciesWeight, double breedWeight, double colorWeight, double ageWeight) {
         List<String> newWords = new ArrayList<>();
 
         double[] speciesVector = getOrAddWordVector(word2Vec, preference.getPreferredSpecies(), newWords);
@@ -102,10 +145,6 @@ public class RecommendationService {
         double[] colorVector = getOrAddWordVector(word2Vec, preference.getPreferredColor(), newWords);
         double[] ageVector = getOrAddWordVector(word2Vec, String.valueOf(preference.getPreferredAge()), newWords);
 
-        double speciesWeight = 1.5 * skewBias;
-        double breedWeight = 1.2;
-        double colorWeight = 1.0;
-        double ageWeight = 1.0;
 
         INDArray speciesVec = Nd4j.create(speciesVector).mul(speciesWeight);
         INDArray breedVec = Nd4j.create(breedVector).mul(breedWeight);
