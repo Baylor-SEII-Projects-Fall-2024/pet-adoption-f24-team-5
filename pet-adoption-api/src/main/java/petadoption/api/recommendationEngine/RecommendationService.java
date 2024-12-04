@@ -17,6 +17,8 @@ import petadoption.api.user.Owner.SeenPetService;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 
 @Service
@@ -143,5 +145,34 @@ public class RecommendationService {
             throw new SQLException(e.getMessage(), e);
         }
 
+    }
+
+    public List<Pet> coldStart(int coldStartVal) {
+        List<String> availableSpecies = petService.distinctSpecies();
+        List<String> searchList = availableSpecies;
+        int[] startIndices = {6,2,0};
+        List<Pet> pets = new ArrayList<>();
+
+        if (availableSpecies.isEmpty()) {
+            throw new RuntimeException("No Species in Database");
+        }
+
+        while (availableSpecies.size() < 3) {
+            searchList.add(availableSpecies.getFirst());
+        }
+
+        if (availableSpecies.size() > 3) {
+            int windowBegin = startIndices[coldStartVal - 1];
+            searchList = new ArrayList<>();
+            for(int i = windowBegin; i < windowBegin + 3; i++) {
+                searchList.add(availableSpecies.get(i % availableSpecies.size()));
+            }
+        }
+
+        for(String species : searchList) {
+            pets.add(petService.findRandomPetBySpecies(species));
+        }
+
+        return pets;
     }
 }

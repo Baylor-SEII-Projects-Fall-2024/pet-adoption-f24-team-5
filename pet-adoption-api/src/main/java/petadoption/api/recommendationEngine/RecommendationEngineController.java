@@ -53,23 +53,18 @@ public class RecommendationEngineController {
 
             double[] userWeights = milvusServiceAdapter.getData(ownerId, recommendationService.OWNER_PARTITION);
 
+            int coldStartValue = ownerService.getColdStartValue(ownerId).get();
             if(userWeights != null){
 
-                int coldStartValue = ownerService.getColdStartValue(ownerId).get();
 
                 if(coldStartValue == 0){
                     return new ResponseEntity<>(recommendationService.findKthNearestNeighbors(ownerId, userWeights, 3)
                             ,HttpStatus.OK);
                 }
 
-                coldStartValue--;
-                ownerService.setColdStartValue(ownerId, coldStartValue);
+                ownerService.setColdStartValue(ownerId, coldStartValue-1);
             }
-            List<Pet> allPets = petService.getAllPets();
-            if(allPets.size() <= 3 ){
-                return new ResponseEntity<>(allPets, HttpStatus.OK);
-            }
-            Collections.shuffle(allPets);
+            List<Pet> allPets = recommendationService.coldStart(coldStartValue);
             return new ResponseEntity<>(allPets.subList(0,3), HttpStatus.OK);
 
         }catch (IOException e){

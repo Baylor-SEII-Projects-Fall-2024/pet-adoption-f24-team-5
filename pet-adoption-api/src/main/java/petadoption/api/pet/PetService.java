@@ -46,5 +46,13 @@ public class PetService {
         return petRepository.count();
     }
 
+    public List<String> distinctSpecies() {
+        return petRepository.findDistinctSpecies();
+    }
+
+    public Pet findRandomPetBySpecies(String species) {
+        return petRepository.findRandomPetBySpecies(species);
+    }
+
 
 }
