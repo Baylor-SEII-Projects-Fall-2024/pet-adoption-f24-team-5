@@ -1,5 +1,5 @@
 import React from 'react';
-import TitleBar from './TitleBar';
+import TitleBar from './titleBar/TitleBar';
 import { Box } from '@mui/material';
 import { Outlet } from 'react-router-dom';
 
