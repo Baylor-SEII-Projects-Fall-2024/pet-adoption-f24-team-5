@@ -19,4 +19,9 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     @Query("SELECT m FROM Message m WHERE m.conversationId =:id")
     List<Message> findByConversationId(@Param("id") Long id);
 
+    @Query("SELECT m FROM Message m WHERE m.conversationId = :conversationId ORDER BY m.date DESC")
+    Optional<Message> findLatestMessageByConversationId(@Param("conversationId") Long conversationId);
+
+
+
 }

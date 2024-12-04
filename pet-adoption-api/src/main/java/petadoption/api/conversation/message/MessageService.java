@@ -38,6 +38,13 @@ public class MessageService {
         }
     }
 
+    public Message findLatestMessage(long conversationId) {
+        return messageRepository.findLatestMessageByConversationId(conversationId)
+                .orElseThrow(() -> new RuntimeException("No messages found for conversation ID: " + conversationId));
+    }
+
+
+
     public Message sendMessage(Message message)
     {
         try

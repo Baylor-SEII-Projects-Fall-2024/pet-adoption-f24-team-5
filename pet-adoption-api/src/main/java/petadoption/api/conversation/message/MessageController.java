@@ -49,6 +49,25 @@ public class MessageController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("/getLatestMessage")
+    public ResponseEntity<Message> getLatestMessage(@RequestParam long conversationId) {
+        try {
+            System.out.println("Fetching latest message for conversation ID: " + conversationId);
+            Message latestMessage = messageService.findLatestMessage(conversationId);
+            return new ResponseEntity<>(latestMessage, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            System.err.println("No message found for conversation ID: " + conversationId);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // Return 404 if no message found
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+
+
     @PostMapping("/sendMessage")
     public ResponseEntity<Message> sendMessage(@RequestBody Message message) {
         try {

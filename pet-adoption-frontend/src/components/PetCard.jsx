@@ -166,10 +166,11 @@ const PetCard = ({
                 return;
             }
 
-            const url = `${API_URL}/api/conversation/startConversation`;
+            const startConversationUrl = `${API_URL}/api/conversation/startConversation`;
 
-            const response = await axios.post(
-                url,
+            // Start the conversation
+            const conversationResponse = await axios.post(
+                startConversationUrl,
                 null,
                 {
                     params: {
@@ -183,14 +184,39 @@ const PetCard = ({
                 }
             );
 
-            console.log("Conversation started:", response.data);
+            const conversation = conversationResponse.data;
+            console.log("Conversation started:", conversation);
+
+            // Send a message with the current PetCard's data
+            const sendMessageUrl = `${API_URL}/api/message/sendMessage`;
+            const petDataMessage = `PETCARD_JSON:${JSON.stringify(pet)}`;
+
+            const messageResponse = await axios.post(
+                sendMessageUrl,
+                {
+                    conversationId: conversation.conversationId,
+                    senderId: userId,
+                    receiverId: centerID,
+                    message: petDataMessage,
+                    isRead: false,
+                },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            console.log("Message sent:", messageResponse.data);
 
             // Navigate to the Messages page
             navigate("/Messages");
         } catch (error) {
-            console.error("Failed to start conversation", error);
+            console.error("Failed to contact adoption center", error);
         }
     };
+
 
     // Extract the Adoption Center's name
     const adoptionCenterName = pet.adoptionCenter?.centerName || "Adoption Center";

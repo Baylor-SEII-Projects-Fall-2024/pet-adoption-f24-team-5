@@ -16,8 +16,10 @@ import {
 import { Menu } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { API_URL } from '@/constants';
 import axios from 'axios';
+import PetCard  from "@/components/PetCard";
 import { getSubjectFromToken } from '@/utils/tokenUtils';
 import { useSelector } from 'react-redux';
 
@@ -29,6 +31,58 @@ const Messages = () => {
     const [userEmail, setUserEmail] = useState('');
     const [userData, setUserData] = useState(null);
     const token = useSelector((state) => state.user.token);
+    const [petSelectionOpen, setPetSelectionOpen] = useState(false);
+    const [hasScrolled, setHasScrolled] = useState(false);
+    const [isNewConversation, setIsNewConversation] = useState(false);
+
+
+    useEffect(() => {
+        if (isNewConversation && messages.length > 0) {
+            scrollToBottom();
+            setIsNewConversation(false); // Reset after scrolling
+        }
+    }, [messages, isNewConversation]);
+
+
+    const handleConversationClick = (conversationId) => {
+        setCurrentConversationId(conversationId);
+        setHasScrolled(false); // Reset scrolling state
+        loadMessages(conversationId, userData.id);
+        if (isMobile) {
+            setMobileOpen(false);
+        }
+    };
+
+    useEffect(() => {
+        if (!hasScrolled && messages.length > 0) {
+            scrollToBottom();
+            setHasScrolled(true); // Mark as scrolled
+        }
+    }, [messages, hasScrolled]);
+
+
+    const handleOpenPetSelection = () => {
+        setPetSelectionOpen(true);
+    };
+
+// Function to close the pet selection dialog
+    const handleClosePetSelection = () => {
+        setPetSelectionOpen(false);
+    };
+
+// Example pet data for testing
+    /*const examplePetData = {
+        petId: 101,
+        petName: 'Buddy',
+        species: 'Dog',
+        breed: 'Labrador',
+        color: 'Yellow',
+        sex: 'Male',
+        age: 3,
+        description: 'A friendly Labrador.',
+        imageName: 'buddy.jpg',
+        // Include other necessary fields
+    };*/
 
     const messagesEndRef = useRef(null); // Reference to the end of messages
 
@@ -36,9 +90,9 @@ const Messages = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
-    useEffect(() => {
+    /*useEffect(() => {
         scrollToBottom();
-    }, [messages]);
+    }, [messages]);*/
 
     const currentConversation = conversations.find(
         (conv) => conv.conversationId === currentConversationId
@@ -79,6 +133,47 @@ const Messages = () => {
             console.error('Failed to send message', error);
         }
     };
+
+    // Function to handel sending the petcard
+    // Function to send a PetCard message
+    const handleSendPetCardMessage = async (petData) => {
+        if (!currentConversationId || !userData) return;
+
+        const receiverId =
+            userData.id === currentConversation.ownerId
+                ? currentConversation.centerId
+                : currentConversation.ownerId;
+
+        // Convert pet data to JSON string and prepend the prefix
+        const petDataJson = JSON.stringify(petData);
+        const messageContent = `PETCARD_JSON:${petDataJson}`;
+
+        const newMessageData = {
+            conversationId: currentConversationId,
+            senderId: userData.id,
+            receiverId: receiverId,
+            message: messageContent,
+            isRead: false,
+        };
+
+        try {
+            const response = await axios.post(`${API_URL}/api/message/sendMessage`, newMessageData, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            const newMessage = response.data;
+
+            setMessages((prevMessages) => [...prevMessages, newMessage]);
+            setMessageInput('');
+            scrollToBottom();
+        } catch (error) {
+            console.error('Failed to send PetCard message', error);
+        }
+    };
+
 
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -286,8 +381,6 @@ const Messages = () => {
                 if (currentConversationId && userData) {
                     try {
                         await loadMessages(currentConversationId, userData.id, false); // Don't reset unread during polling
-                        // Optionally, update conversations to get new unread counts
-                        await fillDrawer(userData.id, userData.userType);
                     } catch (error) {
                         console.error('Error polling for new messages:', error);
                     }
@@ -305,6 +398,7 @@ const Messages = () => {
             }
         };
     }, [currentConversationId, userData]);
+
 
     return (
         <Box sx={{ display: 'flex', height: 'calc(100vh - 64px)', backgroundColor: '#f0f0f0' }}>
@@ -339,11 +433,13 @@ const Messages = () => {
                                     selected={conversation.conversationId === currentConversationId}
                                     onClick={() => {
                                         setCurrentConversationId(conversation.conversationId);
+                                        setIsNewConversation(true); // Mark this as a new conversation
                                         loadMessages(conversation.conversationId, userData.id);
                                         if (isMobile) {
                                             setMobileOpen(false);
                                         }
                                     }}
+
                                 >
                                     <ListItemText
                                         primary={
@@ -403,40 +499,107 @@ const Messages = () => {
                 {/* Messages */}
                 <Box sx={{ flexGrow: 1, overflowY: 'auto', mb: 2, mt: 2 }}>
                     <Stack spacing={2}>
-                        {messages.map((message) => (
-                            <Box
-                                key={message.messageId}
-                                sx={{
-                                    display: 'flex',
-                                    justifyContent:
-                                        message.senderId === userData.id ? 'flex-end' : 'flex-start',
-                                }}
-                            >
-                                <Box
-                                    sx={{
-                                        maxWidth: '70%',
-                                        p: 1,
-                                        borderRadius: 2,
-                                        backgroundColor:
-                                            message.senderId === userData.id ? '#DCF8C6' : '#FFFFFF',
-                                        boxShadow: 1,
-                                    }}
-                                >
-                                    <Typography variant="body1">{message.message}</Typography>
-                                    <Typography variant="caption" display="block" align="right">
-                                        {new Date(message.date).toLocaleTimeString([], {
-                                            hour: '2-digit',
-                                            minute: '2-digit',
-                                        })}
-                                    </Typography>
-                                </Box>
-                            </Box>
-                        ))}
+                        {messages.map((message) => {
+                            const isCurrentUserSender = message.senderId === userData.id;
+
+                            // Check if the message is a PetCard
+                            if (message.message.startsWith('PETCARD_JSON:')) {
+                                const petDataJson = message.message.replace('PETCARD_JSON:', '').trim();
+                                let petData;
+                                try {
+                                    petData = JSON.parse(petDataJson);
+                                } catch (error) {
+                                    console.error('Invalid pet data in message:', error);
+                                    return (
+                                        <Box
+                                            key={message.messageId}
+                                            sx={{
+                                                display: 'flex',
+                                                justifyContent: isCurrentUserSender ? 'flex-end' : 'flex-start',
+                                            }}
+                                        >
+                                            <Typography color="error">Invalid pet data received.</Typography>
+                                        </Box>
+                                    );
+                                }
+
+                                return (
+                                    <Box
+                                        key={message.messageId}
+                                        sx={{
+                                            display: 'flex',
+                                            justifyContent: isCurrentUserSender ? 'flex-end' : 'flex-start',
+                                        }}
+                                    >
+                                        {/* Render the PetCard component */}
+                                        <Box
+                                            sx={{
+                                                maxWidth: '70%',
+                                            }}
+                                        >
+                                            <PetCard
+                                                pet={petData}
+                                                expandable={true} // Set as needed
+                                                saveable={true} // Set as needed
+                                                likeable={true} // Set as needed
+                                            />
+                                            <Typography variant="caption" display="block" align="right">
+                                                {new Date(message.date).toLocaleTimeString([], {
+                                                    hour: '2-digit',
+                                                    minute: '2-digit',
+                                                })}
+                                            </Typography>
+                                        </Box>
+                                    </Box>
+                                );
+                            } else {
+                                // Render regular text messages
+                                return (
+                                    <Box
+                                        key={message.messageId}
+                                        sx={{
+                                            display: 'flex',
+                                            justifyContent: isCurrentUserSender ? 'flex-end' : 'flex-start',
+                                        }}
+                                    >
+                                        <Box
+                                            sx={{
+                                                maxWidth: '70%',
+                                                p: 1,
+                                                borderRadius: 2,
+                                                backgroundColor: isCurrentUserSender ? '#DCF8C6' : '#FFFFFF',
+                                                boxShadow: 1,
+                                            }}
+                                        >
+                                            <Typography variant="body1">{message.message}</Typography>
+                                            <Typography variant="caption" display="block" align="right">
+                                                {new Date(message.date).toLocaleTimeString([], {
+                                                    hour: '2-digit',
+                                                    minute: '2-digit',
+                                                })}
+                                            </Typography>
+                                        </Box>
+                                    </Box>
+                                );
+                            }
+                        })}
                         {/* Dummy div to scroll into view */}
                         <div ref={messagesEndRef} />
                     </Stack>
                 </Box>
                 {/* Message Input */}
+
+                {/* Add this button within your JSX, perhaps near the message input
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => handleSendPetCardMessage(examplePetData)}
+                        disabled={!currentConversation}
+                    >
+                        Send PetCard
+                    </Button>*/}
+
+
                 <Box sx={{ mt: 'auto' }}>
                     <form onSubmit={handleSendMessage}>
                         <Stack direction="row" spacing={1}>
