@@ -13,7 +13,7 @@ import petadoption.api.user.Owner.Owner;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = Pet.TABLE_NAME)
-@JsonIgnoreProperties("adoptionCenter")
+//@JsonIgnoreProperties("adoptionCenter")
 public class Pet {
 
     public static final String TABLE_NAME = "Pets";
