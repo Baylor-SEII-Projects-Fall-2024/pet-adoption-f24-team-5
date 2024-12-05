@@ -30,7 +30,6 @@ public class PetService {
         petRepository.findByPetId(pet.getPetId()).map(tempPet -> {
             tempPet.setAdoptionStatus(true);
             tempPet.setPetOwner(owner);
-            tempPet.setOwner(owner);
             Pet savedPet = petRepository.save(tempPet);
             return ResponseEntity.ok(savedPet);
         }).orElseGet(() -> ResponseEntity.notFound().build());
