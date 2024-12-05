@@ -14,12 +14,21 @@ public class AdoptionCenterService {
     private final CenterWorkerRepository centerWorkerRepository;
     private final UserService userService;
 
-    Optional<AdoptionCenter> findById(long id) {
+    public Optional<AdoptionCenter> findById(long id) {
         return adoptionCenterRepository.findById(id);
     }
 
     Optional<List<CenterWorker>> findAllCenterWorkers(long centerId) {
         return centerWorkerRepository.findAllByCenterID(centerId);
+    }
+
+    public void updatePetCount(long centerId, int petCount) {
+        Optional<AdoptionCenter> tempCenter = adoptionCenterRepository.findById(centerId);
+        if(tempCenter.isPresent()) {
+            AdoptionCenter adoptionCenter = tempCenter.get();
+            adoptionCenter.setNumberOfPets(petCount);
+            adoptionCenterRepository.save(adoptionCenter);
+        }
     }
 
     void deleteCenterWorker(long id) {

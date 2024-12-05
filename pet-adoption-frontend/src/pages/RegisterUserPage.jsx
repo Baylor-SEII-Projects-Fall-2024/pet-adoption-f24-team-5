@@ -17,6 +17,7 @@ const Register = () => {
         lastName: '',
         age: '',
         centerZip: '',
+        numberOfPets: 0,
     });
     const [errorMessage, setErrorMessage] = useState('');
 
@@ -172,25 +173,25 @@ const Register = () => {
                                     required
                                     fullWidth
                                 />
-                                <TextField
-                                    label="Center Pet Count"
-                                    type="number"
-                                    value={registrationData.numberOfPets}
-                                    onChange={(e) => {
-                                        const value = e.target.value;
-                                        if (value === '' || (/^\d+$/.test(value) && parseInt(value, 10) > 0 && parseInt(value, 10) <= 999)) {
-                                            setRegistrationData({ ...registrationData, numberOfPets: value });
-                                        }
-                                    }}
-                                    onKeyDown={(e) => {
-                                        // Prevent non-numeric key presses
-                                        if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete') {
-                                            e.preventDefault();
-                                        }
-                                    }}
-                                    required
-                                    fullWidth
-                                />
+                                {/*<TextField*/}
+                                {/*    label="Center Pet Count"*/}
+                                {/*    type="number"*/}
+                                {/*    value={registrationData.numberOfPets}*/}
+                                {/*    onChange={(e) => {*/}
+                                {/*        const value = e.target.value;*/}
+                                {/*        if (value === '' || (/^\d+$/.test(value) && parseInt(value, 10) > 0 && parseInt(value, 10) <= 999)) {*/}
+                                {/*            setRegistrationData({ ...registrationData, numberOfPets: value });*/}
+                                {/*        }*/}
+                                {/*    }}*/}
+                                {/*    onKeyDown={(e) => {*/}
+                                {/*        // Prevent non-numeric key presses*/}
+                                {/*        if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete') {*/}
+                                {/*            e.preventDefault();*/}
+                                {/*        }*/}
+                                {/*    }}*/}
+                                {/*    required*/}
+                                {/*    fullWidth*/}
+                                {/*/>*/}
                             </>
                         )}
 

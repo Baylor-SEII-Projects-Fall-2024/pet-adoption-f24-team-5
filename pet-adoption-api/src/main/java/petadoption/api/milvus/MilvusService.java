@@ -1,4 +1,4 @@
-package petadoption.api.milvus;
+/*package petadoption.api.milvus;
 
 import com.google.gson.JsonObject;
 import io.milvus.client.MilvusClient;
@@ -193,3 +193,4 @@ public class MilvusService {
     }
 
 }
+*/

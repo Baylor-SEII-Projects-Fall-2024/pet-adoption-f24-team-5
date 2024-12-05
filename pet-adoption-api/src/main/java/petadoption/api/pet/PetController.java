@@ -5,10 +5,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import petadoption.api.images.ImageService;
-import petadoption.api.milvus.MilvusServiceAdapter;
-import petadoption.api.recommendationEngine.RecommendationService;
+//import petadoption.api.milvus.MilvusServiceAdapter;
+//import petadoption.api.recommendationEngine.RecommendationService;
 //import petadoption.api.recommendationEngine.RecommendationService;
 import petadoption.api.user.AdoptionCenter.AdoptionCenter;
+import petadoption.api.user.AdoptionCenter.AdoptionCenterService;
 import petadoption.api.user.Owner.Owner;
 import petadoption.api.user.User;
 import petadoption.api.user.UserService;
@@ -25,8 +26,9 @@ public class PetController {
     private final PetService petService;
     private final UserService userService;
     private final ImageService imageService;
-    private final RecommendationService recommendationService;
-    private final MilvusServiceAdapter milvusServiceAdapter;
+    private final AdoptionCenterService adoptionCenterService;
+    //private final RecommendationService recommendationService;
+    //private final MilvusServiceAdapter milvusServiceAdapter;
     //private final RecommendationService recommendationService;
 
 
@@ -62,6 +64,13 @@ public class PetController {
             Optional<?> user = userService.findUser(email);
             if(user.isPresent() && user.get() instanceof Owner) {
                 petService.adoptPet(pet, (Owner) user.get());
+
+                long adoptionCenterID = pet.getAdoptionCenter().getId();
+                Optional<AdoptionCenter> tempCenter = adoptionCenterService.findById(adoptionCenterID);
+                if(tempCenter.isPresent()) {
+                    int petCount = petService.getPetByAdoptionCenter(tempCenter.get()).size();
+                    adoptionCenterService.updatePetCount(adoptionCenterID, petCount);
+                }
             }
             else {
                 return ResponseEntity.badRequest().body("Email not an owner");
@@ -74,19 +83,23 @@ public class PetController {
 
 @PostMapping("/save")
 public ResponseEntity<?> savePet(@RequestBody Pet pet, @RequestParam String email) {
-    if (pet.getImageName().isEmpty()) {
-        return ResponseEntity.badRequest().body("Image is required");
-    }
-    if (email.isEmpty()) {
-        return ResponseEntity.badRequest().body("Email is required");
-    }
+//    if (pet.getImageName().isEmpty()) {
+//        return ResponseEntity.badRequest().body("Image is required");
+//    }
+//    if (email.isEmpty()) {
+//        return ResponseEntity.badRequest().body("Email is required");
+//    }
 
     try {
         //TODO: change this to use milvus
         AdoptionCenter adoptionCenter = userService.findCenterByWorkerEmail(email);
-        double[] petVector = recommendationService.generatePreferenceVector(pet);
+        //double[] petVector = recommendationService.generatePreferenceVector(pet);
         Pet savedPet = petService.savePet(pet, adoptionCenter);
-        milvusServiceAdapter.upsertData(savedPet.petId, petVector,petVector.length, recommendationService.PET_PARTITION);
+
+        adoptionCenterService.updatePetCount(adoptionCenter.getId(),
+                petService.getPetByAdoptionCenter(adoptionCenter).size());
+
+        //milvusServiceAdapter.upsertData(savedPet.petId, petVector,petVector.length, recommendationService.PET_PARTITION);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedPet);
     } catch (Exception e) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -105,8 +118,8 @@ public ResponseEntity<?> updatePet(@RequestBody Pet pet, @RequestParam String em
     }
 
         try {
-            double [] petVector = recommendationService.generatePreferenceVector(pet);
-            milvusServiceAdapter.upsertData(pet.petId, petVector,petVector.length, recommendationService.PET_PARTITION);
+            //double [] petVector = recommendationService.generatePreferenceVector(pet);
+            //milvusServiceAdapter.upsertData(pet.petId, petVector,petVector.length, recommendationService.PET_PARTITION);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(petService.savePet(pet, userService.findCenterByWorkerEmail(email)));
         } catch (Exception e) {
@@ -123,7 +136,14 @@ public ResponseEntity<?> updatePet(@RequestBody Pet pet, @RequestParam String em
 
         try {
             petService.deletePet(pet);
-            milvusServiceAdapter.deleteData(pet.petId, recommendationService.PET_PARTITION);
+
+            long adoptionCenterID = pet.getAdoptionCenter().getId();
+            Optional<AdoptionCenter> tempCenter = adoptionCenterService.findById(adoptionCenterID);
+            if(tempCenter.isPresent()) {
+                int petCount = petService.getPetByAdoptionCenter(tempCenter.get()).size();
+                adoptionCenterService.updatePetCount(adoptionCenterID, petCount);
+            }
+            //milvusServiceAdapter.deleteData(pet.petId, recommendationService.PET_PARTITION);
             return ResponseEntity.status(HttpStatus.OK).body("Pet deleted successfully");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());

@@ -1,4 +1,4 @@
-package petadoption.api.milvus;
+/*package petadoption.api.milvus;
 
 import io.milvus.client.MilvusClient;
 import io.milvus.v2.client.ConnectConfig;
@@ -33,3 +33,4 @@ public class MilvusConfig {
         }
     }
 }
+*/

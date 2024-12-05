@@ -1,4 +1,4 @@
-package petadoption.api.recommendationEngine;
+/*package petadoption.api.recommendationEngine;
 
 import io.milvus.v2.client.MilvusClientV2;
 import lombok.RequiredArgsConstructor;
@@ -158,7 +158,7 @@ public class RecommendationService {
         }
 
         INDArray preferenceVector = speciesVec.add(breedVec).add(colorVec).add(ageVec)
-                .div(speciesWeight + breedWeight + colorWeight + ageWeight);*/
+                .div(speciesWeight + breedWeight + colorWeight + ageWeight);*//*
         return null; // preferenceVector.toDoubleVector();
     }
 
@@ -229,3 +229,4 @@ public class RecommendationService {
 
 
 }
+*/

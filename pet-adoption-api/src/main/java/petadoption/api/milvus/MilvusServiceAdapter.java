@@ -1,4 +1,4 @@
-package petadoption.api.milvus;
+/*package petadoption.api.milvus;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -115,3 +115,4 @@ public class MilvusServiceAdapter {
         return ids;
     }
 }
+*/
