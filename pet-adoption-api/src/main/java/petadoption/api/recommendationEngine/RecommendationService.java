@@ -28,8 +28,8 @@ import static java.lang.Math.floor;
 @RequiredArgsConstructor
 @ConditionalOnBean(MilvusServiceAdapter.class)
 public class RecommendationService {
-    private final AttributeEmbedding attributeEmbedding;
-    private final Word2Vec word2Vec;
+    //private final AttributeEmbedding attributeEmbedding;
+    //private final Word2Vec word2Vec;
     private final PetService petService;
     private final SeenPetService seenPetService;
     private final MilvusServiceAdapter milvusServiceAdapter;
@@ -67,7 +67,7 @@ public class RecommendationService {
                 double weightOfOld = 0.75;
                 double weightOfNew= 0.25;
 
-                embeddingVector = VectorUtils.combineVectors(preferences, weightOfOld, embeddingVector, weightOfNew);
+                //embeddingVector = VectorUtils.combineVectors(preferences, weightOfOld, embeddingVector, weightOfNew);
             }
 
             milvusServiceAdapter.upsertData(ownerId,embeddingVector,embeddingVector.length,OWNER_PARTITION);
@@ -140,7 +140,7 @@ public class RecommendationService {
                                              double speciesWeight, double breedWeight, double colorWeight, double ageWeight) {
         List<String> newWords = new ArrayList<>();
 
-        double[] speciesVector = getOrAddWordVector(word2Vec, preference.getPreferredSpecies(), newWords);
+        /*double[] speciesVector = getOrAddWordVector(word2Vec, preference.getPreferredSpecies(), newWords);
         double[] breedVector = getOrAddWordVector(word2Vec, preference.getPreferredBreed(), newWords);
         double[] colorVector = getOrAddWordVector(word2Vec, preference.getPreferredColor(), newWords);
         double[] ageVector = getOrAddWordVector(word2Vec, String.valueOf(preference.getPreferredAge()), newWords);
@@ -158,8 +158,8 @@ public class RecommendationService {
         }
 
         INDArray preferenceVector = speciesVec.add(breedVec).add(colorVec).add(ageVec)
-                .div(speciesWeight + breedWeight + colorWeight + ageWeight);
-        return preferenceVector.toDoubleVector();
+                .div(speciesWeight + breedWeight + colorWeight + ageWeight);*/
+        return null; // preferenceVector.toDoubleVector();
     }
 
     private double[] getOrAddWordVector(Word2Vec word2Vec, String word, List<String> newWords) {

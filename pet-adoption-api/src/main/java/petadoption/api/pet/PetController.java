@@ -77,32 +77,20 @@ public ResponseEntity<?> savePet(@RequestBody Pet pet, @RequestParam String emai
     if (pet.getImageName().isEmpty()) {
         return ResponseEntity.badRequest().body("Image is required");
     }
-
     if (email.isEmpty()) {
         return ResponseEntity.badRequest().body("Email is required");
     }
 
-        try {
-            //TODO: change this to use milvus
-            AdoptionCenter adoptionCenter = userService.findCenterByWorkerEmail(email);
-            double[] petVector = recommendationService.generatePreferenceVector(pet);
-            Pet savedPet = petService.savePet(pet, adoptionCenter);
-            milvusServiceAdapter.upsertData(savedPet.petId, petVector,petVector.length, recommendationService.PET_PARTITION);
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(savedPet);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
     try {
+        //TODO: change this to use milvus
         AdoptionCenter adoptionCenter = userService.findCenterByWorkerEmail(email);
-        //double[] petVector = recommendationService.generatePreferenceVector(pet);
-        Pet savedPet = petService.savePet(pet, adoptionCenter/*, petVector*/);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(savedPet);
+        double[] petVector = recommendationService.generatePreferenceVector(pet);
+        Pet savedPet = petService.savePet(pet, adoptionCenter);
+        milvusServiceAdapter.upsertData(savedPet.petId, petVector,petVector.length, recommendationService.PET_PARTITION);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedPet);
     } catch (Exception e) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
     }
-
 }
 
 
@@ -125,27 +113,12 @@ public ResponseEntity<?> updatePet(@RequestBody Pet pet, @RequestParam String em
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
-    try {
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(petService.savePet(pet, userService.findCenterByWorkerEmail(email)/*, recommendationService.generatePreferenceVector(pet)*/));
-    } catch (Exception e) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-    }
-}
 
     @DeleteMapping("/delete")
     public ResponseEntity<?> deletePet(@RequestBody Pet pet) {
 
         if (pet.getPetId() == null) {
             return ResponseEntity.badRequest().body("Pet id is required");
-        }
-
-        try {
-            if (!pet.getImageName().isEmpty() || pet.getAdoptionStatus() != null) {
-                imageService.deleteImage(pet.getImageName());
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
 
         try {
@@ -156,5 +129,4 @@ public ResponseEntity<?> updatePet(@RequestBody Pet pet, @RequestParam String em
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
-
 }
