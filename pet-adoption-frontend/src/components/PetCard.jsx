@@ -115,34 +115,6 @@ const PetCard = ({
         setIsModalOpen(false);
     };
 
-    const handleAdoptPet = async () => {
-        const formattedPet = {
-            petId: pet.petId,
-            petOwner: pet.petOwner,
-            species: pet.species,
-            petName: pet.petName,
-            breed: pet.breed,
-            color: pet.color,
-            sex: pet.sex,
-            age: pet.age,
-            adoptionStatus: pet.adoptionStatus,
-            description: pet.description,
-            imageName: pet.imageName,
-            owner: pet.owner,
-            petWeightId: pet.petWeightId,
-        };
-        axios.post(`${API_URL}/api/pets/adopt`, formattedPet, {
-            params: { email: email },
-            headers: { Authorization: `Bearer ${token}`},
-        })
-        .then((res) => {
-            console.log(res.data);
-        })
-        .catch(error => {
-            console.log(error)
-        });
-    }
-
     const handleLikePet = async () => {
         const url = `${API_URL}/api/recommendation-engine/update-preference`;
         const preference = {
@@ -181,6 +153,35 @@ const PetCard = ({
             throw error;
         }
     };
+
+    const handleAdoptPet = async () => {
+        const formattedPet = {
+            petId: pet.petId,
+            petOwner: pet.petOwner,
+            species: pet.species,
+            petName: pet.petName,
+            breed: pet.breed,
+            color: pet.color,
+            sex: pet.sex,
+            age: pet.age,
+            adoptionStatus: pet.adoptionStatus,
+            description: pet.description,
+            imageName: pet.imageName,
+            owner: pet.owner,
+            petWeightId: pet.petWeightId,
+        };
+        await axios.post(`${API_URL}/api/pets/adopt`,
+            formattedPet, {
+                params: { email: email },
+                headers: { Authorization: `Bearer ${token}`},
+            })
+            .then((res) => {
+                console.log(res.data);
+            })
+            .catch(error => {
+                console.log(error)
+            });
+    }
 
     // Function to handle contacting the adoption center
     const handleContactCenter = async () => {
@@ -341,7 +342,7 @@ const PetCard = ({
                                 Save Pet
                             </Button>
                         )}
-                        {adoptable && authority === 'owner' && (
+                        {adoptable && authority === 'Owner' && (
                             <Button
                                 onClick={handleAdoptPet}
                                 variant="contained"
