@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import petadoption.api.images.ImageController;
 import petadoption.api.images.ImageService;
 import petadoption.api.user.AdoptionCenter.AdoptionCenter;
+import petadoption.api.user.AdoptionCenter.AdoptionCenterService;
 import petadoption.api.user.Owner.Owner;
 import petadoption.api.user.UserRepository;
 import petadoption.api.user.UserService;
@@ -31,10 +32,14 @@ public class PetController {
     @Autowired
     private final ImageService imageService;
 
-    PetController(PetService petService, UserService userService, ImageService imageService) {
+    @Autowired
+    private final AdoptionCenterService adoptionCenterService;
+
+    PetController(PetService petService, UserService userService, ImageService imageService, AdoptionCenterService adoptionCenterService) {
         this.petService = petService;
         this.userService = userService;
         this.imageService = imageService;
+        this.adoptionCenterService = adoptionCenterService;
     }
 
     @GetMapping
@@ -70,6 +75,11 @@ public class PetController {
         if(email.isEmpty()) { return ResponseEntity.badRequest().body("Email is required");}
 
         try{
+            AdoptionCenter adoptionCenter = userService.findCenterByWorkerEmail(email);
+            Pet savedPet = petService.savePet(pet, adoptionCenter);
+
+            adoptionCenterService.updatePetCount(adoptionCenter.getId(),
+                    petService.getPetByAdoptionCenter(adoptionCenter).size());
             return ResponseEntity.status(HttpStatus.CREATED).body(petService.savePet(pet, userService.findCenterByWorkerEmail(email)));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
