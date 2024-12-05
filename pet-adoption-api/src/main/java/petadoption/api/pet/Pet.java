@@ -1,10 +1,10 @@
 package petadoption.api.pet;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import petadoption.api.user.AdoptionCenter.AdoptionCenter;
 import petadoption.api.user.User;
 import petadoption.api.user.Owner.Owner;
-
 
 @Entity
 @Getter
@@ -13,6 +13,7 @@ import petadoption.api.user.Owner.Owner;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = Pet.TABLE_NAME)
+//@JsonIgnoreProperties("adoptionCenter")
 public class Pet {
 
     public static final String TABLE_NAME = "Pets";
@@ -61,9 +62,6 @@ public class Pet {
     @JoinColumn(name = "OWNER_ID")
     private Owner owner;
 
-    @Column(name = "PET_WEIGHT_ID")
-    long petWeightId;
-
     public Pet(String species, String petName, String breed, String color, String sex, Integer age,
             Boolean adoptionStatus,
             String description) {
@@ -90,6 +88,8 @@ public class Pet {
         this.description = description;
         this.imageName = imageName;
     }
+
+
 
     public Pet(String imageName) {
         this.imageName = imageName;

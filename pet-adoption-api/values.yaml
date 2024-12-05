@@ -1,0 +1,59 @@
+# Disable cluster mode
+cluster:
+  enabled: false
+
+# Configure etcd with persistence and resource limits
+etcd:
+  replicaCount: 1
+  persistence:
+    enabled: true
+    size: 1Gi
+    storageClass: ""
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "200m"
+
+# Disable MinIO but include necessary defaults to avoid errors
+minio:
+  enabled: true
+  replicaCount: 1
+  mode: standalone
+  persistence:
+    enabled: true
+    size: 5Gi # Adjust as needed
+    storageClass: "" # Use the default or specify your storage class
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      cpu: "500m"
+
+
+# Disable Pulsar
+pulsar:
+  enabled: false
+
+# Configure Milvus with persistence and resource limits
+milvus:
+  standalone:
+    service:
+      type: NodePort
+      port: 19530
+    persistence:
+      enabled: true
+      size: 5Gi
+      storageClass: ""
+  resources:
+    requests:
+      memory: "2Gi"
+      cpu: "1"
+    limits:
+      memory: "2Gi"
+      cpu: "1"
+

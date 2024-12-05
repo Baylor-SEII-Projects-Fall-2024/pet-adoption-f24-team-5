@@ -14,12 +14,14 @@ spec:
     spec:
       containers:
         - name: spring-backend
-          image: us-south1-docker.pkg.dev/possible-cocoa-438319-m0/dogpile-repo/spring-backend:latest
+          image: us-south1-docker.pkg.dev/dogpile-solutions/dogpile-repo/spring-backend:latest
           ports:
             - containerPort: 8080
           env:
             - name: MYSQL_HOST
               value: "mysql"
+#            - name: MILVUS_ENDPOINT
+#              value: "http://milvus-standalone.default.svc.cluster.local:19530"
             - name: FILE_UPLOAD_DIR
               value: "/tmp/uploads"
           volumeMounts:

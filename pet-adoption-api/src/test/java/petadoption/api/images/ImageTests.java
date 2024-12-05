@@ -1,5 +1,6 @@
 package petadoption.api.images;
 
+import io.milvus.v2.client.MilvusClientV2;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -7,8 +8,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
+import petadoption.api.PetAdoptionApplicationTests;
+import petadoption.api.milvus.MilvusService;
+import petadoption.api.milvus.MilvusServiceAdapter;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,10 +24,11 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
-@ActiveProfiles("testdb")
+//@SpringBootTest
+//@ActiveProfiles("testdb")
 @Transactional
-public class ImageTests {
+public class ImageTests extends PetAdoptionApplicationTests {
+
 
     @Autowired
     private ImageService imageService;

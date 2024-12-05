@@ -28,8 +28,8 @@ public class SeenPetService {
         return seenPetsList;
     }
 
-    public List<SeenPets> getSeenPets(Long ownerId){
-        List<SeenPets> seenPetsList = savedPetsRepository.findByOwnerId(ownerId);
+    public List<Long> getSeenPets(Long ownerId){
+        List<Long> seenPetsList = savedPetsRepository.findSeenPetIdsByOwnerId(ownerId);
         if(seenPetsList == null || seenPetsList.isEmpty()){
             return new ArrayList<>();
         }
