@@ -137,6 +137,14 @@ public class PetController {
 
         try {
             petService.deletePet(pet);
+
+            long adoptionCenterID = pet.getAdoptionCenter().getId();
+            Optional<AdoptionCenter> tempCenter = adoptionCenterService.findById(adoptionCenterID);
+            if(tempCenter.isPresent()) {
+                int petCount = petService.getPetByAdoptionCenter(tempCenter.get()).size();
+                adoptionCenterService.updatePetCount(adoptionCenterID, petCount);
+            }
+
             return ResponseEntity.status(HttpStatus.OK).body("Pet deleted successfully");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
