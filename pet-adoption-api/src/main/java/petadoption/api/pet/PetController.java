@@ -102,7 +102,7 @@ public class PetController {
         }
 
         try {
-            if (!pet.getImageName().isEmpty()) {
+            if (!pet.getImageName().isEmpty() || pet.getAdoptionStatus() != null) {
                 imageService.deleteImage(pet.getImageName());
             }
         } catch (Exception e) {
