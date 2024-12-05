@@ -78,7 +78,7 @@ public class PetController {
 
             adoptionCenterService.updatePetCount(adoptionCenter.getId(),
                     petService.getPetByAdoptionCenter(adoptionCenter).size());
-            return ResponseEntity.status(HttpStatus.CREATED).body(petService.savePet(pet, userService.findCenterByWorkerEmail(email)));
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedPet);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
