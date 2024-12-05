@@ -22,7 +22,7 @@ const Register = () => {
     const [phoneNumber, setPhoneNumber] = useState('');
     const [centerState, setCenterState] = useState('');
     const [centerZip, setCenterZip] = useState('');
-    const [numberOfPets, setNumberOfPets] = useState('');
+    const [numberOfPets, setNumberOfPets] = useState(0);
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -55,7 +55,7 @@ const Register = () => {
             centerCity,
             centerState,
             centerZip,
-            numberOfPets: parseInt(numberOfPets, 10),
+            numberOfPets,
         } : {
             firstName,
             lastName,
@@ -222,14 +222,6 @@ const Register = () => {
                                     label="Zip Code"
                                     value={centerZip}
                                     onChange={(e) => setCenterZip(e.target.value)}
-                                    required
-                                    fullWidth
-                                />
-                                <TextField
-                                    label="Center Pet Count"
-                                    type="number"
-                                    value={numberOfPets}
-                                    onChange={(e) => setNumberOfPets(e.target.value)}
                                     required
                                     fullWidth
                                 />
