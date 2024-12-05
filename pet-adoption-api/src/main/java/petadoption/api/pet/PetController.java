@@ -77,7 +77,7 @@ public class PetController {
             Pet savedPet = petService.savePet(pet, adoptionCenter);
 
             adoptionCenterService.updatePetCount(adoptionCenter.getId(),
-                    petService.getPetByAdoptionCenter(adoptionCenter).size());
+                    petService.getAvailablePetsByAdoptionCenter(adoptionCenter).size());
             return ResponseEntity.status(HttpStatus.CREATED).body(savedPet);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -92,11 +92,10 @@ public class PetController {
             if(user.isPresent() && user.get() instanceof Owner) {
                 petService.adoptPet(pet, (Owner) user.get());
 
-                long adoptionCenterID = pet.getAdoptionCenter().getId();
-                Optional<AdoptionCenter> tempCenter = adoptionCenterService.findById(adoptionCenterID);
+                Optional<AdoptionCenter> tempCenter = adoptionCenterService.findById(pet.getAdoptionCenter().getId());
                 if(tempCenter.isPresent()) {
-                    int petCount = petService.getPetByAdoptionCenter(tempCenter.get()).size();
-                    adoptionCenterService.updatePetCount(adoptionCenterID, petCount);
+                    int petCount = petService.getAvailablePetsByAdoptionCenter(pet.getAdoptionCenter()).size();
+                    adoptionCenterService.updatePetCount(pet.getAdoptionCenter().getId(), petCount);
                 }
             }
             else {
@@ -138,11 +137,10 @@ public class PetController {
         try {
             petService.deletePet(pet);
 
-            long adoptionCenterID = pet.getAdoptionCenter().getId();
-            Optional<AdoptionCenter> tempCenter = adoptionCenterService.findById(adoptionCenterID);
+            Optional<AdoptionCenter> tempCenter = adoptionCenterService.findById(pet.getAdoptionCenter().getId());
             if(tempCenter.isPresent()) {
-                int petCount = petService.getPetByAdoptionCenter(tempCenter.get()).size();
-                adoptionCenterService.updatePetCount(adoptionCenterID, petCount);
+                int petCount = petService.getAvailablePetsByAdoptionCenter(pet.getAdoptionCenter()).size();
+                adoptionCenterService.updatePetCount(pet.getAdoptionCenter().getId(), petCount);
             }
 
             return ResponseEntity.status(HttpStatus.OK).body("Pet deleted successfully");

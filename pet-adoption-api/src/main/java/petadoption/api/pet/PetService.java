@@ -40,6 +40,11 @@ public class PetService {
                 .orElse(null);
     }
 
+    public List<Pet> getAvailablePetsByAdoptionCenter(AdoptionCenter adoptionCenter) {
+        return petRepository.findAvailablePetsByAdoptionCenter(adoptionCenter.getId())
+                .orElse(null);
+    }
+
     public void deletePet(Pet pet) {
         if(pet == null) {
             throw new IllegalArgumentException("Pet is null");
