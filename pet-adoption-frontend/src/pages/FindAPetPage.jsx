@@ -1,26 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Grid, Typography, Button, Modal, Container, Collapse, IconButton, Stack } from "@mui/material";
+import { Box, Grid, Typography, Button, IconButton, Stack } from "@mui/material";
 import { ExpandMore, ExpandLess } from '@mui/icons-material';
 import { getSubjectFromToken, getAuthorityFromToken } from "@/utils/redux/tokenUtils";
 import { useSelector } from "react-redux";
 import PetCard from "@/components/petCard/PetCard";
 import { generateNewOptions } from "@/utils/recommendationEngine/generateNewOptions";
-import { getSavedPets } from "@/utils/user/owner/GetSavedPets";
 import { getEvents } from "@/utils/event/getEvents";
 import { getCenterName } from "@/utils/user/center/getCenterName";
 import EventCard from "@/components/eventCard/EventCard";
+import HamburgerMenu from "@/components/HamburgerMenu";
+import SavedPetsModal from "@/components/SavedPetsModal";
 
 const FindAPetPage = () => {
-    const [pets, setPets] = useState([]);
+    const [currentPets, setCurrentPets] = useState([]);
+    const [preloadedPets, setPreloadedPets] = useState([]);
     const [events, setEvents] = useState([]);
     const [isEventsCollapsed, setIsEventsCollapsed] = useState(false);
     const token = useSelector((state) => state.user.token);
     const [email, setEmail] = useState(getSubjectFromToken(token));
     const userType = getAuthorityFromToken(token);
-    const [showSavedPets, setShowSavedPets] = useState(false);
-    const [savedPets, setSavedPets] = useState([]);
     const [loading, setLoading] = useState(false);
     const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+    const [hamburgerAnchorEl, setHamburgerAnchorEl] = useState(null);
+    const [savedPetsModalOpen, setSavedPetsModalOpen] = useState(false);
 
     useEffect(() => {
         const fetchEvents = async () => {
@@ -43,37 +45,42 @@ const FindAPetPage = () => {
         fetchEvents();
     }, [token, userType, email]);
 
-    const handleSearch = async () => {
-        setLoading(true);
-        const response = await generateNewOptions(token);
-        setPets(response);
-        setLoading(false);
-    }
-
     useEffect(() => {
         handleSearch();
         setShowWelcomeModal(true);
-    }, []);
+    }, [token]);
 
-    const handleOpenSavedPets = async () => {
-        try {
-            setLoading(true);
-            const response = await getSavedPets(token, email);
-            setSavedPets(response);
-            setShowSavedPets(true);
-        } catch (error) {
-            console.error('Error fetching saved pets:', error);
-        } finally {
-            setLoading(false);
+    const handleSearch = async () => {
+        if (preloadedPets.length > 0) {
+            setCurrentPets(preloadedPets);
         }
-    };
+        else {
+            const response = await generateNewOptions(token);
+            setCurrentPets(response);
+        }
 
-    const handleCloseSavedPets = () => {
-        setShowSavedPets(false);
+        // Swap current pets with preloaded pets
+        const preloadNextOptions = async () => {
+            const response = await generateNewOptions(token);
+            setPreloadedPets(response);
+        };
+
+        // Preload the next set of options in the background
+        preloadNextOptions();
     }
 
-    const handleCloseWelcomeModal = () => {
-        setShowWelcomeModal(false);
+    const handleOpenHamburgerMenu = (event) => {
+        setHamburgerAnchorEl(event.currentTarget);
+    }
+
+    const handleCloseHamburgerMenu = () => {
+        setHamburgerAnchorEl(null);
+    }
+
+    const handleSelectSpecies = (species) => {
+        console.log(`Selected species: ${species}`);
+        // Implement logic to filter or search pets by the selected species
+        handleCloseHamburgerMenu();
     }
 
     return (
@@ -159,15 +166,21 @@ const FindAPetPage = () => {
                 overflowY: 'auto'
             }}>
                 {/* Pet Grid Section */}
-                <Box sx={{ flex: 1, p: 4 }}>
-                    <Grid container spacing={3}>
+                <Box sx={{ flex: 1, p: 3, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <Grid container spacing={3} justifyContent="center">
                         {loading ? (
                             <Typography variant="h6" textAlign="center" sx={{ width: '100%', mt: 4 }}>
                                 Finding perfect matches for you...
                             </Typography>
                         ) : (
-                            Array.isArray(pets) && pets.map((pet) => (
-                                <Grid item xs={12} sm={6} md={4} key={pet.id}>
+                            Array.isArray(currentPets) && currentPets.map((pet) => (
+                                <Grid
+                                    item
+                                    xs={12}
+                                    sm={isEventsCollapsed ? 6 : 6}
+                                    md={isEventsCollapsed ? 4 : 4}
+                                    key={pet.id}
+                                >
                                     <PetCard pet={pet} onLike={handleSearch} />
                                 </Grid>
                             ))
@@ -178,9 +191,10 @@ const FindAPetPage = () => {
                 {/* Footer Actions */}
                 <Box
                     sx={{
-                        p: 2,
+                        p: 3,
                         display: 'flex',
-                        justifyContent: 'center',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
                         gap: 2,
                         borderTop: '1px solid #e0e0e0',
                         bgcolor: 'white',
@@ -191,161 +205,60 @@ const FindAPetPage = () => {
                     <Button
                         onClick={handleSearch}
                         variant="contained"
-                        size="medium"
+                        size="large"
                         sx={{
                             bgcolor: '#4b6cb7',
+                            color: 'white',
+                            fontWeight: 'bold',
                             '&:hover': {
                                 bgcolor: '#3b5998',
                             },
+                            boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)',
+                            borderRadius: '8px',
+                            padding: '12px 24px',
                         }}
                     >
-                        Discover Pets
+                        Discover New Pets
                     </Button>
+
                     <Button
-                        onClick={handleOpenSavedPets}
-                        variant="outlined"
-                        size="medium"
-                        sx={{
-                            borderColor: '#4b6cb7',
-                            color: '#4b6cb7',
-                            '&:hover': {
-                                borderColor: '#3b5998',
-                                bgcolor: 'rgba(75,108,183,0.1)',
-                            },
-                        }}
+                        variant="contained"
+                        size="large"
+                        onClick={() => setSavedPetsModalOpen(true)}
                     >
-                        Saved Pets
+                        View Saved Pets
+                    </Button>
+
+                    <Button
+                        sx={{
+                            bgcolor: '#4b6cb7',
+                            color: 'white',
+                            fontWeight: 'bold',
+                            '&:hover': {
+                                bgcolor: '#3b5998',
+                            },
+                            marginLeft: 'auto',
+                        }}
+                        onClick={handleOpenHamburgerMenu}
+                        variant="contained"
+                        size="large"
+                    >
+                        Not Seeing What You Want?
                     </Button>
                 </Box>
             </Box>
 
-            {/* Saved Pets Modal */}
-            <Modal
-                open={showSavedPets}
-                onClose={handleCloseSavedPets}
-                sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                }}
-            >
-                <Box
-                    sx={{
-                        width: '80%',
-                        height: '80vh',
-                        backgroundColor: 'white',
-                        borderRadius: 4,
-                        boxShadow: 24,
-                        p: 4,
-                        display: 'flex',
-                        flexDirection: 'column',
-                    }}
-                >
-                    <Box
-                        sx={{
-                            flex: 1,
-                            overflowY: 'auto',
-                            mb: 2,
-                        }}
-                    >
-                        <Typography variant="h6" sx={{ mb: 2 }} textAlign="center">
-                            Saved Pets
-                        </Typography>
-                        {loading ? (
-                            <Typography>Loading saved pets...</Typography>
-                        ) : savedPets.length > 0 ? (
-                            <Grid container spacing={2}>
-                                {savedPets.map((pet) => (
-                                    <Grid item xs={12} sm={6} md={4} key={pet.id}>
-                                        <PetCard pet={pet} />
-                                    </Grid>
-                                ))}
-                            </Grid>
-                        ) : (
-                            <Typography textAlign="center">No saved pets found</Typography>
-                        )}
-                    </Box>
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            mt: 2,
-                        }}
-                    >
-                        <Button
-                            onClick={handleCloseSavedPets}
-                            variant="contained"
-                            sx={{
-                                bgcolor: '#4b6cb7',
-                                '&:hover': {
-                                    bgcolor: '#3b5998',
-                                },
-                            }}
-                        >
-                            Close
-                        </Button>
-                    </Box>
-                </Box>
-            </Modal>
+            <HamburgerMenu
+                anchorEl={hamburgerAnchorEl}
+                open={Boolean(hamburgerAnchorEl)}
+                onClose={handleCloseHamburgerMenu}
+                onSelectSpecies={handleSelectSpecies}
+            />
 
-            {/* Welcome Modal */}
-            <Modal
-                open={showWelcomeModal}
-                onClose={handleCloseWelcomeModal}
-                sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                }}
-            >
-                <Box
-                    sx={{
-                        width: '80%',
-                        height: '80vh',
-                        backgroundColor: 'white',
-                        borderRadius: 4,
-                        boxShadow: 24,
-                        p: 4,
-                        display: 'flex',
-                        flexDirection: 'column',
-                    }}
-                >
-                    <Box
-                        sx={{
-                            flex: 1,
-                            overflowY: 'auto',
-                            mb: 2,
-                        }}
-                    >
-                        <Typography variant="h6" sx={{ mb: 2 }} textAlign="center">
-                            Welcome to Pet Adoption!
-                        </Typography>
-                        <Typography variant="body1" textAlign="center">
-                            Discover your perfect pet today.
-                        </Typography>
-                    </Box>
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            mt: 2,
-                        }}
-                    >
-                        <Button
-                            onClick={handleCloseWelcomeModal}
-                            variant="contained"
-                            sx={{
-                                bgcolor: '#4b6cb7',
-                                '&:hover': {
-                                    bgcolor: '#3b5998',
-                                },
-                            }}
-                        >
-                            Get Started
-                        </Button>
-                    </Box>
-                </Box>
-            </Modal>
+            <SavedPetsModal
+                open={savedPetsModalOpen}
+                onClose={() => setSavedPetsModalOpen(false)}
+            />
         </Box>
     )
 }

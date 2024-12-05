@@ -40,7 +40,7 @@ const PetCard = ({
     }
 
     return (
-        <Box sx={{ width: "330px", height: "500px" }}>
+        <Box sx={{ width: "450px", height: "600px" }}>
             <StyledCard
                 onClick={onClick}
                 elevation={0}
@@ -102,7 +102,19 @@ const PetCard = ({
                                 color: "text.secondary"
                             }}
                         >
-                            {pet.breed} • {pet.age} years
+                            {pet.breed} • {pet.sex} • {pet.age} years
+                        </Typography>
+                        <Typography
+                            variant="body1"
+                            sx={{
+                                color: "text.primary",
+                                fontStyle: "italic",
+                                lineHeight: 1.5,
+                                mt: 1,
+                                mb: 1
+                            }}
+                        >
+                            {pet.description}
                         </Typography>
                     </PetInfo>
                 </BlurredContent>

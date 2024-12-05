@@ -41,7 +41,6 @@ export default function AppRoutes() {
                     <Route path="/RegisterCenterWorker" element={<ProtectedRoute><RegisterCenterWorker /></ProtectedRoute>} />
                     <Route path="/AvailablePets" element={<ProtectedRoute><AvailablePets /></ProtectedRoute>} />
                     <Route path="/preferences" element={<ProtectedRoute><PreferencesPage /></ProtectedRoute>} />
-                    <Route path="/SavedPets" element={<ProtectedRoute><SavedPets /></ProtectedRoute>} />
                     <Route path="/Messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
                 </Route>
                 <Route path="/Register" element={<Register />} />
