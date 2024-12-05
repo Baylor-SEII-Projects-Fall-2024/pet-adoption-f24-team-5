@@ -9,12 +9,14 @@ import org.springframework.web.multipart.MultipartFile;
 import petadoption.api.images.ImageController;
 import petadoption.api.images.ImageService;
 import petadoption.api.user.AdoptionCenter.AdoptionCenter;
+import petadoption.api.user.Owner.Owner;
 import petadoption.api.user.UserRepository;
 import petadoption.api.user.UserService;
 
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequestMapping("/api/pets")
@@ -73,6 +75,29 @@ public class PetController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
 
+    }
+
+    @PostMapping("/adopt")
+    public ResponseEntity<?> adoptPet(@RequestBody Pet pet, @RequestParam String email) {
+        try {
+            Optional<?> user = userService.findUser(email);
+            if(user.isPresent() && user.get() instanceof Owner) {
+                petService.adoptPet(pet, (Owner) user.get());
+
+                long adoptionCenterID = pet.getAdoptionCenter().getId();
+                Optional<AdoptionCenter> tempCenter = adoptionCenterService.findById(adoptionCenterID);
+                if(tempCenter.isPresent()) {
+                    int petCount = petService.getPetByAdoptionCenter(tempCenter.get()).size();
+                    adoptionCenterService.updatePetCount(adoptionCenterID, petCount);
+                }
+            }
+            else {
+                return ResponseEntity.badRequest().body("Email not an owner");
+            }
+            return ResponseEntity.status(HttpStatus.OK).body("");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
     @PostMapping("/update")
