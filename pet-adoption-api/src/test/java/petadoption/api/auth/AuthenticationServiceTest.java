@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
 
+import petadoption.api.PetAdoptionApplicationTests;
 import petadoption.api.config.JwtService;
 import petadoption.api.user.AdoptionCenter.AdoptionCenter;
 import petadoption.api.user.AdoptionCenter.AdoptionCenterRepository;
@@ -30,9 +31,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.client.ExpectedCount.times;
 
-@SpringBootTest
-@ActiveProfiles("testdb")
-public class AuthenticationServiceTest {
+//@SpringBootTest
+//@ActiveProfiles("testdb")
+public class AuthenticationServiceTest extends PetAdoptionApplicationTests {
 
     @Autowired
     private AuthenticationService authenticationService;

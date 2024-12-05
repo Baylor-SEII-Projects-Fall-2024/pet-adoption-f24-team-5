@@ -14,8 +14,17 @@ spring:
       max-request-size: 15MB
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
       dialect: org.hibernate.dialect.MySQLDialect
     show-sql: true
+file:
+  upload-dir: /tmp/upload
+milvus:
+  #endpoint: http://34.118.228.181:19530
+  endpoint: http://milvus.default.svc.cluster.local:19530
+  #endpoint: http://localhost:19530
+  enabled:
+    true
+
 
 

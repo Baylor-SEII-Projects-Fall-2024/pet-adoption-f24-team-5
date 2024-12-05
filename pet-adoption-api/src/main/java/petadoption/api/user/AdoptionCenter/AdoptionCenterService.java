@@ -30,4 +30,8 @@ public class AdoptionCenterService {
             adoptionCenterRepository.save(adoptionCenter);
         }
     }
+    void deleteCenterWorker(long id) {
+        centerWorkerRepository.deleteById(id);
+    }
+
 }

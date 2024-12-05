@@ -1,9 +1,9 @@
 package petadoption.api.user.Owner;
 
+
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import petadoption.api.preferences.Preference;
 import petadoption.api.user.User;
 import petadoption.api.user.UserType;
@@ -14,9 +14,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @Getter
 @Setter
@@ -24,11 +22,15 @@ import java.util.List;
 @DiscriminatorValue("OWNER")
 @PrimaryKeyJoinColumn(name = "USER_ID")
 @EqualsAndHashCode(callSuper = true)
+@AllArgsConstructor
+@NoArgsConstructor
 public class Owner extends User {
-
     @OneToOne
-    @JoinColumn(name = "PREFERENCE_ID")
-    private Preference preference;
+    @JoinColumn(name = "DEFAULT_PREFERENCE_ID")
+    private Preference defaultPreference;
+
+    @Column(name = "COLD_START_VALUE", columnDefinition = "int default 3")
+    private int coldStartValue = 3;
 
     @Column(name = "AGE")
     private int age;
@@ -48,9 +50,13 @@ public class Owner extends User {
     @Column(name = "LAST_NAME")
     protected String lastName;
 
-    public Owner() {
-        super();
-    }
+
+    @ElementCollection
+    @CollectionTable(name = "saved_pets", joinColumns = @JoinColumn(name = "owner_id"))
+    @Column(name = "pet_id")
+    private Set<Long> savedPets = new HashSet<>();
+
+
 
     public Owner(String firstName, String lastName, String emailAddress, String password, UserType userType, int age,
             String phoneNumber, String centerZip) {
@@ -63,9 +69,8 @@ public class Owner extends User {
     }
 
     public Owner(String emailAddress, String password, UserType userType, int age, String phoneNumber,
-            Preference preference, String centerZip) {
+                  String centerZip) {
         super(emailAddress, password, userType, phoneNumber);
-        this.preference = preference;
         this.age = age;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -74,9 +79,8 @@ public class Owner extends User {
     }
 
     public Owner(Long id, String firstName, String lastName, String emailAddress, String password, UserType userType,
-            int age, String phoneNumber, Preference preference, String centerZip) {
+                 int age, String phoneNumber,  String centerZip) {
         super(id, emailAddress, password, userType, phoneNumber);
-        this.preference = preference;
         this.age = age;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -144,7 +148,7 @@ public class Owner extends User {
         }
     }
 
-    public void setPreferenceId(Long preferenceId) {
-        this.preference.setPreferenceId(preferenceId);
-    }
+
+
+
 }

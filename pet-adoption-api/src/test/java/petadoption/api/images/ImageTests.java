@@ -1,5 +1,6 @@
 package petadoption.api.images;
 
+import io.milvus.v2.client.MilvusClientV2;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -7,8 +8,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
+import petadoption.api.PetAdoptionApplicationTests;
+import petadoption.api.milvus.MilvusService;
+import petadoption.api.milvus.MilvusServiceAdapter;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,12 +24,11 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
-@ActiveProfiles("testdb")
+//@SpringBootTest
+//@ActiveProfiles("testdb")
 @Transactional
-public class ImageTests {
+public class ImageTests extends PetAdoptionApplicationTests {
 
-    final private String UPLOAD_DIRECTORY = "src/test/resources/images/";
 
     @Autowired
     private ImageService imageService;
@@ -69,7 +73,7 @@ public class ImageTests {
         final String[] result = new String[1];
 
         assertDoesNotThrow(() -> {
-            result[0] = imageService.saveImage(UPLOAD_DIRECTORY, mockImage);
+            result[0] = imageService.saveImage(mockImage);
         });
 
         assert(result[0].contains("test.jpg"));
@@ -81,18 +85,9 @@ public class ImageTests {
         MockMultipartFile mockImage = new MockMultipartFile("file", "test.jpg", "image/jpeg", new byte[0]);
 
         assertThrows(IllegalArgumentException.class, () -> {
-            imageService.saveImage(UPLOAD_DIRECTORY, mockImage);
-            imageService.saveImage(UPLOAD_DIRECTORY, null);
+            imageService.saveImage(mockImage);
+            imageService.saveImage(null);
         });
-    }
-
-    @Test
-    @DisplayName("test bad upload directory")
-    void testBadUploadDirectory() {
-        /*MockMultipartFile mockImage = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test".getBytes());
-        assertThrows(IllegalArgumentException.class, () -> {
-            imageService.saveImage(UPLOAD_DIRECTORY + "asdf", mockImage);
-        });*/
     }
 
     @Test
@@ -101,12 +96,12 @@ public class ImageTests {
         MockMultipartFile mockImage = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test".getBytes());
         final String[] result = new String[1];
         assertDoesNotThrow(() -> {
-            result[0] = imageService.saveImage(UPLOAD_DIRECTORY, mockImage);
+            result[0] = imageService.saveImage(mockImage);
         });
 
         final Map<String, String> getResult = new HashMap<>();
         assertDoesNotThrow(() -> {
-            Map.Entry<String, String> entry = imageService.getImage(UPLOAD_DIRECTORY, result[0]);
+            Map.Entry<String, String> entry = imageService.getImage(result[0]);
 
             getResult.put(entry.getKey(), entry.getValue());
         });
@@ -123,25 +118,11 @@ public class ImageTests {
     void testGetImageBadFileName() {
         MockMultipartFile mockImage = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test".getBytes());
         assertDoesNotThrow(() -> {
-            imageService.saveImage(UPLOAD_DIRECTORY, mockImage);
+            imageService.saveImage(mockImage);
         });
 
         assertThrows(IOException.class, () -> {
-            Map.Entry<String, String> entry = imageService.getImage(UPLOAD_DIRECTORY, "this is a bad image name");
-        });
-    }
-
-    @Test
-    @DisplayName("get image bad directory")
-    void testGetImageBadDirectory() {
-        assertThrows(IOException.class, () -> {
-            MockMultipartFile mockImage = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test".getBytes());
-            final String[] result = new String[1];
-            assertDoesNotThrow(() -> {
-                result[0] = imageService.saveImage(UPLOAD_DIRECTORY, mockImage);
-            });
-
-            Map.Entry<String, String> entry = imageService.getImage(UPLOAD_DIRECTORY + "bad directory", result[0]);
+            Map.Entry<String, String> entry = imageService.getImage("this is a bad image name");
         });
     }
 
@@ -152,24 +133,10 @@ public class ImageTests {
             MockMultipartFile mockImage = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test".getBytes());
             final String[] result = new String[1];
             assertDoesNotThrow(() -> {
-                result[0] = imageService.saveImage(UPLOAD_DIRECTORY, mockImage);
+                result[0] = imageService.saveImage(mockImage);
             });
 
-            assertTrue(imageService.deleteImage(UPLOAD_DIRECTORY, result[0]));
-        });
-    }
-
-    @Test
-    @DisplayName("delete image bad directory name")
-    void testDeleteImageBadDirectoryName() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            MockMultipartFile mockImage = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test".getBytes());
-            final String[] result = new String[1];
-            assertDoesNotThrow(() -> {
-                result[0] = imageService.saveImage(UPLOAD_DIRECTORY, mockImage);
-            });
-
-            assertFalse(imageService.deleteImage(UPLOAD_DIRECTORY + "bad directory", result[0]));
+            assertTrue(imageService.deleteImage(result[0]));
         });
     }
 
@@ -179,10 +146,10 @@ public class ImageTests {
         assertThrows(IllegalArgumentException.class, () -> {
             MockMultipartFile mockImage = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test".getBytes());
             assertDoesNotThrow(() -> {
-                imageService.saveImage(UPLOAD_DIRECTORY, mockImage);
+                imageService.saveImage(mockImage);
             });
 
-            assertFalse(imageService.deleteImage(UPLOAD_DIRECTORY, null));
+            assertFalse(imageService.deleteImage(null));
         });
     }
 }

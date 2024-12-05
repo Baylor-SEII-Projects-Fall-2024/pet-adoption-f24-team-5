@@ -5,6 +5,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/api/preferences")
 public class PreferenceController {
@@ -14,23 +16,24 @@ public class PreferenceController {
 
     @GetMapping("/get")
     public ResponseEntity<Preference> getPreferences(@RequestParam Long preferenceId) {
-        Preference preferences = preferenceService.getPreferences(preferenceId);
-        if (preferences != null) {
-            return ResponseEntity.ok(preferences);
-        }
-        return ResponseEntity.notFound().build();
+        Optional<Preference> preference = preferenceService.getPreference(preferenceId);
+        return preference.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<Preference> createPreference(@RequestBody Preference newPreference) {
-        Preference createdPreference = preferenceService.createPreference(newPreference);
+
+
+    @PostMapping("/create/{id}")
+    public ResponseEntity<Preference> createPreference(@PathVariable("id") long id,  @RequestBody Preference newPreference) {
+
+        Preference createdPreference = preferenceService.createPreference(id, newPreference);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdPreference);
     }
+
 
     @PutMapping("/update")
     public ResponseEntity<Preference> updatePreferences(@RequestParam Long preferenceId,
             @RequestBody Preference newPreferences) {
-        Preference updatedPreferences = preferenceService.updatePreferences(preferenceId, newPreferences);
+        Preference updatedPreferences = preferenceService.updatePreference(preferenceId, newPreferences);
         if (updatedPreferences != null) {
             return ResponseEntity.ok(updatedPreferences);
         }

@@ -1,8 +1,6 @@
 package petadoption.api.pet;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.amqp.RabbitConnectionDetails;
-import org.springframework.http.ResponseEntity;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import petadoption.api.user.AdoptionCenter.AdoptionCenter;
 import petadoption.api.user.Owner.Owner;
@@ -11,9 +9,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class PetService {
-    @Autowired
-    private PetRepository petRepository;
+
+    private final PetRepository petRepository;
+
 
     public List<Pet> getAllPets() { return petRepository.findAll(); }
 
@@ -51,6 +51,22 @@ public class PetService {
         }
 
         petRepository.delete(pet);
+    }
+
+    public Optional<Pet> getPetById(long id) {
+        return petRepository.findByPetId(id);
+    }
+
+    public long numberOfPets() {
+        return petRepository.count();
+    }
+
+    public List<String> distinctSpecies() {
+        return petRepository.findDistinctSpecies();
+    }
+
+    public Pet findRandomPetBySpecies(String species) {
+        return petRepository.findRandomPetBySpecies(species);
     }
 
 

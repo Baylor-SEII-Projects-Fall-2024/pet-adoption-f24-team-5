@@ -1,13 +1,10 @@
 package petadoption.api.user;
 
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import petadoption.api.Event.Event;
 import petadoption.api.user.AdoptionCenter.AdoptionCenter;
-import petadoption.api.user.AdoptionCenter.AdoptionCenterRepository;
 import petadoption.api.user.AdoptionCenter.CenterWorker;
 import petadoption.api.user.Owner.Owner;
 
@@ -74,12 +71,6 @@ public class UserController {
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-    }
-
-    @PutMapping("/update/Owner/preferenceId")
-    public ResponseEntity<Owner> updateOwnerPreferenceId(@RequestBody Owner user) {
-
-        return userService.updateOwnerPreferenceId(user);
     }
 
     @PutMapping("/update/CenterWorker")
