@@ -9,13 +9,10 @@ import petadoption.api.milvus.MilvusServiceAdapter;
 import petadoption.api.recommendationEngine.RecommendationService;
 import petadoption.api.user.AdoptionCenter.AdoptionCenter;
 import petadoption.api.user.AdoptionCenter.AdoptionCenterService;
-import petadoption.api.user.Owner.Owner;
-import petadoption.api.user.UserRepository;
 import petadoption.api.user.UserService;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RequestMapping("/api/pets")
 @RestController
@@ -28,13 +25,6 @@ public class PetController {
     private final RecommendationService recommendationService;
     private final MilvusServiceAdapter milvusServiceAdapter;
     private final AdoptionCenterService adoptionCenterService;
-
-    PetController(PetService petService, UserService userService, ImageService imageService, AdoptionCenterService adoptionCenterService) {
-        this.petService = petService;
-        this.userService = userService;
-        this.imageService = imageService;
-        this.adoptionCenterService = adoptionCenterService;
-    }
 
     @GetMapping
     public List<Pet> getPets() {
@@ -88,25 +78,17 @@ public class PetController {
     @PostMapping("/adopt")
     public ResponseEntity<?> adoptPet(@RequestBody Pet pet, @RequestParam String email) {
         try {
-            Optional<?> user = userService.findUser(email);
-            if(user.isPresent() && user.get() instanceof Owner) {
-                petService.adoptPet(pet, (Owner) user.get());
-
-                Optional<AdoptionCenter> tempCenter = adoptionCenterService.findById(pet.getAdoptionCenter().getId());
-                if(tempCenter.isPresent()) {
-                    int petCount = petService.getAvailablePetsByAdoptionCenter(pet.getAdoptionCenter()).size();
-                    adoptionCenterService.updatePetCount(pet.getAdoptionCenter().getId(), petCount);
-                }
-            }
-            else {
-                return ResponseEntity.badRequest().body("Email not an owner");
-            }
-            return ResponseEntity.status(HttpStatus.OK).body("");
-        try {
             //TODO: change this to use milvus
             AdoptionCenter adoptionCenter = userService.findCenterByWorkerEmail(email);
             double[] petVector = recommendationService.generatePreferenceVector(pet);
             Pet savedPet = petService.savePet(pet, adoptionCenter);
+
+            Optional<AdoptionCenter> tempCenter = adoptionCenterService.findById(pet.getAdoptionCenter().getId());
+            if(tempCenter.isPresent()) {
+                int petCount = petService.getAvailablePetsByAdoptionCenter(pet.getAdoptionCenter()).size();
+                adoptionCenterService.updatePetCount(pet.getAdoptionCenter().getId(), petCount);
+            }
+
             milvusServiceAdapter.upsertData(savedPet.petId, petVector,petVector.length, recommendationService.PET_PARTITION);
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(savedPet);
