@@ -13,7 +13,7 @@ export default function SettingsPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-
+  const [_, setForceUpdate] = useState(0);
 
   const updatedValuesRef = useRef({
     firstName: currentUser.firstName,
@@ -65,6 +65,7 @@ export default function SettingsPage() {
       setInvalidPhoneNumber(true);
     }
     updatedValuesRef.current.phoneNumber = formattedPhoneNumber;
+    setForceUpdate(prev => prev + 1);
   };
 
   const handleAgeChange = (event) => {
@@ -125,7 +126,7 @@ export default function SettingsPage() {
                     value={updatedValuesRef.current.firstName}
                     onChange={(e) => {
                       updatedValuesRef.current.firstName = e.target.value;
-                      forceUpdate({});
+                      setForceUpdate(prev => prev + 1);
                     }}
                     InputProps={{
                       style: { height: '40px', width: '470px' },
@@ -143,7 +144,7 @@ export default function SettingsPage() {
                     value={updatedValuesRef.current.lastName}
                     onChange={(e) => {
                       updatedValuesRef.current.lastName = e.target.value;
-                      forceUpdate({});
+                      setForceUpdate(prev => prev + 1);
                     }}
                     InputProps={{
                       style: { height: '40px', width: '470px' },
@@ -183,7 +184,7 @@ export default function SettingsPage() {
                 value={updatedValuesRef.current.oldPassword}
                 onChange={(e) => {
                   updatedValuesRef.current.oldPassword = e.target.value;
-                  forceUpdate({});
+                  setForceUpdate(prev => prev + 1);
                 }}
                 InputProps={{
                   style: { height: '40px', width: '425px' },
@@ -199,7 +200,7 @@ export default function SettingsPage() {
                 value={updatedValuesRef.current.password}
                 onChange={(e) => {
                   updatedValuesRef.current.password = e.target.value;
-                  forceUpdate({});
+                  setForceUpdate(prev => prev + 1);
                 }}
                 InputProps={{
                   style: { height: '40px', width: '425px' },
@@ -248,7 +249,7 @@ export default function SettingsPage() {
                     value={updatedValuesRef.current.centerName}
                     onChange={(e) => {
                       updatedValuesRef.current.centerName = e.target.value;
-                      forceUpdate({});
+                      setForceUpdate(prev => prev + 1);
                     }}
                     InputProps={{
                       style: { height: '40px', width: '440px' },
@@ -266,7 +267,7 @@ export default function SettingsPage() {
                     value={updatedValuesRef.current.centerAddress}
                     onChange={(e) => {
                       updatedValuesRef.current.centerAddress = e.target.value;
-                      forceUpdate({});
+                      setForceUpdate(prev => prev + 1);
                     }}
                     InputProps={{
                       style: { height: '40px', width: '420px' },
@@ -284,7 +285,7 @@ export default function SettingsPage() {
                     value={updatedValuesRef.current.centerCity}
                     onChange={(e) => {
                       updatedValuesRef.current.centerCity = e.target.value;
-                      forceUpdate({});
+                      setForceUpdate(prev => prev + 1);
                     }}
                     InputProps={{
                       style: { height: '40px', width: '465px' },
@@ -302,7 +303,7 @@ export default function SettingsPage() {
                     value={updatedValuesRef.current.centerState}
                     onChange={(e) => {
                       updatedValuesRef.current.centerState = e.target.value;
-                      forceUpdate({});
+                      setForceUpdate(prev => prev + 1);
                     }}
                     InputProps={{
                       style: { height: '40px', width: '450px' },

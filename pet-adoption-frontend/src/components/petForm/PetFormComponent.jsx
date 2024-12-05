@@ -89,7 +89,7 @@ const PetFormComponent = (props) => {
         setDescription("");
         setPetColor("");
         setStatus(false);
-        setImageName('');
+        setImageName("");
     }
 
     const handleImageUpload = (name) => {

@@ -1,20 +1,24 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Head from 'next/head';
 import {
-    Card,
-    CardContent,
     Stack,
     Typography,
-    Container,
     Box,
     CircularProgress,
-    Alert
+    Alert,
+    TextField,
+    InputAdornment,
+    IconButton
 } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
+import ClearIcon from '@mui/icons-material/Clear';
 import AdoptionCenterCard from '../components/adoptionCenterCard/AdoptionCenterCard';
 import { getSubjectFromToken } from '../utils/redux/tokenUtils';
 import { useSelector } from 'react-redux';
+
 import { getUser } from "@/utils/user/getUser";
 import { getCenters } from "@/utils/user/center/getCenters";
+import MapComponent from '../components/MapComponent';
 
 // Updated calculateDistance function to return miles
 const calculateDistance = (lat1, lon1, lat2, lon2) => {
@@ -37,7 +41,9 @@ export default function AdoptionCenterPage() {
     const [userEmail, setUserEmail] = useState(null);
     const [ownerLat, setOwnerLat] = useState(null);
     const [ownerLng, setOwnerLng] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
     const token = useSelector((state) => state.user.token);
+    const mapRef = useRef(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -77,73 +83,141 @@ export default function AdoptionCenterPage() {
         fetchData();
     }, [token]);
 
+    const handleCenterClick = (center) => {
+        mapRef.current?.zoomToCenter(center);
+    };
+
+    const filteredCenters = data?.filter(center => {
+        const query = searchQuery.toLowerCase();
+        return (
+            center.centerName?.toLowerCase().includes(query) ||
+            center.centerCity?.toLowerCase().includes(query) ||
+            center.centerState?.toLowerCase().includes(query) ||
+            center.centerZip?.toLowerCase().includes(query)
+        );
+    });
+
+    const handleSearchChange = (event) => {
+        setSearchQuery(event.target.value);
+    };
+
+    const handleClearSearch = () => {
+        setSearchQuery('');
+    };
+
     return (
-        <>
-            <Head>
-                <title>Local Adoption Centers</title>
-            </Head>
-
-            <Container maxWidth="lg">
-                <Box sx={{ py: 4 }}>
-                    {userEmail && (
-                        <Card sx={{ mb: 4, bgcolor: 'primary.light', color: 'primary.contrastText' }}>
-                            <CardContent>
-                                <Typography variant="h5" align="center" gutterBottom>
-                                    Welcome, {userEmail}!
-                                </Typography>
-                                {ownerLat && ownerLng && (
-                                    <Typography variant="body2" align="center">
-                                        Showing adoption centers sorted by distance from your location
-                                    </Typography>
-                                )}
-                            </CardContent>
-                        </Card>
-                    )}
-
-                    {loading ? (
-                        <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
-                            <CircularProgress />
-                        </Box>
-                    ) : error ? (
-                        <Alert severity="error" sx={{ mb: 4 }}>{error}</Alert>
-                    ) : (
-                        <Stack
-                            direction="row"
-                            gap={3}
-                            flexWrap="wrap"
-                            justifyContent="center"
-                            sx={{
-                                '& > *': {
-                                    flexBasis: {
-                                        xs: '100%',
-                                        sm: 'calc(50% - 16px)',
-                                        md: 'calc(33.333% - 16px)',
-                                    },
-                                    minWidth: 280,
-                                }
-                            }}
-                        >
-                            {data?.map((center) => (
-                                <AdoptionCenterCard
-                                    key={center.id}
-                                    center={center}
-                                    distance={
-                                        ownerLat && ownerLng
-                                            ? calculateDistance(ownerLat, ownerLng, center.latitude, center.longitude)
-                                            : null
-                                    }
-                                />
-                            ))}
-                        </Stack>
-                    )}
-
-                    {data?.length === 0 && (
-                        <Alert severity="info" sx={{ mt: 4 }}>
-                            No adoption centers found in your area.
-                        </Alert>
-                    )}
+        <Box sx={{ height: '92vh', display: 'flex', overflow: 'hidden' }}>
+            {loading ? (
+                <Box display="flex" justifyContent="center" alignItems="center" flex={1}>
+                    <CircularProgress size={60} />
                 </Box>
-            </Container>
-        </>
+            ) : error ? (
+                <Box display="flex" justifyContent="center" alignItems="center" flex={1}>
+                    <Alert
+                        severity="error"
+                        sx={{
+                            m: 4,
+                            borderRadius: 2,
+                            '& .MuiAlert-message': { fontSize: '1.1rem' }
+                        }}
+                    >
+                        {error}
+                    </Alert>
+                </Box>
+            ) : (
+                <>
+                    {/* Map Section - Left Side */}
+                    <Box sx={{ flex: 1.5, height: '100%', position: 'relative' }}>
+                        <MapComponent ref={mapRef} centers={filteredCenters} />
+                    </Box>
+
+                    {/* Centers List - Right Side */}
+                    <Box
+                        sx={{
+                            flex: 1,
+                            height: '100%',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            borderLeft: 1,
+                            borderColor: 'divider',
+                            bgcolor: 'background.default'
+                        }}
+                    >
+                        {/* Search Bar */}
+                        <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
+                            <TextField
+                                fullWidth
+                                variant="outlined"
+                                size="small"
+                                placeholder="Search by name, city, state, or zip..."
+                                value={searchQuery}
+                                onChange={handleSearchChange}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <SearchIcon color="action" />
+                                        </InputAdornment>
+                                    ),
+                                    endAdornment: searchQuery && (
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                size="small"
+                                                onClick={handleClearSearch}
+                                                edge="end"
+                                            >
+                                                <ClearIcon />
+                                            </IconButton>
+                                        </InputAdornment>
+                                    )
+                                }}
+                                sx={{
+                                    bgcolor: 'background.paper',
+                                    '& .MuiOutlinedInput-root': {
+                                        '& fieldset': {
+                                            borderColor: 'divider',
+                                        },
+                                        '&:hover fieldset': {
+                                            borderColor: 'primary.main',
+                                        }
+                                    }
+                                }}
+                            />
+                        </Box>
+
+                        {/* Centers List */}
+                        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
+                            {filteredCenters?.length === 0 ? (
+                                <Alert
+                                    severity="info"
+                                    sx={{
+                                        borderRadius: 2,
+                                        '& .MuiAlert-message': { fontSize: '1.1rem' }
+                                    }}
+                                >
+                                    {searchQuery
+                                        ? 'No adoption centers match your search.'
+                                        : 'No adoption centers found in your area.'}
+                                </Alert>
+                            ) : (
+                                <Stack spacing={2}>
+                                    {filteredCenters?.map((center) => (
+                                        <AdoptionCenterCard
+                                            key={center.id}
+                                            center={center}
+                                            distance={
+                                                ownerLat && ownerLng
+                                                    ? calculateDistance(ownerLat, ownerLng, center.latitude, center.longitude)
+                                                    : null
+                                            }
+                                            onClick={handleCenterClick}
+                                        />
+                                    ))}
+                                </Stack>
+                            )}
+                        </Box>
+                    </Box>
+                </>
+            )}
+        </Box>
     );
 }

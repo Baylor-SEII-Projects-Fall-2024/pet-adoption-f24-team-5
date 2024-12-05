@@ -30,9 +30,7 @@ const ImageUploadComponent = ({ onImageUpload }) => {
 
         try {
             const response = await uploadImage(token, formData, setUploadProgress);
-
-            console.log(response);
-            if (onImageUpload) onImageUpload(response.data);
+            if (onImageUpload) onImageUpload(response);
         } catch (error) {
             console.error('Upload failed:', error);
             if (error.response && error.response.status === 400) {

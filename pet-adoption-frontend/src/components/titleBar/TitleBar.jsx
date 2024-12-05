@@ -69,7 +69,6 @@ const TitleBar = () => {
         { label: 'Adoption Centers', path: '/LocalAdoptionCenter' },
         { label: 'Available Pets', path: '/AvailablePets' },
         { label: 'Find A Pet', path: '/FindAPet' },
-        { label: 'Saved Pets', path: '/SavedPets' },
     ];
 
     const centerNavItems = [
@@ -82,6 +81,7 @@ const TitleBar = () => {
         <AppBar
             position="static"
             sx={{
+                height: '8vh',
                 background: 'linear-gradient(135deg, #4b6cb7 30%, #182848 90%)',
                 boxShadow: 'none',
             }}
