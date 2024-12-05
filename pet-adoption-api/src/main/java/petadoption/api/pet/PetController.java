@@ -68,8 +68,6 @@ public class PetController {
 
     @PostMapping("/save")
     public ResponseEntity<?> savePet(@RequestBody Pet pet, @RequestParam String email) {
-
-
         if(pet.getImageName().isEmpty()) { return ResponseEntity.badRequest().body("Image is required");}
 
         if(email.isEmpty()) { return ResponseEntity.badRequest().body("Email is required");}
