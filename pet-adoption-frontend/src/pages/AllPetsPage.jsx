@@ -11,7 +11,8 @@ import {
     Typography,
     Paper,
     Container,
-    Divider
+    Divider,
+    Pagination
 } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -38,6 +39,8 @@ const AvailablePets = () => {
     const [centers, setCenters] = useState([]);
     const navigate = useNavigate();
     const location = useLocation();
+    const [page, setPage] = useState(1);
+    const itemsPerPage = 12;
 
     // Handle query parameter changes
     useEffect(() => {
@@ -133,177 +136,260 @@ const AvailablePets = () => {
     const ageOptions = getUniqueValues('age', true);
 
     return (
-        <Container maxWidth="xl" sx={{ py: 4 }}>
-            <Paper elevation={3} sx={{ p: 3, mb: 4, borderRadius: 2 }}>
-                <Typography variant="h4" sx={{ mb: 3, fontWeight: 'bold', color: 'primary.main' }}>
-                    Find Your Perfect Pet
-                </Typography>
-
-                <Grid container spacing={3}>
+        <Container
+            maxWidth="xl"
+            sx={{
+                height: 'calc(100vh - 64px)',
+                py: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden',
+                maxWidth: '1800px'
+            }}
+        >
+            {/* Even More Compact Search Section */}
+            <Paper
+                elevation={1}
+                sx={{
+                    p: 1,
+                    mb: 1,
+                    borderRadius: '8px',
+                    backgroundColor: 'background.paper',
+                    flexShrink: 0
+                }}
+            >
+                <Grid container spacing={1}>
+                    {/* Search Row */}
                     <Grid item xs={12}>
-                        <TextField
-                            fullWidth
-                            label="Search by species, breed, or color"
-                            placeholder="Example: Golden Retriever, Black, Cat (separate terms with commas)"
-                            variant="outlined"
-                            value={searchText}
-                            onChange={(e) => setSearchText(e.target.value)}
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <SearchIcon color="primary" />
-                                    </InputAdornment>
-                                ),
-                            }}
-                            helperText="Separate multiple search terms with commas"
-                        />
-                    </Grid>
-
-                    {/* Filters */}
-                    <Grid item xs={12} md={4}>
-                        <FormControl fullWidth>
-                            <InputLabel>Species</InputLabel>
-                            <Select
-                                value={speciesFilter}
-                                onChange={(e) => setSpeciesFilter(e.target.value)}
+                        <Box sx={{
+                            display: 'flex',
+                            gap: 1,
+                            alignItems: 'center'
+                        }}>
+                            {/* Title */}
+                            <Typography
+                                variant="h6"
+                                sx={{
+                                    fontWeight: 600,
+                                    color: 'primary.main',
+                                    whiteSpace: 'nowrap',
+                                    fontSize: '1.1rem'
+                                }}
                             >
-                                <MenuItem value="">All Species</MenuItem>
-                                {speciesOptions.map((species) => (
-                                    <MenuItem key={species} value={species}>{species}</MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </Grid>
+                                Find Pets
+                            </Typography>
 
-                    <Grid item xs={12} md={4}>
-                        <FormControl fullWidth>
-                            <InputLabel>Breed</InputLabel>
-                            <Select
-                                value={breedFilter}
-                                onChange={(e) => setBreedFilter(e.target.value)}
-                            >
-                                <MenuItem value="">All Breeds</MenuItem>
-                                {breedOptions.map((breed) => (
-                                    <MenuItem key={breed} value={breed}>{breed}</MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </Grid>
+                            {/* Search Field */}
+                            <TextField
+                                size="small"
+                                placeholder="Search pets..."
+                                variant="outlined"
+                                value={searchText}
+                                onChange={(e) => setSearchText(e.target.value)}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <SearchIcon color="action" fontSize="small" />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                                sx={{
+                                    flex: 1,
+                                    '& .MuiOutlinedInput-root': {
+                                        height: '32px'
+                                    }
+                                }}
+                            />
 
-                    <Grid item xs={12} md={4}>
-                        <FormControl fullWidth>
-                            <InputLabel>Color</InputLabel>
-                            <Select
-                                value={colorFilter}
-                                onChange={(e) => setColorFilter(e.target.value)}
-                            >
-                                <MenuItem value="">All Colors</MenuItem>
-                                {colorOptions.map((color) => (
-                                    <MenuItem key={color} value={color}>{color}</MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </Grid>
-
-                    <Grid item xs={12} md={4}>
-                        <FormControl fullWidth>
-                            <InputLabel>Sex</InputLabel>
-                            <Select
-                                value={sexFilter}
-                                onChange={(e) => setSexFilter(e.target.value)}
-                            >
-                                <MenuItem value="">All</MenuItem>
-                                {sexOptions.map((sex) => (
-                                    <MenuItem key={sex} value={sex}>{sex}</MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </Grid>
-
-                    <Grid item xs={12} md={4}>
-                        <FormControl fullWidth>
-                            <InputLabel>Age</InputLabel>
-                            <Select
-                                value={ageFilter}
-                                onChange={(e) => setAgeFilter(e.target.value)}
-                            >
-                                <MenuItem value="">All Ages</MenuItem>
-                                {ageOptions.map((age) => (
-                                    <MenuItem key={age} value={age}>{age}</MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </Grid>
-
-                    <Grid item xs={12} md={4}>
-                        <FormControl fullWidth>
-                            <InputLabel>Adoption Center</InputLabel>
-                            <Select
-                                value={centerFilter}
-                                onChange={(e) => setCenterFilter(e.target.value)}
-                            >
-                                <MenuItem value="">All Centers</MenuItem>
-                                {centers.map((center) => (
-                                    <MenuItem key={center.id} value={center.id}>
-                                        {center.centerName}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </Grid>
-
-                    {userLocation && (
-                        <Grid item xs={12}>
-                            <FormControl fullWidth>
-                                <InputLabel>Distance</InputLabel>
+                            {/* Center Select */}
+                            <FormControl sx={{ width: 150 }}>
                                 <Select
-                                    value={distance}
-                                    onChange={(e) => setDistance(e.target.value)}
+                                    value={centerFilter}
+                                    onChange={(e) => setCenterFilter(e.target.value)}
+                                    displayEmpty
+                                    size="small"
+                                    sx={{ height: '32px' }}
                                 >
-                                    <MenuItem value="">Any Distance</MenuItem>
-                                    <MenuItem value="5">Within 5 km</MenuItem>
-                                    <MenuItem value="10">Within 10 km</MenuItem>
-                                    <MenuItem value="25">Within 25 km</MenuItem>
-                                    <MenuItem value="50">Within 50 km</MenuItem>
-                                    <MenuItem value="100">Within 100 km</MenuItem>
+                                    <MenuItem value="">All Centers</MenuItem>
+                                    {centers.map((center) => (
+                                        <MenuItem key={center.id} value={center.id}>
+                                            {center.centerName}
+                                        </MenuItem>
+                                    ))}
                                 </Select>
                             </FormControl>
-                        </Grid>
-                    )}
+                        </Box>
+                    </Grid>
+
+                    {/* Filter Pills Row */}
+                    <Grid item xs={12}>
+                        <Box sx={{
+                            display: 'flex',
+                            gap: 1,
+                            flexWrap: 'wrap',
+                            alignItems: 'center'
+                        }}>
+                            {/* Filter Controls */}
+                            {[
+                                { value: speciesFilter, setter: setSpeciesFilter, options: speciesOptions, label: "Species", width: 100 },
+                                { value: breedFilter, setter: setBreedFilter, options: breedOptions, label: "Breed", width: 100 },
+                                { value: sexFilter, setter: setSexFilter, options: sexOptions, label: "Sex", width: 80 },
+                                { value: ageFilter, setter: setAgeFilter, options: ageOptions, label: "Age", width: 80 }
+                            ].map((filter) => (
+                                <FormControl
+                                    key={filter.label}
+                                    size="small"
+                                    sx={{ width: filter.width }}
+                                >
+                                    <Select
+                                        value={filter.value}
+                                        onChange={(e) => filter.setter(e.target.value)}
+                                        displayEmpty
+                                        sx={{
+                                            height: '32px',
+                                            borderRadius: '16px',
+                                            '& .MuiSelect-select': {
+                                                py: 0.5
+                                            }
+                                        }}
+                                    >
+                                        <MenuItem value="">{filter.label}</MenuItem>
+                                        {filter.options.map((option) => (
+                                            <MenuItem key={option} value={option}>{option}</MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            ))}
+
+                            {/* Distance Filter */}
+                            {userLocation && (
+                                <FormControl size="small" sx={{ width: 100 }}>
+                                    <Select
+                                        value={distance}
+                                        onChange={(e) => setDistance(e.target.value)}
+                                        displayEmpty
+                                        sx={{
+                                            height: '32px',
+                                            borderRadius: '16px',
+                                            '& .MuiSelect-select': {
+                                                py: 0.5
+                                            }
+                                        }}
+                                    >
+                                        <MenuItem value="">Distance</MenuItem>
+                                        <MenuItem value="5">5 km</MenuItem>
+                                        <MenuItem value="10">10 km</MenuItem>
+                                        <MenuItem value="25">25 km</MenuItem>
+                                        <MenuItem value="50">50 km</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            )}
+                        </Box>
+                    </Grid>
                 </Grid>
             </Paper>
 
-            {loading ? (
-                <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-                    <CircularProgress size={60} />
-                </Box>
-            ) : (
-                <>
-                    <Typography variant="h6" sx={{ mb: 2, color: 'text.secondary' }}>
-                        {filteredPets.length} Pets Found
-                    </Typography>
-                    <Grid
-                        container
-                        spacing={3}
-                        sx={{
-                            display: 'grid',
-                            gridTemplateColumns: {
-                                xs: '1fr',
-                                sm: 'repeat(2, 1fr)',
-                                md: 'repeat(3, 1fr)',
-                                lg: 'repeat(4, 1fr)'
-                            },
-                            gap: 3
-                        }}
-                    >
-                        {filteredPets.slice(0, 10).map((pet) => (
-                            <Box key={pet.petName}>
-                                <PetCard pet={pet} saveable={true} likeable={false} />
-                            </Box>
-                        ))}
-                    </Grid>
-                </>
-            )}
+            {/* Content Area */}
+            <Box sx={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden',
+                minHeight: 0
+            }}>
+                {loading ? (
+                    <Box sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        flex: 1
+                    }}>
+                        <CircularProgress size={40} />
+                    </Box>
+                ) : (
+                    <>
+                        <Box sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            mb: 1,
+                            px: 1
+                        }}>
+                            <Typography
+                                variant="subtitle2"
+                                sx={{ color: 'text.secondary' }}
+                            >
+                                {filteredPets.length} Pets Found
+                            </Typography>
+                        </Box>
+
+                        {/* Scrollable Grid Container */}
+                        <Box sx={{
+                            flex: 1,
+                            overflow: 'auto',
+                            px: 1
+                        }}>
+                            <Grid
+                                container
+                                sx={{
+                                    display: 'grid',
+                                    gridTemplateColumns: {
+                                        xs: 'repeat(1, 1fr)',
+                                        sm: 'repeat(2, 1fr)',
+                                        md: 'repeat(3, 1fr)',
+                                        lg: 'repeat(4, 1fr)'
+                                    },
+                                    gap: 1.5,
+                                    mb: 1,
+                                    gridAutoRows: 'min-content',
+                                    maxHeight: 'calc(100vh - 200px)'
+                                }}
+                            >
+                                {filteredPets
+                                    .slice((page - 1) * itemsPerPage, page * itemsPerPage)
+                                    .map((pet) => (
+                                        <Box
+                                            key={pet.petName}
+                                            sx={{
+                                                height: 'fit-content'
+                                            }}
+                                        >
+                                            <PetCard
+                                                pet={pet}
+                                                saveable={true}
+                                                likeable={false}
+                                                expandable={true}
+                                                contactable={true}
+                                            />
+                                        </Box>
+                                    ))}
+                            </Grid>
+                        </Box>
+
+                        {/* Pagination Footer */}
+                        <Box sx={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            py: 1,
+                            borderTop: 1,
+                            borderColor: 'divider',
+                            backgroundColor: 'background.paper',
+                            flexShrink: 0,
+                            mt: 'auto'
+                        }}>
+                            <Pagination
+                                count={Math.ceil(filteredPets.length / itemsPerPage)}
+                                page={page}
+                                onChange={(e, value) => setPage(value)}
+                                color="primary"
+                                size="small"
+                                showFirstButton
+                                showLastButton
+                            />
+                        </Box>
+                    </>
+                )}
+            </Box>
         </Container>
     );
 };

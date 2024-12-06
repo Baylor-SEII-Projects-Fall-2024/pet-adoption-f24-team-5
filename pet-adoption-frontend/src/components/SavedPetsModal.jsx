@@ -11,28 +11,29 @@ const SavedPetsModal = ({ open, onClose }) => {
     const [email, setEmail] = useState(getSubjectFromToken(token));
     const [savedPets, setSavedPets] = useState([]);
 
+    const fetchSavedPets = async () => {
+        try {
+            const pets = await getSavedPets(token, email);
+            setSavedPets(pets);
+        } catch (error) {
+            console.error('Error fetching saved pets:', error);
+        }
+    };
+
     const handleDeletePet = async (petToDelete) => {
         try {
             await removeSavedPet(petToDelete, token, email);
-            const savedPets = await getSavedPets(token, email);
-            setSavedPets(savedPets);
+            await fetchSavedPets();
         } catch (error) {
             console.error('Error deleting pet:', error);
         }
     };
 
     useEffect(() => {
-        const fetchSavedPets = async () => {
-            try {
-                const pets = await getSavedPets(token, email);
-                setSavedPets(pets);
-            } catch (error) {
-                console.error('Error fetching saved pets:', error);
-            }
-        };
-
-        fetchSavedPets();
-    }, [token, email]);
+        if (open) {
+            fetchSavedPets();
+        }
+    }, [open, token, email]);
 
     return (
         <Modal open={open} onClose={onClose}>
