@@ -8,6 +8,8 @@ import SavedPetsModal from "@/components/SavedPetsModal";
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import CloseIcon from '@mui/icons-material/Close';
 import CircularProgress from '@mui/material/CircularProgress';
+import HamburgerMenu from '@/components/HamburgerMenu';
+import TuneIcon from '@mui/icons-material/Tune';
 
 const FindAPetPage = () => {
     const [currentPets, setCurrentPets] = useState([]);
@@ -17,6 +19,7 @@ const FindAPetPage = () => {
     const userType = getAuthorityFromToken(token);
     const [loading, setLoading] = useState(true);
     const [savedPetsModalOpen, setSavedPetsModalOpen] = useState(false);
+    const [menuAnchorEl, setMenuAnchorEl] = useState(null);
 
     useEffect(() => {
         const initialLoad = async () => {
@@ -74,6 +77,56 @@ const FindAPetPage = () => {
         // Show some visual feedback
         // Then load next set of pets
         handleSearch();
+    };
+
+    const handleOpenMenu = (event) => {
+        setMenuAnchorEl(event.currentTarget);
+    };
+
+    const handleCloseMenu = () => {
+        setMenuAnchorEl(null);
+    };
+
+    const handleSelectSpecies = async (species) => {
+        setLoading(true);
+        try {
+            // You'll need to modify generateNewOptions to accept species parameter
+            const newPets = await generateNewOptions(token, species.toLowerCase());
+            setCurrentPets(newPets);
+
+            // Preload next set
+            const nextPets = await generateNewOptions(token, species.toLowerCase());
+            setPreloadedPets(nextPets);
+        } catch (error) {
+            console.error('Error loading pets:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleResetPreferences = async () => {
+        setLoading(true);
+        try {
+            // You'll need to implement this endpoint
+            await fetch('/api/users/reset-preferences', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            // Load new pets with reset preferences
+            const newPets = await generateNewOptions(token);
+            setCurrentPets(newPets);
+
+            // Preload next set
+            const nextPets = await generateNewOptions(token);
+            setPreloadedPets(nextPets);
+        } catch (error) {
+            console.error('Error resetting preferences:', error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -226,8 +279,8 @@ const FindAPetPage = () => {
                                 <Button
                                     variant="contained"
                                     size="medium"
-                                    onClick={handleSearch}
-                                    startIcon={<FavoriteIcon />}
+                                    onClick={handleOpenMenu}
+                                    startIcon={<TuneIcon />}
                                     sx={{
                                         minWidth: 150,
                                         height: 40,
@@ -237,7 +290,7 @@ const FindAPetPage = () => {
                                         }
                                     }}
                                 >
-                                    Show More Like These
+                                    Change Preferences
                                 </Button>
                             </Box>
                         </Box>
@@ -249,6 +302,14 @@ const FindAPetPage = () => {
             <SavedPetsModal
                 open={savedPetsModalOpen}
                 onClose={() => setSavedPetsModalOpen(false)}
+            />
+
+            <HamburgerMenu
+                anchorEl={menuAnchorEl}
+                open={Boolean(menuAnchorEl)}
+                onClose={handleCloseMenu}
+                onSelectSpecies={handleSelectSpecies}
+                onResetPreferences={handleResetPreferences}
             />
         </Container>
     );

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Grid, Modal, Button } from "@mui/material";
+import { Box, Typography, Grid, Modal, Button, IconButton } from "@mui/material";
+import CloseIcon from '@mui/icons-material/Close';
 import PetCard from "@/components/petCard/PetCard";
 import { useSelector } from 'react-redux';
 import { getSavedPets } from '../utils/user/owner/GetSavedPets';
@@ -36,47 +37,89 @@ const SavedPetsModal = ({ open, onClose }) => {
     }, [open, token, email]);
 
     return (
-        <Modal open={open} onClose={onClose}>
+        <Modal
+            open={open}
+            onClose={onClose}
+            sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+            }}
+        >
             <Box sx={{
-                padding: 4,
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
+                position: 'relative',
                 backgroundColor: 'background.paper',
-                margin: 'auto',
-                width: '80%',
-                height: '80vh',
-                overflowY: 'auto',
+                width: '90%',
+                maxWidth: '1400px',
+                maxHeight: '90vh',
                 borderRadius: '16px',
-                boxShadow: 3,
+                boxShadow: 24,
                 display: 'flex',
                 flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
             }}>
-                <Typography variant="h4" align="center" gutterBottom>
-                    Saved Pets
-                </Typography>
-                <Grid container spacing={3} justifyContent="center">
+                {/* Header */}
+                <Box sx={{
+                    p: 2,
+                    borderBottom: '1px solid',
+                    borderColor: 'divider',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
+                }}>
+                    <Typography variant="h5" sx={{ fontWeight: 600, color: 'primary.main' }}>
+                        Saved Pets
+                    </Typography>
+                    <IconButton onClick={onClose} size="small">
+                        <CloseIcon />
+                    </IconButton>
+                </Box>
+
+                {/* Content */}
+                <Box sx={{
+                    p: 3,
+                    overflowY: 'auto',
+                    flexGrow: 1,
+                }}>
                     {savedPets.length > 0 ? (
-                        savedPets.map((pet) => (
-                            <Grid item xs={12} sm={6} md={4} lg={3} key={pet.petName}>
-                                <PetCard
-                                    pet={pet}
-                                    likeable={false}
-                                    saveable={false}
-                                    canDelete={true}
-                                    onDelete={() => handleDeletePet(pet)}
-                                />
-                            </Grid>
-                        ))
+                        <Grid container spacing={3}>
+                            {savedPets.map((pet) => (
+                                <Grid item xs={12} sm={6} md={4} key={pet.id}>
+                                    <PetCard
+                                        pet={pet}
+                                        likeable={false}
+                                        saveable={false}
+                                        expandable={true}
+                                        contactable={true}
+                                        onDelete={() => handleDeletePet(pet)}
+                                    />
+                                </Grid>
+                            ))}
+                        </Grid>
                     ) : (
-                        <Typography variant="h6" align="center">
-                            No saved pets yet.
-                        </Typography>
+                        <Box sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            py: 8,
+                            gap: 2
+                        }}>
+                            <Typography variant="h6" color="text.secondary">
+                                No saved pets yet
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                Start browsing and save pets you're interested in!
+                            </Typography>
+                            <Button
+                                variant="contained"
+                                onClick={onClose}
+                                sx={{ mt: 2 }}
+                            >
+                                Browse Pets
+                            </Button>
+                        </Box>
                     )}
-                </Grid>
+                </Box>
             </Box>
         </Modal>
     );

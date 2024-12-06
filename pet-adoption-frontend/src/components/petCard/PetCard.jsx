@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CardContent, Typography, Box } from "@mui/material";
+import { CardContent, Typography, Box, Button } from "@mui/material";
 import ImageComponent from "@/components/imageComponent/ImageComponent";
 import { StyledCard, ImageWrapper, PetInfo } from "./styles/PetCard.styles";
 import PetCardActions from "./PetCardActions";
@@ -7,6 +7,7 @@ import { usePetCardHandlers } from "./hooks/usePetCardHandlers";
 import { useSelector } from "react-redux";
 import { getSubjectFromToken, getAuthorityFromToken } from "@/utils/redux/tokenUtils";
 import ExpandedPetCard from './ExpandedPetCard';
+import EditIcon from '@mui/icons-material/Edit';
 
 const PetCard = ({
     pet,
@@ -18,6 +19,7 @@ const PetCard = ({
     onLike = null,
     onDelete = null,
     size = 'default',
+    isManagerView = false,
 }) => {
     const token = useSelector((state) => state.user.token);
     const email = getSubjectFromToken(token);
@@ -57,12 +59,11 @@ const PetCard = ({
     return (
         <>
             <StyledCard
-                onClick={handleCardClick}
                 elevation={1}
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
                 size={size}
-                sx={{ cursor: expandable ? 'pointer' : 'default' }}
+                sx={{ cursor: 'default' }}
             >
                 <ImageWrapper size={size}>
                     <ImageComponent
@@ -150,15 +151,33 @@ const PetCard = ({
                     </Box>
 
                     <Box sx={{ mt: 'auto' }}>
-                        <PetCardActions
-                            saveable={saveable}
-                            likeable={likeable}
-                            authority={authority}
-                            onSave={handleSavePetToOwner}
-                            onLike={handleLikePet}
-                            onContact={handleContactCenter}
-                            onDelete={onDelete ? () => onDelete(pet) : null}
-                        />
+                        {isManagerView ? (
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                fullWidth
+                                startIcon={<EditIcon />}
+                                onClick={onClick}
+                                sx={{
+                                    mt: 1,
+                                    py: 1,
+                                    textTransform: 'none',
+                                    fontWeight: 600
+                                }}
+                            >
+                                Edit Pet Details
+                            </Button>
+                        ) : (
+                            <PetCardActions
+                                saveable={saveable}
+                                likeable={likeable}
+                                authority={authority}
+                                onSave={handleSavePetToOwner}
+                                onLike={handleLikePet}
+                                onContact={handleContactCenter}
+                                onDelete={onDelete ? () => onDelete(pet) : null}
+                            />
+                        )}
                     </Box>
                 </PetInfo>
             </StyledCard>

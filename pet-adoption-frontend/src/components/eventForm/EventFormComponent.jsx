@@ -1,26 +1,36 @@
-import { Box, Button, Stack, TextField } from "@mui/material";
+import {
+    Box,
+    Button,
+    TextField,
+    Typography,
+    Grid,
+} from "@mui/material";
 import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import React, { useEffect, useState } from "react";
 import { useSelector } from 'react-redux';
 import { DeleteEvent } from "@/utils/event/DeleteEvent";
 import { SaveUpdateEvent } from "@/utils/event/SaveUpdateEvent";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const EventFormComponent = (props) => {
-    const [event_id, setEventID] = useState(null);
-    const [center_id, setCenterID] = useState(null);
-    const [event_name, setEventName] = useState('');
-    const [event_date, setEventDate] = useState(new Date());
-    const [event_time, setEventTime] = useState(new Date());
-    const [event_description, setEventDescription] = useState('');
-    const [buttonText, setButtonText] = useState('');
-    const [formType, setFormType] = useState('');
     const token = useSelector((state) => state.user.token);
+    const [formData, setFormData] = useState({
+        event_id: null,
+        center_id: null,
+        event_name: '',
+        event_date: new Date(),
+        event_time: new Date(),
+        event_description: '',
+    });
+    const [formType, setFormType] = useState('');
+    const [buttonText, setButtonText] = useState('');
 
     useEffect(() => {
         setFormType(props.type);
         setButtonText(props.type === "update" ? "Update Event" : "Save Event");
 
-        if (props.event && props.event.event_id) {
+        if (props.event?.event_id) {
             setFields(props.event);
         } else {
             resetFields();
@@ -32,50 +42,50 @@ const EventFormComponent = (props) => {
             const [datePart, timePart] = dateTimeString.split(' ');
             const [day, month, year] = datePart.split('/').map(Number);
             const [hours, minutes] = timePart.split(':').map(Number);
-
             return new Date(year, month - 1, day, hours, minutes);
         }
         const receivedDateTime = parseDateTime(event.event_date + " " + event.event_time);
 
-        setEventID(event.event_id);
-        setCenterID(event.center_id);
-        setEventName(event.event_name);
-        setEventDate(receivedDateTime);
-        setEventTime(receivedDateTime);
-        setEventDescription(event.event_description);
+        setFormData({
+            event_id: event.event_id,
+            center_id: event.center_id,
+            event_name: event.event_name,
+            event_date: receivedDateTime,
+            event_time: receivedDateTime,
+            event_description: event.event_description,
+        });
     };
 
     const resetFields = () => {
-        setEventID(null);
-        setCenterID(null);
-        setEventName('');
-        setEventDate(null);
-        setEventTime(null);
-        setEventDescription('');
+        setFormData({
+            event_id: null,
+            center_id: null,
+            event_name: '',
+            event_date: new Date(),
+            event_time: new Date(),
+            event_description: '',
+        });
     };
+
     const formatDate = (date) => {
         const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+        const month = String(date.getMonth() + 1).padStart(2, '0');
         const year = date.getFullYear();
-
         return `${day}/${month}/${year}`;
     }
+
     const formatTime = (date) => {
         const hours = String(date.getHours()).padStart(2, '0');
         const minutes = String(date.getMinutes()).padStart(2, '0');
-
-        return `${hours}:${minutes}`
+        return `${hours}:${minutes}`;
     }
 
     const handleDelete = async (e) => {
         e.preventDefault();
         const eventData = {
-            event_id,
-            center_id,
-            event_name,
-            event_date: formatDate(event_date),
-            event_time: formatTime(event_time),
-            event_description
+            ...formData,
+            event_date: formatDate(formData.event_date),
+            event_time: formatTime(formData.event_time),
         };
         await DeleteEvent({
             event: eventData,
@@ -85,19 +95,12 @@ const EventFormComponent = (props) => {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        handleSaveOrUpdateEvent();
-    };
-
-    const handleSaveOrUpdateEvent = async () => {
         const eventData = {
-            event_id,
-            center_id,
-            event_name,
-            event_date: formatDate(event_date),
-            event_time: formatTime(event_time),
-            event_description
+            ...formData,
+            event_date: formatDate(formData.event_date),
+            event_time: formatTime(formData.event_time),
         };
         try {
             await SaveUpdateEvent({
@@ -113,66 +116,191 @@ const EventFormComponent = (props) => {
         }
     };
 
-    const handleDateChange = (date) => {
-        setEventDate(date);
-        setEventTime(date);
+    const handleValidateSetEvent = () => {
+        return formData.event_name &&
+            formData.event_date &&
+            formData.event_time &&
+            formData.event_description;
     };
 
-    const handleValidateSetEvent = (displayAlert) => {
-        if (event_name && event_date && event_time && event_description) {
-            return true;
+    const customInputStyle = {
+        backgroundColor: 'background.paper',
+        '& .MuiOutlinedInput-root': {
+            height: '40px'
         }
-        if (displayAlert) {
-            if (!event_name) alert("Please enter an event name");
-            else if (!event_date) alert("Please enter an event date");
-            else if (!event_time) alert("Please enter an event time");
-            else if (!event_description) alert("Please enter an event description");
-            else alert("Unknown error when validating event");
-        }
-        return false;
     };
 
     return (
-        <Box component="form" onSubmit={handleSubmit}>
-            <Button onClick={props.handleCreateNewEvent} variant='contained'>Back to Events</Button>
-            <Stack spacing={2} sx={{ marginTop: 2 }}>
-                <TextField
-                    label="Event Name"
-                    value={event_name}
-                    onChange={(e) => setEventName(e.target.value)}
-                    fullWidth
-                />
-                <DatePicker
-                    selected={event_date}
-                    onChange={handleDateChange}
-                    showTimeSelect
-                    dateFormat="Pp"
-                    customInput={<TextField label="Event Date" fullWidth />}
-                />
-                <TextField
-                    label="Description"
-                    value={event_description}
-                    onChange={(e) => setEventDescription(e.target.value)}
-                    fullWidth
-                />
+        <Box
+            component="form"
+            onSubmit={handleSubmit}
+            sx={{
+                height: '92vh',
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden',
+                backgroundColor: 'background.default'
+            }}
+        >
+            {/* Header */}
+            <Box sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 2,
+                py: 1.5,
+                px: 2,
+                borderBottom: 1,
+                borderColor: 'divider',
+                backgroundColor: 'background.paper',
+                minHeight: '56px',
+                flexShrink: 0,
+            }}>
+                <Button
+                    onClick={props.handleCreateNewEvent}
+                    variant='outlined'
+                    startIcon={<ArrowBackIcon />}
+                    size="small"
+                >
+                    Back to Events
+                </Button>
+                <Typography variant="h5" component="h1" sx={{ fontWeight: 600 }}>
+                    {formType === "update" ? "Edit Event Details" : "Add New Event"}
+                </Typography>
+            </Box>
+
+            {/* Form Content */}
+            <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
+                <Box sx={{
+                    maxWidth: '600px',
+                    margin: '0 auto',
+                    backgroundColor: 'background.paper',
+                    borderRadius: 1,
+                    p: 3,
+                    boxShadow: 1
+                }}>
+                    <Grid container spacing={3}>
+                        <Grid item xs={12}>
+                            <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 500 }}>
+                                Event Information
+                            </Typography>
+                        </Grid>
+
+                        <Grid item xs={12}>
+                            <TextField
+                                label="Event Name *"
+                                value={formData.event_name}
+                                onChange={(e) => setFormData(prev => ({ ...prev, event_name: e.target.value }))}
+                                required
+                                fullWidth
+                                size="small"
+                                sx={customInputStyle}
+                            />
+                        </Grid>
+
+                        <Grid item xs={12}>
+                            <Typography variant="subtitle2" sx={{ mb: 1, color: 'text.secondary' }}>
+                                Date & Time
+                            </Typography>
+                            <Grid container spacing={2}>
+                                <Grid item xs={12} sm={6}>
+                                    <DatePicker
+                                        selected={formData.event_date}
+                                        onChange={(date) => setFormData(prev => ({ ...prev, event_date: date }))}
+                                        dateFormat="MMMM d, yyyy"
+                                        customInput={
+                                            <TextField
+                                                label="Event Date *"
+                                                required
+                                                fullWidth
+                                                size="small"
+                                                sx={customInputStyle}
+                                            />
+                                        }
+                                    />
+                                </Grid>
+
+                                <Grid item xs={12} sm={6}>
+                                    <DatePicker
+                                        selected={formData.event_time}
+                                        onChange={(date) => setFormData(prev => ({ ...prev, event_time: date }))}
+                                        showTimeSelect
+                                        showTimeSelectOnly
+                                        timeIntervals={15}
+                                        timeCaption="Time"
+                                        dateFormat="h:mm aa"
+                                        customInput={
+                                            <TextField
+                                                label="Event Time *"
+                                                required
+                                                fullWidth
+                                                size="small"
+                                                sx={customInputStyle}
+                                            />
+                                        }
+                                    />
+                                </Grid>
+                            </Grid>
+                        </Grid>
+
+                        <Grid item xs={12}>
+                            <Typography variant="subtitle2" sx={{ mb: 1, color: 'text.secondary' }}>
+                                Event Details
+                            </Typography>
+                            <TextField
+                                label="Description *"
+                                value={formData.event_description}
+                                onChange={(e) => setFormData(prev => ({ ...prev, event_description: e.target.value }))}
+                                fullWidth
+                                multiline
+                                rows={4}
+                                required
+                                size="small"
+                                placeholder="Enter event description..."
+                                sx={{
+                                    backgroundColor: 'background.paper',
+                                    '& .MuiOutlinedInput-root': {
+                                        padding: '12px'
+                                    }
+                                }}
+                            />
+                        </Grid>
+                    </Grid>
+                </Box>
+            </Box>
+
+            {/* Footer */}
+            <Box sx={{
+                display: 'flex',
+                gap: 2,
+                py: 1.5,
+                px: 2,
+                borderTop: 1,
+                borderColor: 'divider',
+                backgroundColor: 'background.paper',
+                minHeight: '56px',
+                flexShrink: 0,
+            }}>
                 <Button
                     type="submit"
                     variant="contained"
-                    disabled={!handleValidateSetEvent(false)}
+                    fullWidth
+                    size="large"
+                    disabled={!handleValidateSetEvent()}
                 >
                     {buttonText}
                 </Button>
                 {formType === "update" && (
                     <Button
-                        type="button"
-                        variant="contained"
-                        color="error"
                         onClick={handleDelete}
+                        variant="outlined"
+                        color="error"
+                        fullWidth
+                        size="large"
                     >
                         Delete Event
                     </Button>
                 )}
-            </Stack>
+            </Box>
         </Box>
     );
 };

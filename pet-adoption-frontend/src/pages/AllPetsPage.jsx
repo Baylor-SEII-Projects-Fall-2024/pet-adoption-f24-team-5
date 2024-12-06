@@ -26,14 +26,9 @@ import { useLocation } from 'react-router-dom';
 const AvailablePets = () => {
     const [loading, setLoading] = useState(true);
     const [pets, setPets] = useState([]);
-    const [speciesFilter, setSpeciesFilter] = useState('');
-    const [breedFilter, setBreedFilter] = useState('');
-    const [colorFilter, setColorFilter] = useState('');
-    const [sexFilter, setSexFilter] = useState('');
-    const [ageFilter, setAgeFilter] = useState('');
     const [searchText, setSearchText] = useState('');
-    const [distance, setDistance] = useState('');
     const [centerFilter, setCenterFilter] = useState('');
+    const [distance, setDistance] = useState('');
     const token = useSelector((state) => state.user.token);
     const userLocation = useSelector((state) => state.user.location);
     const [centers, setCenters] = useState([]);
@@ -100,73 +95,51 @@ const AvailablePets = () => {
         const matchesSearch = searchTerms.length === 0 || searchTerms.every(term =>
             pet.species.toLowerCase().includes(term) ||
             pet.breed.toLowerCase().includes(term) ||
-            pet.color.toLowerCase().includes(term)
+            pet.color.toLowerCase().includes(term) ||
+            pet.sex.toLowerCase().includes(term) ||
+            pet.age.toString().includes(term)
         );
 
-        const matchesFilters =
-            (speciesFilter ? pet.species.toLowerCase() === speciesFilter.toLowerCase() : true) &&
-            (breedFilter ? pet.breed.toLowerCase() === breedFilter.toLowerCase() : true) &&
-            (colorFilter ? pet.color.toLowerCase() === colorFilter.toLowerCase() : true) &&
-            (sexFilter ? pet.sex.toLowerCase() === sexFilter.toLowerCase() : true) &&
-            (ageFilter ? pet.age.toString() === ageFilter : true) &&
-            (centerFilter ? pet.adoptionCenter.id.toString() === centerFilter.toString() : true);
+        const matchesCenter = !centerFilter ||
+            pet.adoptionCenter.id.toString() === centerFilter.toString();
 
         const center = centers.find(c => c.id === pet.adoptionCenter.id);
         const withinDistance = !distance || !userLocation || !center ||
             calculateDistance(center.location) <= parseInt(distance);
 
-        return matchesSearch && matchesFilters && withinDistance;
+        return matchesSearch && matchesCenter && withinDistance;
     });
-
-    const getUniqueValues = (key, filterBySpecies = false) => {
-        if (filterBySpecies && speciesFilter) {
-            return [...new Set(pets.filter(pet => pet.species.toLowerCase() === speciesFilter.toLowerCase()).map(pet => pet[key]))];
-        }
-        return [...new Set(pets.map(pet => pet[key]))];
-    };
-
-    const centerOptions = centers.map(center => ({
-        id: center.id,
-        name: center.centerName
-    }));
-    const speciesOptions = getUniqueValues('species');
-    const breedOptions = getUniqueValues('breed', true);
-    const colorOptions = getUniqueValues('color', true);
-    const sexOptions = getUniqueValues('sex', true);
-    const ageOptions = getUniqueValues('age', true);
 
     return (
         <Container
             maxWidth="xl"
             sx={{
-                height: 'calc(100vh - 64px)',
+                height: '92vh',
                 py: 1,
+                mb: 1,
                 display: 'flex',
                 flexDirection: 'column',
                 overflow: 'hidden',
                 maxWidth: '1800px'
             }}
         >
-            {/* Even More Compact Search Section */}
             <Paper
                 elevation={1}
                 sx={{
                     p: 1,
-                    mb: 1,
+                    mb: 0.5,
                     borderRadius: '8px',
                     backgroundColor: 'background.paper',
                     flexShrink: 0
                 }}
             >
                 <Grid container spacing={1}>
-                    {/* Search Row */}
                     <Grid item xs={12}>
                         <Box sx={{
                             display: 'flex',
                             gap: 1,
                             alignItems: 'center'
                         }}>
-                            {/* Title */}
                             <Typography
                                 variant="h6"
                                 sx={{
@@ -179,29 +152,45 @@ const AvailablePets = () => {
                                 Find Pets
                             </Typography>
 
-                            {/* Search Field */}
                             <TextField
                                 size="small"
-                                placeholder="Search pets..."
+                                placeholder="Search by species, breed, color, sex, or age (use commas to separate terms)"
                                 variant="outlined"
                                 value={searchText}
                                 onChange={(e) => setSearchText(e.target.value)}
                                 InputProps={{
                                     startAdornment: (
                                         <InputAdornment position="start">
-                                            <SearchIcon color="action" fontSize="small" />
+                                            <SearchIcon color="action" />
+                                        </InputAdornment>
+                                    ),
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <Typography
+                                                variant="caption"
+                                                sx={{
+                                                    color: 'text.secondary',
+                                                    whiteSpace: 'nowrap',
+                                                    fontSize: '0.85rem'
+                                                }}
+                                            >
+                                                {filteredPets.length} results
+                                            </Typography>
                                         </InputAdornment>
                                     ),
                                 }}
                                 sx={{
                                     flex: 1,
                                     '& .MuiOutlinedInput-root': {
-                                        height: '32px'
+                                        height: '40px',
+                                        '& input': {
+                                            padding: '8px 0',
+                                            fontSize: '0.95rem'
+                                        }
                                     }
                                 }}
                             />
 
-                            {/* Center Select */}
                             <FormControl sx={{ width: 150 }}>
                                 <Select
                                     value={centerFilter}
@@ -218,63 +207,14 @@ const AvailablePets = () => {
                                     ))}
                                 </Select>
                             </FormControl>
-                        </Box>
-                    </Grid>
 
-                    {/* Filter Pills Row */}
-                    <Grid item xs={12}>
-                        <Box sx={{
-                            display: 'flex',
-                            gap: 1,
-                            flexWrap: 'wrap',
-                            alignItems: 'center'
-                        }}>
-                            {/* Filter Controls */}
-                            {[
-                                { value: speciesFilter, setter: setSpeciesFilter, options: speciesOptions, label: "Species", width: 100 },
-                                { value: breedFilter, setter: setBreedFilter, options: breedOptions, label: "Breed", width: 100 },
-                                { value: sexFilter, setter: setSexFilter, options: sexOptions, label: "Sex", width: 80 },
-                                { value: ageFilter, setter: setAgeFilter, options: ageOptions, label: "Age", width: 80 }
-                            ].map((filter) => (
-                                <FormControl
-                                    key={filter.label}
-                                    size="small"
-                                    sx={{ width: filter.width }}
-                                >
-                                    <Select
-                                        value={filter.value}
-                                        onChange={(e) => filter.setter(e.target.value)}
-                                        displayEmpty
-                                        sx={{
-                                            height: '32px',
-                                            borderRadius: '16px',
-                                            '& .MuiSelect-select': {
-                                                py: 0.5
-                                            }
-                                        }}
-                                    >
-                                        <MenuItem value="">{filter.label}</MenuItem>
-                                        {filter.options.map((option) => (
-                                            <MenuItem key={option} value={option}>{option}</MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-                            ))}
-
-                            {/* Distance Filter */}
                             {userLocation && (
                                 <FormControl size="small" sx={{ width: 100 }}>
                                     <Select
                                         value={distance}
                                         onChange={(e) => setDistance(e.target.value)}
                                         displayEmpty
-                                        sx={{
-                                            height: '32px',
-                                            borderRadius: '16px',
-                                            '& .MuiSelect-select': {
-                                                py: 0.5
-                                            }
-                                        }}
+                                        sx={{ height: '32px' }}
                                     >
                                         <MenuItem value="">Distance</MenuItem>
                                         <MenuItem value="5">5 km</MenuItem>
@@ -308,21 +248,6 @@ const AvailablePets = () => {
                     </Box>
                 ) : (
                     <>
-                        <Box sx={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            mb: 1,
-                            px: 1
-                        }}>
-                            <Typography
-                                variant="subtitle2"
-                                sx={{ color: 'text.secondary' }}
-                            >
-                                {filteredPets.length} Pets Found
-                            </Typography>
-                        </Box>
-
                         {/* Scrollable Grid Container */}
                         <Box sx={{
                             flex: 1,
