@@ -8,7 +8,8 @@ import {
     Alert,
     TextField,
     InputAdornment,
-    IconButton
+    IconButton,
+    Drawer
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -18,6 +19,7 @@ import { useSelector } from 'react-redux';
 
 import { getUser } from "@/utils/user/getUser";
 import { getCenters } from "@/utils/user/center/getCenters";
+import { getAllPets } from "@/utils/pet/getAllPets";
 import MapComponent from '../components/MapComponent';
 
 // Updated calculateDistance function to return miles
@@ -37,11 +39,12 @@ const calculateDistance = (lat1, lon1, lat2, lon2) => {
 export default function AdoptionCenterPage() {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState(false);
     const [userEmail, setUserEmail] = useState(null);
     const [ownerLat, setOwnerLat] = useState(null);
     const [ownerLng, setOwnerLng] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
+    const [expandedCenterId, setExpandedCenterId] = useState(null);
     const token = useSelector((state) => state.user.token);
     const mapRef = useRef(null);
 
@@ -60,6 +63,13 @@ export default function AdoptionCenterPage() {
                         }
 
                         let centers = await getCenters(token);
+
+                        let petsForCenterCounts = await getAllPets(token);
+
+                        centers.forEach(center => {
+                            center.numberOfPets = petsForCenterCounts.filter(pet => pet.adoptionCenter.id === center.id).length;
+                        });
+                        console.log(centers);
 
                         if (user.userType === 'Owner' && user.latitude && user.longitude) {
                             centers = centers.sort((a, b) => {
@@ -83,8 +93,18 @@ export default function AdoptionCenterPage() {
         fetchData();
     }, [token]);
 
-    const handleCenterClick = (center) => {
-        mapRef.current?.zoomToCenter(center);
+    const handleCenterClick = (addressOrCenter) => {
+        if (typeof addressOrCenter === 'string') {
+            // If it's a string, treat it as an address
+            mapRef.current?.zoomToAddress(addressOrCenter);
+        } else {
+            // If it's an object, treat it as center coordinates
+            mapRef.current?.zoomToCenter(addressOrCenter);
+        }
+    };
+
+    const handleExpandCenter = (centerId) => {
+        setExpandedCenterId(expandedCenterId === centerId ? null : centerId);
     };
 
     const filteredCenters = data?.filter(center => {
@@ -113,14 +133,7 @@ export default function AdoptionCenterPage() {
                 </Box>
             ) : error ? (
                 <Box display="flex" justifyContent="center" alignItems="center" flex={1}>
-                    <Alert
-                        severity="error"
-                        sx={{
-                            m: 4,
-                            borderRadius: 2,
-                            '& .MuiAlert-message': { fontSize: '1.1rem' }
-                        }}
-                    >
+                    <Alert severity="error" sx={{ m: 4, borderRadius: 2, '& .MuiAlert-message': { fontSize: '1.1rem' } }}>
                         {error}
                     </Alert>
                 </Box>
@@ -131,7 +144,7 @@ export default function AdoptionCenterPage() {
                         <MapComponent ref={mapRef} centers={filteredCenters} />
                     </Box>
 
-                    {/* Centers List - Right Side */}
+                    {/* Centers List - Middle */}
                     <Box
                         sx={{
                             flex: 1,
@@ -160,11 +173,7 @@ export default function AdoptionCenterPage() {
                                     ),
                                     endAdornment: searchQuery && (
                                         <InputAdornment position="end">
-                                            <IconButton
-                                                size="small"
-                                                onClick={handleClearSearch}
-                                                edge="end"
-                                            >
+                                            <IconButton size="small" onClick={handleClearSearch} edge="end">
                                                 <ClearIcon />
                                             </IconButton>
                                         </InputAdornment>
@@ -173,12 +182,8 @@ export default function AdoptionCenterPage() {
                                 sx={{
                                     bgcolor: 'background.paper',
                                     '& .MuiOutlinedInput-root': {
-                                        '& fieldset': {
-                                            borderColor: 'divider',
-                                        },
-                                        '&:hover fieldset': {
-                                            borderColor: 'primary.main',
-                                        }
+                                        '& fieldset': { borderColor: 'divider' },
+                                        '&:hover fieldset': { borderColor: 'primary.main' }
                                     }
                                 }}
                             />
@@ -189,10 +194,7 @@ export default function AdoptionCenterPage() {
                             {filteredCenters?.length === 0 ? (
                                 <Alert
                                     severity="info"
-                                    sx={{
-                                        borderRadius: 2,
-                                        '& .MuiAlert-message': { fontSize: '1.1rem' }
-                                    }}
+                                    sx={{ borderRadius: 2, '& .MuiAlert-message': { fontSize: '1.1rem' } }}
                                 >
                                     {searchQuery
                                         ? 'No adoption centers match your search.'
@@ -204,6 +206,8 @@ export default function AdoptionCenterPage() {
                                         <AdoptionCenterCard
                                             key={center.id}
                                             center={center}
+                                            expanded={expandedCenterId === center.id}
+                                            onExpand={() => handleExpandCenter(center.id)}
                                             distance={
                                                 ownerLat && ownerLng
                                                     ? calculateDistance(ownerLat, ownerLng, center.latitude, center.longitude)

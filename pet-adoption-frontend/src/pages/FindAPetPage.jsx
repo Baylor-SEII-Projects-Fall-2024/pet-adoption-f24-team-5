@@ -1,21 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Grid, Typography, Button, IconButton, Stack } from "@mui/material";
-import { ExpandMore, ExpandLess } from '@mui/icons-material';
+import { Box, Grid, Typography, Button } from "@mui/material";
 import { getSubjectFromToken, getAuthorityFromToken } from "@/utils/redux/tokenUtils";
 import { useSelector } from "react-redux";
 import PetCard from "@/components/petCard/PetCard";
 import { generateNewOptions } from "@/utils/recommendationEngine/generateNewOptions";
-import { getEvents } from "@/utils/event/getEvents";
-import { getCenterName } from "@/utils/user/center/getCenterName";
-import EventCard from "@/components/eventCard/EventCard";
 import HamburgerMenu from "@/components/HamburgerMenu";
 import SavedPetsModal from "@/components/SavedPetsModal";
 
 const FindAPetPage = () => {
     const [currentPets, setCurrentPets] = useState([]);
     const [preloadedPets, setPreloadedPets] = useState([]);
-    const [events, setEvents] = useState([]);
-    const [isEventsCollapsed, setIsEventsCollapsed] = useState(false);
     const token = useSelector((state) => state.user.token);
     const [email, setEmail] = useState(getSubjectFromToken(token));
     const userType = getAuthorityFromToken(token);
@@ -23,27 +17,6 @@ const FindAPetPage = () => {
     const [showWelcomeModal, setShowWelcomeModal] = useState(false);
     const [hamburgerAnchorEl, setHamburgerAnchorEl] = useState(null);
     const [savedPetsModalOpen, setSavedPetsModalOpen] = useState(false);
-
-    useEffect(() => {
-        const fetchEvents = async () => {
-            try {
-                const eventsResponse = await getEvents(token) || [];
-
-                const eventsWithCenterNames = await Promise.all(
-                    eventsResponse.map(async (event) => {
-                        const centerName = await getCenterName(token, event.center_id);
-                        return { ...event, center_name: centerName };
-                    })
-                );
-
-                setEvents(eventsWithCenterNames);
-            } catch (error) {
-                console.error('Error fetching events:', error);
-            }
-        };
-
-        fetchEvents();
-    }, [token, userType, email]);
 
     useEffect(() => {
         handleSearch();
@@ -84,79 +57,7 @@ const FindAPetPage = () => {
     }
 
     return (
-        <Box sx={{ height: '92vh', display: 'flex' }}>
-            {/* Events Sidebar */}
-            <Box
-                sx={{
-                    width: isEventsCollapsed ? '60px' : '400px',
-                    borderRight: '1px solid #e0e0e0',
-                    bgcolor: 'white',
-                    transition: 'width 0.3s ease',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: '92vh',
-                    overflowY: 'auto',
-                }}
-            >
-                {/* Sidebar Header */}
-                <Box
-                    sx={{
-                        p: 2,
-                        borderBottom: '1px solid #e0e0e0',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: isEventsCollapsed ? 'center' : 'space-between',
-                        position: 'sticky',
-                        top: 0,
-                        bgcolor: 'white',
-                        zIndex: 1,
-                    }}
-                >
-                    {!isEventsCollapsed && (
-                        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                            Upcoming Events
-                        </Typography>
-                    )}
-                    <IconButton
-                        onClick={() => setIsEventsCollapsed(!isEventsCollapsed)}
-                        sx={{
-                            transform: isEventsCollapsed ? 'rotate(180deg)' : 'none',
-                            transition: 'transform 0.3s ease',
-                        }}
-                    >
-                        {isEventsCollapsed ? <ExpandMore /> : <ExpandLess />}
-                    </IconButton>
-                </Box>
-
-                {/* Events List */}
-                {!isEventsCollapsed && (
-                    <Box sx={{ p: 2, overflowY: 'auto' }}>
-                        {events.length > 0 ? (
-                            <Stack spacing={2}>
-                                {events.map((event) => (
-                                    <EventCard
-                                        key={event.id}
-                                        event={event}
-                                        sx={{
-                                            width: '100%',
-                                            height: 'auto',
-                                        }}
-                                    />
-                                ))}
-                            </Stack>
-                        ) : (
-                            <Typography
-                                variant="body1"
-                                textAlign="center"
-                                sx={{ color: 'text.secondary', mt: 2 }}
-                            >
-                                No upcoming events at this time
-                            </Typography>
-                        )}
-                    </Box>
-                )}
-            </Box>
-
+        <Box sx={{ height: '92vh', display: 'flex', flexDirection: 'column' }}>
             {/* Main Content Area */}
             <Box sx={{
                 flex: 1,
@@ -177,8 +78,8 @@ const FindAPetPage = () => {
                                 <Grid
                                     item
                                     xs={12}
-                                    sm={isEventsCollapsed ? 6 : 6}
-                                    md={isEventsCollapsed ? 4 : 4}
+                                    sm={6}
+                                    md={4}
                                     key={pet.id}
                                 >
                                     <PetCard pet={pet} onLike={handleSearch} />
