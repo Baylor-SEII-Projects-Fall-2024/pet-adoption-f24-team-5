@@ -1,5 +1,4 @@
-import { Button } from "@mui/material";
-import { ActionButtons } from "./styles/PetCard.styles";
+import { Button, Box } from "@mui/material";
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import MessageIcon from '@mui/icons-material/Message';
@@ -15,15 +14,23 @@ const PetCardActions = ({
     onDelete
 }) => {
     return (
-        <ActionButtons>
+        <Box sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 0.5
+        }}>
             {saveable && (
                 <Button
                     onClick={onSave}
                     variant="contained"
-                    startIcon={<BookmarkIcon />}
+                    startIcon={<BookmarkIcon sx={{ fontSize: '1.2rem' }} />}
+                    fullWidth
+                    size="small"
                     sx={{
-                        bgcolor: 'primary.main',
-                        '&:hover': { bgcolor: 'primary.dark' }
+                        borderRadius: '6px',
+                        textTransform: 'none',
+                        fontWeight: 600,
+                        fontSize: '0.875rem'
                     }}
                 >
                     Save Pet
@@ -32,11 +39,19 @@ const PetCardActions = ({
             {likeable && (
                 <Button
                     onClick={onLike}
-                    variant="contained"
+                    variant="outlined"
                     startIcon={<FavoriteIcon />}
+                    fullWidth
                     sx={{
-                        bgcolor: 'secondary.main',
-                        '&:hover': { bgcolor: 'secondary.dark' }
+                        borderRadius: '8px',
+                        textTransform: 'none',
+                        fontWeight: 600,
+                        borderColor: 'secondary.main',
+                        color: 'secondary.main',
+                        '&:hover': {
+                            borderColor: 'secondary.dark',
+                            backgroundColor: 'secondary.50'
+                        }
                     }}
                 >
                     Like Pet
@@ -47,7 +62,11 @@ const PetCardActions = ({
                     onClick={onContact}
                     variant="contained"
                     startIcon={<MessageIcon />}
+                    fullWidth
                     sx={{
+                        borderRadius: '8px',
+                        textTransform: 'none',
+                        fontWeight: 600,
                         bgcolor: 'success.main',
                         '&:hover': { bgcolor: 'success.dark' }
                     }}
@@ -58,17 +77,25 @@ const PetCardActions = ({
             {onDelete && (
                 <Button
                     onClick={onDelete}
-                    variant="contained"
+                    variant="outlined"
                     startIcon={<DeleteIcon />}
+                    fullWidth
                     sx={{
-                        bgcolor: 'error.main',
-                        '&:hover': { bgcolor: 'error.dark' }
+                        borderRadius: '8px',
+                        textTransform: 'none',
+                        fontWeight: 600,
+                        borderColor: 'error.main',
+                        color: 'error.main',
+                        '&:hover': {
+                            borderColor: 'error.dark',
+                            backgroundColor: 'error.50'
+                        }
                     }}
                 >
                     Delete Pet
                 </Button>
             )}
-        </ActionButtons>
+        </Box>
     );
 };
 

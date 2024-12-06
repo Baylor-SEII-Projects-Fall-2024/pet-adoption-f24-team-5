@@ -1,5 +1,5 @@
-import React from 'react';
-import { Modal, Typography, Button, Divider, Fade, Box, Tooltip, IconButton } from '@mui/material';
+import React, { useState } from 'react';
+import { Modal, Typography, Button, Divider, Fade, Box, Tooltip, IconButton, Backdrop } from '@mui/material';
 import ImageComponent from '../imageComponent/ImageComponent';
 import { useSelector } from 'react-redux';
 import { getSubjectFromToken } from "@/utils/redux/tokenUtils";
@@ -32,12 +32,16 @@ import {
 import { getUser } from '@/utils/user/getUser';
 import { startConversation } from '@/utils/message/startConversation';
 import { useNavigate } from 'react-router-dom';
+import { CircularProgress } from '@mui/material';
 
 
 const ExpandedPetCard = ({ pet, onClose, saveable = true, likeable = true, contactable = true, onLike = null }) => {
     const token = useSelector((state) => state.user.token);
     const [imageZoom, setImageZoom] = React.useState(false);
     const navigate = useNavigate();
+
+    if (!pet) return null;
+
     const handleSavePetToOwner = async () => {
         const email = getSubjectFromToken(token);
         const formattedPet = {
@@ -100,8 +104,23 @@ const ExpandedPetCard = ({ pet, onClose, saveable = true, likeable = true, conta
             open={!!pet}
             onClose={onClose}
             closeAfterTransition
+            slots={{ backdrop: Backdrop }}
+            slotProps={{
+                backdrop: {
+                    timeout: 500,
+                    sx: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    }
+                }
+            }}
         >
-            <Fade in={!!pet}>
+            <Fade
+                in={!!pet}
+                timeout={300}
+                style={{
+                    transitionDelay: '100ms'
+                }}
+            >
                 <ModalContainer>
                     <ImageSection>
                         <ImageComponent
@@ -110,8 +129,8 @@ const ExpandedPetCard = ({ pet, onClose, saveable = true, likeable = true, conta
                             height="100%"
                             style={{
                                 transform: imageZoom ? 'scale(1.5)' : 'scale(1)',
-                                transition: 'transform 0.3s ease',
-                                cursor: 'pointer',
+                                transition: 'all 0.3s ease',
+                                cursor: 'pointer'
                             }}
                             onClick={() => setImageZoom(!imageZoom)}
                         />

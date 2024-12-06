@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Head from 'next/head';
-import { Button, Card, CardContent, Stack, TextField, Typography, Paper } from '@mui/material';
+import { Button, Card, CardContent, Stack, TextField, Typography, Paper, Container, Box, Grid } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { handleUpdateUser } from '../utils/user/updateUser';
@@ -104,241 +104,228 @@ export default function SettingsPage() {
   }
 
   return (
-    <>
-      <Head>
-        <title>Settings Page</title>
-      </Head>
-      <main>
-        <Stack sx={{ paddingTop: 4 }} alignItems='center' gap={2}>
-          <Card sx={{ width: 600, height: 80 }} elevation={4}>
-            <CardContent>
-              <Typography variant='h3' align='center'>Settings</Typography>
-            </CardContent>
-          </Card>
+    <Container
+      maxWidth="xl"
+      sx={{
+        py: 3,
+        px: 2,
+        height: '92vh', // Account for navbar height
+        overflow: 'auto'
+      }}
+    >
+      {/* Title Section */}
+      <Box sx={{ textAlign: 'center', mb: 2 }}>
+        <Typography
+          variant="h5"
+          sx={{
+            color: 'primary.main',
+            fontSize: '1.5rem',
+            fontWeight: 500
+          }}
+        >
+          Settings
+        </Typography>
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{ mt: 0.5 }}
+        >
+          Manage your account information
+        </Typography>
+      </Box>
+
+      {/* Form Container */}
+      <Box
+        sx={{
+          maxWidth: '600px',
+          mx: 'auto',
+          backgroundColor: 'background.paper',
+          borderRadius: 1,
+          boxShadow: 1,
+          p: 3
+        }}
+      >
+        <Stack spacing={2.5}>
           {updatedValuesRef.current.userType !== 'CenterOwner' && (
             <>
-              <Paper sx={{ width: 600, height: 50 }} elevation={4}>
-                <Stack spacing={1} direction="row" alignItems='center'>
-                  <Typography variant='h5'>First Name</Typography>
-                  <TextField
-                    label="First Name"
-                    align='center'
-                    value={updatedValuesRef.current.firstName}
-                    onChange={(e) => {
-                      updatedValuesRef.current.firstName = e.target.value;
-                      setForceUpdate(prev => prev + 1);
-                    }}
-                    InputProps={{
-                      style: { height: '40px', width: '470px' },
-                      readOnly: !isEditing
-                    }}
-                  />
-                </Stack>
-              </Paper>
-              <Paper sx={{ width: 600, height: 50 }} elevation={4}>
-                <Stack spacing={1} direction="row" alignItems='center'>
-                  <Typography variant='h5'>Last Name</Typography>
-                  <TextField
-                    label="Last Name"
-                    align='center'
-                    value={updatedValuesRef.current.lastName}
-                    onChange={(e) => {
-                      updatedValuesRef.current.lastName = e.target.value;
-                      setForceUpdate(prev => prev + 1);
-                    }}
-                    InputProps={{
-                      style: { height: '40px', width: '470px' },
-                      readOnly: !isEditing
-                    }}
-                  />
-                </Stack>
-              </Paper>
-            </>
-          )}
-          <Paper sx={{ width: 600, height: invalidPhoneNumber ? 70 : 50 }} elevation={4}>
-            <Stack spacing={1} direction="row" alignItems='center'>
-              <Typography variant='h5'>Phone Number</Typography>
               <TextField
-                label="Phone Number"
-                align='center'
-                value={updatedValuesRef.current.phoneNumber}
-                onChange={(e) => { handlePhoneNumberChange(e) }}
-                InputProps={{
-                  style: { height: '40px', width: '425px' },
-                  readOnly: !isEditing
+                fullWidth
+                label="First Name"
+                value={updatedValuesRef.current.firstName || ''}
+                onChange={(e) => {
+                  updatedValuesRef.current.firstName = e.target.value;
+                  setForceUpdate(prev => prev + 1);
+                }}
+                disabled={!isEditing}
+                variant="outlined"
+                InputLabelProps={{
+                  shrink: true,
                 }}
               />
-            </Stack>
-            {invalidPhoneNumber && (
-              <Typography color="error" variant="body2">
-                Please enter a valid phone number.
-              </Typography>
-            )}
-          </Paper>
-          <Paper sx={{ width: 600, height: invalidPassword ? 120 : 90 }} elevation={4}>
-            <Stack spacing={1} direction="row" alignItems='center'>
-              <Typography variant='h5' width={160}>Old Password</Typography>
               <TextField
+                fullWidth
+                label="Last Name"
+                value={updatedValuesRef.current.lastName || ''}
+                onChange={(e) => {
+                  updatedValuesRef.current.lastName = e.target.value;
+                  setForceUpdate(prev => prev + 1);
+                }}
+                disabled={!isEditing}
+                variant="outlined"
+                InputLabelProps={{
+                  shrink: true,
+                }}
+              />
+            </>
+          )}
+
+          <TextField
+            fullWidth
+            label="Phone Number"
+            value={updatedValuesRef.current.phoneNumber || ''}
+            onChange={handlePhoneNumberChange}
+            disabled={!isEditing}
+            error={invalidPhoneNumber}
+            helperText={invalidPhoneNumber ? "Please enter a valid phone number" : ""}
+            variant="outlined"
+            InputLabelProps={{
+              shrink: true,
+            }}
+          />
+
+          {isEditing && (
+            <>
+              <TextField
+                fullWidth
                 label="Old Password"
-                align='center'
+                type="password"
                 value={updatedValuesRef.current.oldPassword}
                 onChange={(e) => {
                   updatedValuesRef.current.oldPassword = e.target.value;
                   setForceUpdate(prev => prev + 1);
                 }}
-                InputProps={{
-                  style: { height: '40px', width: '425px' },
-                  readOnly: !isEditing
-                }}
+                variant="outlined"
               />
-            </Stack>
-            <Stack spacing={1} direction="row" alignItems='center'>
-              <Typography variant='h5'>New Password</Typography>
               <TextField
+                fullWidth
                 label="New Password"
-                align='center'
+                type="password"
                 value={updatedValuesRef.current.password}
                 onChange={(e) => {
                   updatedValuesRef.current.password = e.target.value;
                   setForceUpdate(prev => prev + 1);
                 }}
-                InputProps={{
-                  style: { height: '40px', width: '425px' },
-                  readOnly: !isEditing
-                }}
+                error={invalidPassword}
+                helperText={invalidPassword ? "Please enter a valid password" : ""}
+                variant="outlined"
               />
-            </Stack>
-            {invalidPassword && (
-              <Typography color="error" variant="body2" sx={{ marginTop: 1 }}>
-                Please enter a valid password.
-              </Typography>
-            )}
-          </Paper>
-          {updatedValuesRef.current.userType !== 'CenterOwner' && (
-            <Paper sx={{ width: 600, height: invalidAge ? 70 : 50 }} elevation={4}>
-              <Stack spacing={1} direction="row" alignItems='center'>
-                <Typography variant='h5'>Age</Typography>
-                <TextField
-                  id="age-input"
-                  type="number"
-                  value={updatedValuesRef.current.age}
-                  onChange={(e) => { handleAgeChange(e) }}
-                  inputProps={{
-                    min: 0,
-                    max: 100,
-                    style: { height: '8px' }
-                  }}
-                  sx={{ width: '545px' }}
-                />
-              </Stack>
-              {invalidAge && (
-                <Typography color="error" variant="body2" sx={{ marginTop: 1 }}>
-                  Please enter a valid age.
-                </Typography>
-              )}
-            </Paper>
+            </>
           )}
+
+          {updatedValuesRef.current.userType !== 'CenterOwner' && (
+            <TextField
+              fullWidth
+              label="Age"
+              type="number"
+              value={updatedValuesRef.current.age || ''}
+              onChange={handleAgeChange}
+              disabled={!isEditing}
+              error={invalidAge}
+              helperText={invalidAge ? "Please enter a valid age" : ""}
+              InputProps={{
+                inputProps: { min: 0, max: 100 }
+              }}
+              variant="outlined"
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+          )}
+
           {updatedValuesRef.current.userType === 'CenterOwner' && (
             <>
-              <Paper sx={{ width: 600, height: 50 }} elevation={4}>
-                <Stack spacing={1} direction="row" alignItems='center'>
-                  <Typography variant='h5'>Center Name</Typography>
+              <TextField
+                fullWidth
+                label="Center Name"
+                value={updatedValuesRef.current.centerName}
+                onChange={(e) => {
+                  updatedValuesRef.current.centerName = e.target.value;
+                  setForceUpdate(prev => prev + 1);
+                }}
+                disabled={!isEditing}
+                variant="outlined"
+              />
+              <TextField
+                fullWidth
+                label="Center Address"
+                value={updatedValuesRef.current.centerAddress}
+                onChange={(e) => {
+                  updatedValuesRef.current.centerAddress = e.target.value;
+                  setForceUpdate(prev => prev + 1);
+                }}
+                disabled={!isEditing}
+                variant="outlined"
+              />
+              <Grid container spacing={2}>
+                <Grid item xs={6}>
                   <TextField
-                    label="Center Name"
-                    align='center'
-                    value={updatedValuesRef.current.centerName}
-                    onChange={(e) => {
-                      updatedValuesRef.current.centerName = e.target.value;
-                      setForceUpdate(prev => prev + 1);
-                    }}
-                    InputProps={{
-                      style: { height: '40px', width: '440px' },
-                      readOnly: !isEditing
-                    }}
-                  />
-                </Stack>
-              </Paper>
-              <Paper sx={{ width: 600, height: 50 }} elevation={4}>
-                <Stack spacing={1} direction="row" alignItems='center'>
-                  <Typography variant='h5'>Center Address</Typography>
-                  <TextField
-                    label="Center Address"
-                    align='center'
-                    value={updatedValuesRef.current.centerAddress}
-                    onChange={(e) => {
-                      updatedValuesRef.current.centerAddress = e.target.value;
-                      setForceUpdate(prev => prev + 1);
-                    }}
-                    InputProps={{
-                      style: { height: '40px', width: '420px' },
-                      readOnly: !isEditing
-                    }}
-                  />
-                </Stack>
-              </Paper>
-              <Paper sx={{ width: 600, height: 50 }} elevation={4}>
-                <Stack spacing={1} direction="row" alignItems='center'>
-                  <Typography variant='h5'>Center City</Typography>
-                  <TextField
+                    fullWidth
                     label="Center City"
-                    align='center'
                     value={updatedValuesRef.current.centerCity}
                     onChange={(e) => {
                       updatedValuesRef.current.centerCity = e.target.value;
                       setForceUpdate(prev => prev + 1);
                     }}
-                    InputProps={{
-                      style: { height: '40px', width: '465px' },
-                      readOnly: !isEditing
-                    }}
+                    disabled={!isEditing}
+                    variant="outlined"
                   />
-                </Stack>
-              </Paper>
-              <Paper sx={{ width: 600, height: 50 }} elevation={4}>
-                <Stack spacing={1} direction="row" alignItems='center'>
-                  <Typography variant='h5'>Center State</Typography>
+                </Grid>
+                <Grid item xs={6}>
                   <TextField
+                    fullWidth
                     label="Center State"
-                    align='center'
                     value={updatedValuesRef.current.centerState}
                     onChange={(e) => {
                       updatedValuesRef.current.centerState = e.target.value;
                       setForceUpdate(prev => prev + 1);
                     }}
-                    InputProps={{
-                      style: { height: '40px', width: '450px' },
-                      readOnly: !isEditing
-                    }}
+                    disabled={!isEditing}
+                    variant="outlined"
                   />
-                </Stack>
-              </Paper>
+                </Grid>
+              </Grid>
             </>
           )}
 
-          <Paper sx={{ width: 600, height: !invalidZip ? 50 : 70 }} elevation={4}>
-            <Stack spacing={1} direction="row" alignItems='center'>
-              <Typography variant='h5'>Center Zip</Typography>
-              <TextField
-                label="Center Zip"
-                align='center'
-                value={updatedValuesRef.current.centerZip}  // Bind the current centerZip value here
-                onChange={(e) => { handleZipChange(e) }}  // Allow user to change zip
-                InputProps={{
-                  style: { height: '40px', width: '470px' },
-                  readOnly: !isEditing,  // Read-only until the user clicks Edit
-                }}
-              />
-            </Stack>
-            {invalidZip && (
-              <Typography color="error" variant="body2">
-                Please enter a valid zip code.
-              </Typography>
-            )}
-          </Paper>
+          <TextField
+            fullWidth
+            label="Center Zip"
+            value={updatedValuesRef.current.centerZip || ''}
+            onChange={handleZipChange}
+            disabled={!isEditing}
+            error={invalidZip}
+            helperText={invalidZip ? "Please enter a valid zip code" : ""}
+            variant="outlined"
+            InputLabelProps={{
+              shrink: true,
+            }}
+          />
 
-          <Button onClick={isEditing ? handleSave : handleEdit}>{isEditing ? 'Save' : 'Edit'}</Button>
+          {/* Action Button */}
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={isEditing ? handleSave : handleEdit}
+            sx={{
+              mt: 2,
+              py: 1,
+              width: '100%'
+            }}
+          >
+            {isEditing ? 'Save Changes' : 'Edit'}
+          </Button>
         </Stack>
-      </main>
-    </>
+      </Box>
+    </Container>
   );
 }

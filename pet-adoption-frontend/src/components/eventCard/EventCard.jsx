@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Typography, Box } from "@mui/material";
+import { Typography, Box, Button } from "@mui/material";
 import { getAuthorityFromToken } from "@/utils/redux/tokenUtils";
 import { useSelector } from "react-redux";
 import {
@@ -19,8 +19,13 @@ import {
     LocationItem,
 } from "./EventCard.styles";
 import { getCenterAddress } from "@/utils/user/center/getCenterAddress";
+import EditIcon from '@mui/icons-material/Edit';
 
-const EventCard = ({ event }) => {
+const EventCard = ({
+    event,
+    onClick,
+    isManagerView = false
+}) => {
     const token = useSelector((state) => state.user.token);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
@@ -73,108 +78,210 @@ const EventCard = ({ event }) => {
         fetchLocation();
     }, [token, event.center_id]);
 
+    const managerCardStyles = isManagerView ? {
+        '& .MuiTypography-h4': {
+            fontSize: '1.5rem',
+            fontWeight: 600,
+            color: 'primary.main',
+            mb: 2
+        },
+        '& .detail-item': {
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            color: 'text.secondary',
+            '& .MuiSvgIcon-root': {
+                fontSize: '1.2rem',
+                color: 'primary.main'
+            }
+        },
+        '& .location-section': {
+            mt: 1,
+            p: 1,
+            bgcolor: 'action.hover',
+            borderRadius: 1,
+        }
+    } : {};
+
     return (
         <>
-            <Box sx={{ width: "330px", height: "400px" }}>
+            <Box sx={{ width: "100%", height: "fit-content" }}>
                 <StyledCard
-                    onClick={() => setIsModalOpen(true)}
+                    onClick={isManagerView ? undefined : () => setIsModalOpen(true)}
                     onMouseEnter={() => setIsHovered(true)}
                     onMouseLeave={() => setIsHovered(false)}
-                    sx={{ cursor: 'pointer' }}
+                    sx={{
+                        cursor: isManagerView ? 'default' : 'pointer',
+                        p: 2,
+                        ...managerCardStyles
+                    }}
                 >
-                    <BlurredContent isHovered={isHovered}>
+                    {isManagerView ? (
                         <EventInfo>
-                            {getAuthorityFromToken(token) === "Owner" && (
-                                <Typography
-                                    variant="h6"
-                                    sx={{
-                                        color: "text.secondary",
-                                        mb: 1
-                                    }}
-                                >
-                                    {event.centerName || event.center_name || "Unknown Center"}
-                                </Typography>
-                            )}
-
                             <Typography
                                 variant="h4"
                                 sx={{
-                                    fontWeight: 700,
-                                    mb: 2,
-                                    background: 'linear-gradient(45deg, #1976d2, #42a5f5)',
-                                    WebkitBackgroundClip: 'text',
-                                    WebkitTextFillColor: 'transparent',
+                                    borderBottom: 1,
+                                    borderColor: 'divider',
+                                    pb: 1
                                 }}
                             >
                                 {event.eventName || event.event_name || "Untitled Event"}
                             </Typography>
 
-                            <DetailGrid>
-                                <DateTimeBox>
-                                    <DetailItem>
-                                        <EventIcon />
-                                        <Typography variant="body2" fontWeight={500}>
-                                            {formatDate(event.eventDate || event.event_date)}
-                                        </Typography>
-                                    </DetailItem>
+                            <Box sx={{ mt: 2 }}>
+                                <Box className="detail-item">
+                                    <EventIcon />
+                                    <Typography variant="body1" fontWeight={500}>
+                                        {formatDate(event.eventDate || event.event_date)}
+                                    </Typography>
+                                </Box>
 
-                                    <DetailItem>
-                                        <ScheduleIcon />
-                                        <Typography variant="body2" fontWeight={500}>
-                                            {formatTime(event.eventTime || event.event_time)}
-                                        </Typography>
-                                    </DetailItem>
-                                </DateTimeBox>
+                                <Box className="detail-item" sx={{ mt: 1 }}>
+                                    <ScheduleIcon />
+                                    <Typography variant="body1" fontWeight={500}>
+                                        {formatTime(event.eventTime || event.event_time)}
+                                    </Typography>
+                                </Box>
 
-                                <LocationItem>
-                                    <LocationIcon />
-                                    <Box sx={{ flex: 1 }}>
-                                        <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 0.5 }}>
-                                            Location
-                                        </Typography>
-                                        <Typography variant="body2" fontWeight={500}>
+                                <Box className="location-section">
+                                    <Box className="detail-item">
+                                        <LocationIcon />
+                                        <Typography variant="body1" fontWeight={500}>
                                             {location}
                                         </Typography>
                                     </Box>
-                                </LocationItem>
-                            </DetailGrid>
+                                </Box>
+                            </Box>
 
                             <Typography
-                                variant="body1"
+                                variant="body2"
                                 sx={{
-                                    color: "text.secondary",
+                                    color: 'text.secondary',
+                                    mt: 2,
+                                    mb: 2,
                                     lineHeight: 1.6,
-                                    display: '-webkit-box',
-                                    WebkitLineClamp: 4,
-                                    WebkitBoxOrient: 'vertical',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    mb: 2
                                 }}
                             >
                                 {event.eventDescription || event.event_description || "No description available"}
                             </Typography>
-                        </EventInfo>
-                    </BlurredContent>
 
-                    <HoverOverlay className={isHovered ? "hovered" : ""}>
-                        <Box sx={{
-                            height: '100%',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            textAlign: 'center'
-                        }}>
-                            <Typography variant="h6" sx={{ mb: 2 }}>
-                                Click to view details
-                            </Typography>
-                        </Box>
-                    </HoverOverlay>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                fullWidth
+                                startIcon={<EditIcon />}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onClick(event);
+                                }}
+                                sx={{
+                                    mt: 'auto',
+                                    py: 1,
+                                    textTransform: 'none',
+                                    fontWeight: 600
+                                }}
+                            >
+                                Edit Event Details
+                            </Button>
+                        </EventInfo>
+                    ) : (
+                        <>
+                            <BlurredContent isHovered={isHovered}>
+                                <EventInfo>
+                                    {getAuthorityFromToken(token) === "Owner" && (
+                                        <Typography
+                                            variant="h6"
+                                            sx={{
+                                                color: "text.secondary",
+                                                mb: 1
+                                            }}
+                                        >
+                                            {event.centerName || event.center_name || "Unknown Center"}
+                                        </Typography>
+                                    )}
+
+                                    <Typography
+                                        variant="h4"
+                                        sx={{
+                                            fontWeight: 700,
+                                            mb: 2,
+                                            background: 'linear-gradient(45deg, #1976d2, #42a5f5)',
+                                            WebkitBackgroundClip: 'text',
+                                            WebkitTextFillColor: 'transparent',
+                                        }}
+                                    >
+                                        {event.eventName || event.event_name || "Untitled Event"}
+                                    </Typography>
+
+                                    <DetailGrid>
+                                        <DateTimeBox>
+                                            <DetailItem>
+                                                <EventIcon />
+                                                <Typography variant="body2" fontWeight={500}>
+                                                    {formatDate(event.eventDate || event.event_date)}
+                                                </Typography>
+                                            </DetailItem>
+
+                                            <DetailItem>
+                                                <ScheduleIcon />
+                                                <Typography variant="body2" fontWeight={500}>
+                                                    {formatTime(event.eventTime || event.event_time)}
+                                                </Typography>
+                                            </DetailItem>
+                                        </DateTimeBox>
+
+                                        <LocationItem>
+                                            <LocationIcon />
+                                            <Box sx={{ flex: 1 }}>
+                                                <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 0.5 }}>
+                                                    Location
+                                                </Typography>
+                                                <Typography variant="body2" fontWeight={500}>
+                                                    {location}
+                                                </Typography>
+                                            </Box>
+                                        </LocationItem>
+                                    </DetailGrid>
+
+                                    <Typography
+                                        variant="body1"
+                                        sx={{
+                                            color: "text.secondary",
+                                            lineHeight: 1.6,
+                                            display: '-webkit-box',
+                                            WebkitLineClamp: 4,
+                                            WebkitBoxOrient: 'vertical',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                            mb: 2
+                                        }}
+                                    >
+                                        {event.eventDescription || event.event_description || "No description available"}
+                                    </Typography>
+                                </EventInfo>
+                            </BlurredContent>
+
+                            <HoverOverlay className={isHovered ? "hovered" : ""}>
+                                <Box sx={{
+                                    height: '100%',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    textAlign: 'center'
+                                }}>
+                                    <Typography variant="h6" sx={{ mb: 2 }}>
+                                        Click to view details
+                                    </Typography>
+                                </Box>
+                            </HoverOverlay>
+                        </>
+                    )}
                 </StyledCard>
             </Box>
 
-            {isModalOpen && (
+            {!isManagerView && isModalOpen && (
                 <ExpandedEventCard
                     event={event}
                     onClose={() => setIsModalOpen(false)}
