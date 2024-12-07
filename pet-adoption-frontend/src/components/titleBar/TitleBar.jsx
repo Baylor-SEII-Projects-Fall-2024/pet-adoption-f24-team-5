@@ -131,6 +131,7 @@ const TitleBar = () => {
                             ))}
                         {location.pathname === '/Messages' && <span>Messages</span>}
                     </Button>
+                    <Button color="inherit" component={Link} to="/credits">Credits</Button>
                     <Button color="inherit" component={Link} to="/Settings">Settings</Button>
                     <Button color="inherit" onClick={handleLogout}>Log Out</Button>
                 </div>
