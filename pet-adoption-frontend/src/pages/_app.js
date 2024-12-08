@@ -11,6 +11,7 @@ import '@/styles/globals.css';
 import '@/styles/styled-button.css';
 
 import AppRoutes from "@/routing/routes";
+import { GoogleMapsProvider } from '../components/GoogleMapsProvider';
 
 
 export default function App() {
@@ -29,10 +30,12 @@ export default function App() {
             <link rel='icon' href='/favicon.ico' />
           </Head>
 
-          <PetAdoptionThemeProvider>
-            <CssBaseline />
-            {isClient && <AppRoutes />}
-          </PetAdoptionThemeProvider>
+          <GoogleMapsProvider>
+            <PetAdoptionThemeProvider>
+              <CssBaseline />
+              {isClient && <AppRoutes />}
+            </PetAdoptionThemeProvider>
+          </GoogleMapsProvider>
         </AppCacheProvider>
       </PersistGate>
     </ReduxProvider>

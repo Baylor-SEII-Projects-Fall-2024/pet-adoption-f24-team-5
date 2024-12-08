@@ -28,17 +28,39 @@ public class RecommendationEngineController {
     private final OwnerService ownerService;
     private final MilvusServiceAdapter milvusServiceAdapter;
 
+    @PostMapping("/skew-results")
+    public ResponseEntity<?> skewResults(@RequestParam String species, @RequestParam String email) {
+        String breed = "any";
+        String color = "multicolor";
+        int age = 6;
+
+        try {
+            List<String> cleanedPreferences = new ArrayList<>();
+            cleanedPreferences.add(species.toLowerCase().replaceAll("\\s+", ""));
+            cleanedPreferences.add(breed.toLowerCase().replaceAll("\\s+", ""));
+            cleanedPreferences.add(color.toLowerCase().replaceAll("\\s+", ""));
+            cleanedPreferences.add(String.valueOf(age).toLowerCase().replaceAll("\\s+", ""));
+
+            double[] userNewWeights = recommendationService.savePreferenceEmbedding(ownerService.findOwnerIdByEmail(email), cleanedPreferences, 2.75);
+            return new ResponseEntity<>(userNewWeights, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
     @PostMapping("/update-preference")
     public ResponseEntity<?> updatePreference(@RequestParam String email, @RequestBody Preference preference) {
         try{
-
+            long ownerId = ownerService.findOwnerIdByEmail(email);
             List<String> cleanedPreferences = new ArrayList<>();
             cleanedPreferences.add(preference.getPreferredSpecies().toLowerCase().replaceAll("\\s+", ""));
             cleanedPreferences.add(preference.getPreferredBreed().toLowerCase().replaceAll("\\s+", ""));
             cleanedPreferences.add(preference.getPreferredColor().toLowerCase().replaceAll("\\s+", ""));
             cleanedPreferences.add(String.valueOf(preference.getPreferredAge()).toLowerCase().replaceAll("\\s+", ""));
-            double[] usersNewWeights = recommendationService.savePreferenceEmbedding(ownerService.findOwnerIdByEmail(email)
-                    , cleanedPreferences);
+
+            double[] usersNewWeights = recommendationService.savePreferenceEmbedding(ownerId, cleanedPreferences, ownerService.getColdStartValue(ownerId).get());
+
             return new ResponseEntity<>(usersNewWeights, HttpStatus.OK);
 
         }catch (Exception e){
@@ -56,13 +78,13 @@ public class RecommendationEngineController {
             int coldStartValue = ownerService.getColdStartValue(ownerId).get();
             if(userWeights != null){
 
+                ownerService.setColdStartValue(ownerId, coldStartValue-1);
 
-                if(coldStartValue == 0){
+                if(coldStartValue <= 0){
                     return new ResponseEntity<>(recommendationService.findKthNearestNeighbors(ownerId, userWeights, 3)
                             ,HttpStatus.OK);
                 }
 
-                ownerService.setColdStartValue(ownerId, coldStartValue-1);
             }
             List<Pet> allPets = recommendationService.coldStart(coldStartValue);
             return new ResponseEntity<>(allPets.subList(0,3), HttpStatus.OK);
@@ -74,7 +96,20 @@ public class RecommendationEngineController {
         }
     }
 
+    @PostMapping("/reset-engine")
+    public ResponseEntity<?> resetEngine(@RequestParam String email) {
+        try {
+            long ownerId = ownerService.findOwnerIdByEmail(email);
 
+            milvusServiceAdapter.deleteData(ownerId, recommendationService.OWNER_PARTITION);
+
+            ownerService.setColdStartValue(ownerId, 3);
+
+            return new ResponseEntity<>("Reset Successful", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
 
 
 

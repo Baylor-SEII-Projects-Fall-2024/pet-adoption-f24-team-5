@@ -1,11 +1,13 @@
-import { CardContent, Typography, CircularProgress, Box } from "@mui/material";
+import React, { useState, useEffect } from 'react';
+import { CardContent, Typography, Box, Button } from "@mui/material";
 import ImageComponent from "@/components/imageComponent/ImageComponent";
+import { StyledCard, ImageWrapper, PetInfo } from "./styles/PetCard.styles";
+import PetCardActions from "./PetCardActions";
+import { usePetCardHandlers } from "./hooks/usePetCardHandlers";
 import { useSelector } from "react-redux";
 import { getSubjectFromToken, getAuthorityFromToken } from "@/utils/redux/tokenUtils";
-import ExpandedPetCard from "@/components/petCard/ExpandedPetCard";
-import { StyledCard, BlurredContent, HoverOverlay, ImageWrapper, PetInfo, ActionButtons } from "./styles/PetCard.styles";
-import PetCardActions from "./PetCardActions";
-import { usePetCardHandlers } from "@/components/petCard/hooks/usePetCardHandlers";
+import ExpandedPetCard from './ExpandedPetCard';
+import EditIcon from '@mui/icons-material/Edit';
 
 const PetCard = ({
     pet,
@@ -16,156 +18,181 @@ const PetCard = ({
     contactable = true,
     onLike = null,
     onDelete = null,
+    size = 'default',
+    isManagerView = false,
 }) => {
     const token = useSelector((state) => state.user.token);
     const email = getSubjectFromToken(token);
     const authority = getAuthorityFromToken(token);
 
-    const {
-        loading,
-        isHovered,
-        isModalOpen,
-        setLoading,
-        setIsHovered,
-        setIsModalOpen,
-        handleSavePetToOwner,
-        handleLikePet,
-        handleContactCenter
-    } = usePetCardHandlers(pet, token, email, onLike);
-
+    // Adjust permissions based on authority
     if (authority !== "Owner") {
         saveable = false;
         likeable = false;
         contactable = false;
     }
 
+    const {
+        loading,
+        isHovered,
+        setIsHovered,
+        handleSavePetToOwner,
+        handleLikePet,
+        handleContactCenter
+    } = usePetCardHandlers(pet, token, email, onLike);
+
+    const [isExpanded, setIsExpanded] = useState(false);
+    const [imageKey, setImageKey] = useState(pet.id);
+
+    // Update imageKey when pet changes
+    useEffect(() => {
+        setImageKey(pet.id + Date.now());
+    }, [pet.id]);
+
+    const handleCardClick = (e) => {
+        if (expandable && !e.target.closest('.MuiButtonBase-root')) {
+            setIsExpanded(true);
+        }
+        if (onClick) onClick(e);
+    };
+
     return (
-        <Box sx={{ width: "330px", height: "500px" }}>
+        <>
             <StyledCard
-                onClick={onClick}
-                elevation={0}
-                key={pet.petName}
-                isHovered={isHovered}
+                elevation={1}
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
+                size={size}
+                sx={{ cursor: 'default' }}
             >
-                <BlurredContent isHovered={isHovered}>
-                    <Typography
-                        variant="h5"
-                        sx={{
-                            fontWeight: 600,
-                            mb: 1,
-                            color: "text.primary"
+                <ImageWrapper size={size}>
+                    <ImageComponent
+                        key={imageKey}
+                        imageName={pet.imageName}
+                        width="100%"
+                        height="100%"
+                        style={{
+                            objectFit: 'cover',
+                            opacity: 1,
+                            transition: 'opacity 0.2s ease-in-out'
                         }}
-                    >
-                        {pet.petName}
-                    </Typography>
+                    />
+                </ImageWrapper>
 
-                    <ImageWrapper>
-                        {loading && (
-                            <Box
-                                display="flex"
-                                alignItems="center"
-                                justifyContent="center"
-                                position="absolute"
-                                top={0}
-                                left={0}
-                                width="100%"
-                                height="100%"
-                                bgcolor="rgba(255, 255, 255, 0.8)"
-                                zIndex={1}
-                            >
-                                <CircularProgress size={40} />
-                            </Box>
-                        )}
-                        <ImageComponent
-                            imageName={pet.imageName}
-                            width="100%"
-                            height="100%"
-                            onLoad={() => setLoading(false)}
-                        />
-                    </ImageWrapper>
-
-                    <PetInfo>
+                <PetInfo>
+                    <Box>
                         <Typography
-                            variant="subtitle1"
+                            variant="h6"
                             sx={{
-                                color: "text.secondary",
-                                fontWeight: 500
+                                fontWeight: 600,
+                                mb: 0.5,
+                                fontSize: size === 'large' ? '1.25rem' : '1rem'
                             }}
                         >
-                            {pet.adoptionCenter?.centerName || "Adoption Center"}
+                            {pet.petName}
                         </Typography>
+
                         <Typography
                             variant="body2"
                             sx={{
-                                color: "text.secondary"
+                                color: 'text.secondary',
+                                mb: 1,
+                                fontWeight: 500,
+                                fontSize: '0.875rem'
                             }}
                         >
-                            {pet.breed} • {pet.age} years
+                            {pet.adoptionCenter?.centerName}
                         </Typography>
-                    </PetInfo>
-                </BlurredContent>
 
-                <HoverOverlay className={isHovered ? "hovered" : ""}>
-                    <Box
-                        onClick={() => expandable && setIsModalOpen(true)}
-                        sx={{
-                            cursor: "pointer",
-                            display: "flex",
-                            flexDirection: "column",
-                            gap: 1.5
-                        }}
-                    >
-                        {["Species", "Breed", "Color", "Sex", "Age"].map((field) => (
+                        <Box sx={{
+                            display: 'flex',
+                            flexWrap: 'wrap',
+                            gap: 0.5,
+                            mb: 1
+                        }}>
+                            {[
+                                { label: pet.breed },
+                                { label: pet.sex },
+                                { label: `${pet.age} years` }
+                            ].map((item, index) => (
+                                <Box
+                                    key={index}
+                                    sx={{
+                                        bgcolor: 'action.hover',
+                                        px: 1,
+                                        py: 0.25,
+                                        borderRadius: '8px',
+                                        fontSize: '0.75rem',
+                                        color: 'text.primary'
+                                    }}
+                                >
+                                    {item.label}
+                                </Box>
+                            ))}
+                        </Box>
+
+                        {/* Only show description for default size cards */}
+                        {size === 'default' && (
                             <Typography
-                                key={field}
-                                variant="body1"
+                                variant="body2"
                                 sx={{
-                                    fontWeight: field === "Species" ? 600 : 400,
-                                    opacity: 0.9
+                                    color: 'text.secondary',
+                                    display: '-webkit-box',
+                                    WebkitLineClamp: 2,
+                                    WebkitBoxOrient: 'vertical',
+                                    overflow: 'hidden',
+                                    lineHeight: 1.4,
+                                    fontSize: '0.875rem'
                                 }}
                             >
-                                {field}: {pet[field.toLowerCase()]}
+                                {pet.description}
                             </Typography>
-                        ))}
-                        <Typography
-                            variant="body2"
-                            sx={{
-                                mt: 1,
-                                opacity: 0.8,
-                                lineHeight: 1.6
-                            }}
-                        >
-                            {pet.description}
-                        </Typography>
+                        )}
                     </Box>
 
-                    <ActionButtons>
-                        <PetCardActions
-                            saveable={saveable}
-                            likeable={likeable}
-                            authority={authority}
-                            onSave={handleSavePetToOwner}
-                            onLike={handleLikePet}
-                            onContact={handleContactCenter}
-                            onDelete={onDelete ? () => onDelete(pet) : null}
-                        />
-                    </ActionButtons>
-                </HoverOverlay>
+                    <Box sx={{ mt: 'auto' }}>
+                        {isManagerView ? (
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                fullWidth
+                                startIcon={<EditIcon />}
+                                onClick={onClick}
+                                sx={{
+                                    mt: 1,
+                                    py: 1,
+                                    textTransform: 'none',
+                                    fontWeight: 600
+                                }}
+                            >
+                                Edit Pet Details
+                            </Button>
+                        ) : (
+                            <PetCardActions
+                                saveable={saveable}
+                                likeable={likeable}
+                                authority={authority}
+                                onSave={handleSavePetToOwner}
+                                onLike={handleLikePet}
+                                onContact={handleContactCenter}
+                                onDelete={onDelete ? () => onDelete(pet) : null}
+                            />
+                        )}
+                    </Box>
+                </PetInfo>
             </StyledCard>
 
-            {isModalOpen && (
+            {expandable && isExpanded && (
                 <ExpandedPetCard
                     pet={pet}
+                    onClose={() => setIsExpanded(false)}
                     saveable={saveable}
                     likeable={likeable}
                     contactable={contactable}
-                    onClose={() => setIsModalOpen(false)}
                     onLike={onLike}
                 />
             )}
-        </Box>
+        </>
     );
 };
 

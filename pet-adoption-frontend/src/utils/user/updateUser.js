@@ -1,5 +1,7 @@
 import axios from '../redux/axiosConfig';
 import { setDisplayName } from '../redux/userSlice';
+import { getUser } from './getUser';
+import { API_URL } from '@/constants';
 
 export const handleUpdateUser = async (updatedValuesRef, token, dispatch, userEmail) => {
     try {
@@ -7,7 +9,7 @@ export const handleUpdateUser = async (updatedValuesRef, token, dispatch, userEm
         const updatedUser = {
             id: currentUser.id,
             emailAddress: currentUser.emailAddress,
-            password: updatedValuesRef.current.password || password,
+            password: updatedValuesRef.current.password || currentUser.password,
             phoneNumber: updatedValuesRef.current.phoneNumber,
             UserType: updatedValuesRef.current.userType,
             ...(updatedValuesRef.current.userType === 'Owner' || updatedValuesRef.current.userType === 'CenterWorker') && {

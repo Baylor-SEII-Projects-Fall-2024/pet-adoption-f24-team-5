@@ -18,6 +18,7 @@ import Register from '@/pages/RegisterUserPage';
 import Login from '@/pages/LoginPage';
 import SessionExpired from '@/pages/SessionExpiredPage';
 import { getAuthorityFromToken } from "@/utils/redux/tokenUtils";
+import CreditsPage from '@/components/creditsContent';
 
 const BrowserRouter = dynamic(
     () => import('react-router-dom').then((mod) => mod.BrowserRouter),
@@ -41,8 +42,8 @@ export default function AppRoutes() {
                     <Route path="/RegisterCenterWorker" element={<ProtectedRoute><RegisterCenterWorker /></ProtectedRoute>} />
                     <Route path="/AvailablePets" element={<ProtectedRoute><AvailablePets /></ProtectedRoute>} />
                     <Route path="/preferences" element={<ProtectedRoute><PreferencesPage /></ProtectedRoute>} />
-                    <Route path="/SavedPets" element={<ProtectedRoute><SavedPets /></ProtectedRoute>} />
                     <Route path="/Messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
+                    <Route path="/credits" element={<CreditsPage />} />
                 </Route>
                 <Route path="/Register" element={<Register />} />
                 <Route path="/Login" element={<Login />} />

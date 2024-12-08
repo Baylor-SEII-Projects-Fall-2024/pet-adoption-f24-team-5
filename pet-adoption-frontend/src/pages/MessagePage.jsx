@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     Box,
     Drawer,
@@ -16,26 +16,73 @@ import {
 import { Menu } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { API_URL } from '@/constants';
 import axios from 'axios';
+import PetCard from '@/components/petCard/PetCard';
 import { getSubjectFromToken } from '@/utils/redux/tokenUtils';
 import { useSelector } from 'react-redux';
-import { sendMessage } from '@/utils/message/SendMessage';
-import { getMessages } from '@/utils/message/GetMessages';
-import { resetOwnerUnreads } from '@/utils/message/ResetOwnerUnreads';
-import { resetCenterUnreads } from '@/utils/message/ResetCenterUnreads';
-import { getUser } from '@/utils/user/getUser';
-import { getOtherUserName } from '@/utils/message/GetOtherUserName';
-import { getAllConversations } from '@/utils/message/GetAllConversations';
 
 const Messages = () => {
     const [conversations, setConversations] = useState([]);
     const [currentConversationId, setCurrentConversationId] = useState(null);
     const [messages, setMessages] = useState([]);
     const [messageInput, setMessageInput] = useState('');
+    const [userEmail, setUserEmail] = useState('');
+    const [userData, setUserData] = useState(null);
     const token = useSelector((state) => state.user.token);
-    const [userEmail, setUserEmail] = useState(getSubjectFromToken(token));
-    const [userData, setUserData] = useState(getUser(token, userEmail));
+    const [petSelectionOpen, setPetSelectionOpen] = useState(false);
+    const [hasScrolled, setHasScrolled] = useState(false);
+    const [isNewConversation, setIsNewConversation] = useState(false);
+
+
+    useEffect(() => {
+        if (isNewConversation && messages.length > 0) {
+            scrollToBottom();
+            setIsNewConversation(false); // Reset after scrolling
+        }
+    }, [messages, isNewConversation]);
+
+
+    const handleConversationClick = (conversationId) => {
+        setCurrentConversationId(conversationId);
+        setHasScrolled(false); // Reset scrolling state
+        loadMessages(conversationId, userData.id);
+        if (isMobile) {
+            setMobileOpen(false);
+        }
+    };
+
+    useEffect(() => {
+        if (!hasScrolled && messages.length > 0) {
+            scrollToBottom();
+            setHasScrolled(true); // Mark as scrolled
+        }
+    }, [messages, hasScrolled]);
+
+
+    const handleOpenPetSelection = () => {
+        setPetSelectionOpen(true);
+    };
+
+// Function to close the pet selection dialog
+    const handleClosePetSelection = () => {
+        setPetSelectionOpen(false);
+    };
+
+// Example pet data for testing
+    /*const examplePetData = {
+        petId: 101,
+        petName: 'Buddy',
+        species: 'Dog',
+        breed: 'Labrador',
+        color: 'Yellow',
+        sex: 'Male',
+        age: 3,
+        description: 'A friendly Labrador.',
+        imageName: 'buddy.jpg',
+        // Include other necessary fields
+    };*/
 
     const messagesEndRef = useRef(null); // Reference to the end of messages
 
@@ -43,9 +90,9 @@ const Messages = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
-    useEffect(() => {
+    /*useEffect(() => {
         scrollToBottom();
-    }, [messages]);
+    }, [messages]);*/
 
     const currentConversation = conversations.find(
         (conv) => conv.conversationId === currentConversationId
@@ -61,7 +108,24 @@ const Messages = () => {
                 : currentConversation.ownerId;
 
         try {
-            const newMessage = await sendMessage(token, currentConversationId, userData, receiverId, messageInput);
+            const url = `${API_URL}/api/message/sendMessage`;
+
+            const newMessageData = {
+                conversationId: currentConversationId,
+                senderId: userData.id,
+                receiverId: receiverId,
+                message: messageInput,
+                isRead: false,
+            };
+
+            const response = await axios.post(url, newMessageData, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            const newMessage = response.data;
 
             setMessages((prevMessages) => [...prevMessages, newMessage]);
             setMessageInput('');
@@ -69,6 +133,47 @@ const Messages = () => {
             console.error('Failed to send message', error);
         }
     };
+
+    // Function to handel sending the petcard
+    // Function to send a PetCard message
+    const handleSendPetCardMessage = async (petData) => {
+        if (!currentConversationId || !userData) return;
+
+        const receiverId =
+            userData.id === currentConversation.ownerId
+                ? currentConversation.centerId
+                : currentConversation.ownerId;
+
+        // Convert pet data to JSON string and prepend the prefix
+        const petDataJson = JSON.stringify(petData);
+        const messageContent = `PETCARD_JSON:${petDataJson}`;
+
+        const newMessageData = {
+            conversationId: currentConversationId,
+            senderId: userData.id,
+            receiverId: receiverId,
+            message: messageContent,
+            isRead: false,
+        };
+
+        try {
+            const response = await axios.post(`${API_URL}/api/message/sendMessage`, newMessageData, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            const newMessage = response.data;
+
+            setMessages((prevMessages) => [...prevMessages, newMessage]);
+            setMessageInput('');
+            scrollToBottom();
+        } catch (error) {
+            console.error('Failed to send PetCard message', error);
+        }
+    };
+
 
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -82,19 +187,50 @@ const Messages = () => {
     const drawerWidth = 240;
 
     // Modified loadMessages to accept an optional parameter to control unread message reset
-    const loadMessages = useCallback(async (conversationId, userId, resetUnread = true) => {
+    const loadMessages = async (conversationId, userId, resetUnread = true) => {
         try {
-            const newMessages = await getMessages(token, conversationId, userId);
+            const url = `${API_URL}/api/message/getMessages`;
 
+            const response = await axios.post(
+                url,
+                null,
+                {
+                    params: { conversationId, userId },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            let newMessages = response.data;
             newMessages.sort((a, b) => new Date(a.date) - new Date(b.date));
             setMessages(newMessages);
 
             // Reset unread messages for this conversation only if resetUnread is true
             if (resetUnread) {
                 if (userData.userType === 'Owner') {
-                    await resetOwnerUnreads(token, conversationId);
+                    await axios.post(
+                        `${API_URL}/api/conversation/reset-owner-unread/${conversationId}`,
+                        null,
+                        {
+                            headers: {
+                                'Content-Type': 'application/json',
+                                Authorization: `Bearer ${token}`,
+                            },
+                        }
+                    );
                 } else {
-                    await resetCenterUnreads(token, conversationId);
+                    await axios.post(
+                        `${API_URL}/api/conversation/reset-center-unread/${conversationId}`,
+                        null,
+                        {
+                            headers: {
+                                'Content-Type': 'application/json',
+                                Authorization: `Bearer ${token}`,
+                            },
+                        }
+                    );
                 }
 
                 // Update the conversation's unread message count in state
@@ -113,11 +249,31 @@ const Messages = () => {
         } catch (error) {
             console.error('Failed to load messages', error);
         }
-    }, [token, userData, setMessages, setConversations]);
+    };
 
     const fetchUser = async (token) => {
         try {
-            const response = await getUser(token, userEmail);
+            let email = '';
+
+            if (token) {
+                const subject = getSubjectFromToken(token);
+                if (subject) {
+                    email = subject;
+                } else {
+                    throw new Error('Invalid token: Subject not found.');
+                }
+            } else {
+                throw new Error('Token is required to fetch user information.');
+            }
+
+            const url = `${API_URL}/api/users/getUser?emailAddress=${email}`;
+            const response = await axios.get(url, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
             return response;
         } catch (error) {
             console.error('Failed to fetch user', error);
@@ -127,18 +283,46 @@ const Messages = () => {
 
     const fetchOtherUserNameForConversation = async (conversationId, userType) => {
         try {
-            const response = await getOtherUserName(token, userType, conversationId);
+            const url = `${API_URL}/api/conversation/getOtherUserName`;
 
-            return response;
+            const response = await axios.post(
+                url,
+                null,
+                {
+                    params: { t: userType, conversationId: conversationId },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            return response.data;
         } catch (error) {
             console.error('Failed to fetch other user name', error);
             return `Conversation ${conversationId}`;
         }
     };
 
-    const fillDrawer = useCallback(async (userId, userType) => {
+    const fillDrawer = async (userId, userType) => {
         try {
-            const conversationsData = await getAllConversations(token, userId);
+            const url = `${API_URL}/api/conversation/getAllConversations`;
+
+            const response = await axios.post(
+                url,
+                null,
+                {
+                    params: { userId },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            console.log('Conversations fetched:', response.data);
+
+            const conversationsData = response.data;
 
             // For each conversation, fetch the other user's name
             const updatedConversations = await Promise.all(conversationsData.map(async (conversation) => {
@@ -161,7 +345,7 @@ const Messages = () => {
         } catch (error) {
             console.error('Failed to get conversations', error);
         }
-    }, [token, currentConversationId, setConversations, setCurrentConversationId, loadMessages]);
+    };
 
     const startup = async () => {
         console.log('Messages component has loaded.');
@@ -169,11 +353,12 @@ const Messages = () => {
         try {
             // Fetch user information
             const response = await fetchUser(token);
-            setUserData(response);
-            setUserEmail(response.emailAddress);
+            console.log('User data:', response.data);
+            setUserData(response.data);
+            setUserEmail(response.data.emailAddress);
 
-            const userId = response.id; // Get the userId from the response
-            const userType = response.userType;
+            const userId = response.data.id; // Get the userId from the response
+            const userType = response.data.userType;
 
             // Fetch conversations and load the first conversation's messages
             await fillDrawer(userId, userType);
@@ -195,8 +380,7 @@ const Messages = () => {
             intervalId = setInterval(async () => {
                 if (currentConversationId && userData) {
                     try {
-                        await loadMessages(currentConversationId, userData.id, false);
-                        await fillDrawer(userData.id, userData.userType);
+                        await loadMessages(currentConversationId, userData.id, false); // Don't reset unread during polling
                     } catch (error) {
                         console.error('Error polling for new messages:', error);
                     }
@@ -213,7 +397,8 @@ const Messages = () => {
                 clearInterval(intervalId);
             }
         };
-    }, [currentConversationId, userData, loadMessages, fillDrawer]);
+    }, [currentConversationId, userData]);
+
 
     return (
         <Box sx={{ display: 'flex', height: 'calc(100vh - 64px)', backgroundColor: '#f0f0f0' }}>
@@ -248,11 +433,13 @@ const Messages = () => {
                                     selected={conversation.conversationId === currentConversationId}
                                     onClick={() => {
                                         setCurrentConversationId(conversation.conversationId);
+                                        setIsNewConversation(true); // Mark this as a new conversation
                                         loadMessages(conversation.conversationId, userData.id);
                                         if (isMobile) {
                                             setMobileOpen(false);
                                         }
                                     }}
+
                                 >
                                     <ListItemText
                                         primary={
@@ -312,40 +499,107 @@ const Messages = () => {
                 {/* Messages */}
                 <Box sx={{ flexGrow: 1, overflowY: 'auto', mb: 2, mt: 2 }}>
                     <Stack spacing={2}>
-                        {messages.map((message) => (
-                            <Box
-                                key={message.messageId}
-                                sx={{
-                                    display: 'flex',
-                                    justifyContent:
-                                        message.senderId === userData.id ? 'flex-end' : 'flex-start',
-                                }}
-                            >
-                                <Box
-                                    sx={{
-                                        maxWidth: '70%',
-                                        p: 1,
-                                        borderRadius: 2,
-                                        backgroundColor:
-                                            message.senderId === userData.id ? '#DCF8C6' : '#FFFFFF',
-                                        boxShadow: 1,
-                                    }}
-                                >
-                                    <Typography variant="body1">{message.message}</Typography>
-                                    <Typography variant="caption" display="block" align="right">
-                                        {new Date(message.date).toLocaleTimeString([], {
-                                            hour: '2-digit',
-                                            minute: '2-digit',
-                                        })}
-                                    </Typography>
-                                </Box>
-                            </Box>
-                        ))}
+                        {messages.map((message) => {
+                            const isCurrentUserSender = message.senderId === userData.id;
+
+                            // Check if the message is a PetCard
+                            if (message.message.startsWith('PETCARD_JSON:')) {
+                                const petDataJson = message.message.replace('PETCARD_JSON:', '').trim();
+                                let petData;
+                                try {
+                                    petData = JSON.parse(petDataJson);
+                                } catch (error) {
+                                    console.error('Invalid pet data in message:', error);
+                                    return (
+                                        <Box
+                                            key={message.messageId}
+                                            sx={{
+                                                display: 'flex',
+                                                justifyContent: isCurrentUserSender ? 'flex-end' : 'flex-start',
+                                            }}
+                                        >
+                                            <Typography color="error">Invalid pet data received.</Typography>
+                                        </Box>
+                                    );
+                                }
+
+                                return (
+                                    <Box
+                                        key={message.messageId}
+                                        sx={{
+                                            display: 'flex',
+                                            justifyContent: isCurrentUserSender ? 'flex-end' : 'flex-start',
+                                        }}
+                                    >
+                                        {/* Render the PetCard component */}
+                                        <Box
+                                            sx={{
+                                                maxWidth: '70%',
+                                            }}
+                                        >
+                                            <PetCard
+                                                pet={petData}
+                                                expandable={true} // Set as needed
+                                                saveable={true} // Set as needed
+                                                likeable={true} // Set as needed
+                                            />
+                                            <Typography variant="caption" display="block" align="right">
+                                                {new Date(message.date).toLocaleTimeString([], {
+                                                    hour: '2-digit',
+                                                    minute: '2-digit',
+                                                })}
+                                            </Typography>
+                                        </Box>
+                                    </Box>
+                                );
+                            } else {
+                                // Render regular text messages
+                                return (
+                                    <Box
+                                        key={message.messageId}
+                                        sx={{
+                                            display: 'flex',
+                                            justifyContent: isCurrentUserSender ? 'flex-end' : 'flex-start',
+                                        }}
+                                    >
+                                        <Box
+                                            sx={{
+                                                maxWidth: '70%',
+                                                p: 1,
+                                                borderRadius: 2,
+                                                backgroundColor: isCurrentUserSender ? '#DCF8C6' : '#FFFFFF',
+                                                boxShadow: 1,
+                                            }}
+                                        >
+                                            <Typography variant="body1">{message.message}</Typography>
+                                            <Typography variant="caption" display="block" align="right">
+                                                {new Date(message.date).toLocaleTimeString([], {
+                                                    hour: '2-digit',
+                                                    minute: '2-digit',
+                                                })}
+                                            </Typography>
+                                        </Box>
+                                    </Box>
+                                );
+                            }
+                        })}
                         {/* Dummy div to scroll into view */}
                         <div ref={messagesEndRef} />
                     </Stack>
                 </Box>
                 {/* Message Input */}
+
+                {/* Add this button within your JSX, perhaps near the message input
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => handleSendPetCardMessage(examplePetData)}
+                        disabled={!currentConversation}
+                    >
+                        Send PetCard
+                    </Button>*/}
+
+
                 <Box sx={{ mt: 'auto' }}>
                     <form onSubmit={handleSendMessage}>
                         <Stack direction="row" spacing={1}>
