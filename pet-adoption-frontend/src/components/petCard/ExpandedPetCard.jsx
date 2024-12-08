@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, Typography, Button, Divider, Fade, Box, Tooltip, IconButton, Backdrop } from '@mui/material';
+import { Modal, Typography, Button, Divider, Fade, Box, Tooltip, IconButton, Backdrop, CircularProgress } from '@mui/material';
 import ImageComponent from '../imageComponent/ImageComponent';
 import { useSelector } from 'react-redux';
 import { getSubjectFromToken } from "@/utils/redux/tokenUtils";
@@ -17,7 +17,6 @@ import {
 } from './styles/ExpandedPetCard.styles';
 import {
     Pets,
-    Palette,
     Cake,
     Male,
     Female,
@@ -29,21 +28,21 @@ import {
     ZoomOut,
     Message as MessageIcon
 } from '@mui/icons-material';
-import { getUser } from '@/utils/user/getUser';
-import { startConversation } from '@/utils/message/startConversation';
 import { useNavigate } from 'react-router-dom';
-import { CircularProgress } from '@mui/material';
+import axios from 'axios';
 
+// Import or define your API_URL constant
+import { API_URL } from '@/constants';
 
 const ExpandedPetCard = ({ pet, onClose, saveable = true, likeable = true, contactable = true, onLike = null }) => {
     const token = useSelector((state) => state.user.token);
-    const [imageZoom, setImageZoom] = React.useState(false);
+    const email = getSubjectFromToken(token);
+    const [imageZoom, setImageZoom] = useState(false);
     const navigate = useNavigate();
 
     if (!pet) return null;
 
     const handleSavePetToOwner = async () => {
-        const email = getSubjectFromToken(token);
         const formattedPet = {
             petId: pet.petId,
             petOwner: pet.petOwner,
@@ -62,7 +61,7 @@ const ExpandedPetCard = ({ pet, onClose, saveable = true, likeable = true, conta
         try {
             await savePetToOwner(token, formattedPet, email);
         } catch (error) {
-            console.error(error);
+            console.error("Failed to save pet to owner:", error);
         }
     };
 
@@ -77,25 +76,90 @@ const ExpandedPetCard = ({ pet, onClose, saveable = true, likeable = true, conta
             await engineUpdatePreference(token, preference);
             if (onLike) onLike(pet);
         } catch (error) {
-            console.error(error);
+            console.error("Failed to like pet:", error);
+        }
+    };
+
+    const fetchUser = async () => {
+        try {
+            const url = `${API_URL}/api/users/getUser?emailAddress=${email}`;
+            const response = await axios.get(url, {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Failed to fetch user", error);
+            throw error;
         }
     };
 
     const handleContactCenter = async () => {
-        const email = getSubjectFromToken(token);
+        console.log("Pet data:", pet);
         try {
-            const userData = await getUser(token, email);
+            // Fetch user data to get userId
+            const userData = await fetchUser();
+            const userId = userData.id;
+
+            // Retrieve centerID from the adoptionCenter field
             const centerID = pet.adoptionCenter?.id;
 
             if (!centerID) {
+                console.error("Center ID not found in pet data");
                 alert("Unable to contact the adoption center. Please try again later.");
                 return;
             }
 
-            await startConversation(token, userData.id, centerID);
+            const startConversationUrl = `${API_URL}/api/conversation/startConversation`;
+
+            // Start the conversation
+            const conversationResponse = await axios.post(
+                startConversationUrl,
+                null,
+                {
+                    params: {
+                        petOwnerID: userId,
+                        centerID: centerID,
+                    },
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            const conversation = conversationResponse.data;
+            console.log("Conversation started:", conversation);
+
+            // Send a message with the current PetCard's data
+            const sendMessageUrl = `${API_URL}/api/message/sendMessage`;
+            const petDataMessage = `PETCARD_JSON:${JSON.stringify(pet)}`;
+
+            const messageResponse = await axios.post(
+                sendMessageUrl,
+                {
+                    conversationId: conversation.conversationId,
+                    senderId: userId,
+                    receiverId: centerID,
+                    message: petDataMessage,
+                    isRead: false,
+                },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            console.log("Message sent:", messageResponse.data);
+
+            // Navigate to the Messages page
             navigate("/Messages");
         } catch (error) {
-            console.error("Failed to start conversation", error);
+            console.error("Failed to contact adoption center", error);
         }
     };
 
