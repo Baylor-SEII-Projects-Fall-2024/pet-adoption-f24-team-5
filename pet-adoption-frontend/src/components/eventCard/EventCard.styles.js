@@ -2,21 +2,24 @@ import { styled } from "@mui/material/styles";
 import { Card, Box } from "@mui/material";
 
 export const StyledCard = styled(Card)(({ theme }) => ({
-    position: "relative",
-    overflow: "hidden",
-    transition: "all 0.3s ease",
-    width: "100%",
-    height: "100%",
-    display: "flex",
-    flexDirection: "column",
-    borderRadius: "24px",
-    backgroundColor: theme.palette.background.paper,
-    boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
-    "&:hover": {
-        transform: "translateY(-8px)",
-        boxShadow: "0 12px 32px rgba(0,0,0,0.12)",
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    position: 'relative',
+    overflow: 'hidden',
+    transition: 'all 0.3s ease',
+    '&:hover': {
+        boxShadow: theme.shadows[4]
     }
 }));
+
+export const EventInfo = styled('div')({
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
+    position: 'relative',
+    zIndex: 1
+});
 
 export const BlurredContent = styled(Box)(({ isHovered }) => ({
     transition: "all 0.3s ease",
@@ -44,12 +47,6 @@ export const HoverOverlay = styled(Box)(({ theme }) => ({
         opacity: 1,
     },
 }));
-
-export const EventInfo = styled(Box)({
-    display: "flex",
-    flexDirection: "column",
-    height: "100%",
-});
 
 export const DetailGrid = styled(Box)(({ theme }) => ({
     display: "flex",

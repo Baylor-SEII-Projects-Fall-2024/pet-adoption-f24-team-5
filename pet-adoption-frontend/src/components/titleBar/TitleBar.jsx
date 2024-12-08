@@ -76,6 +76,10 @@ const TitleBar = () => {
         { label: 'Events', path: '/EventManager' },
         { label: 'Workers', path: '/ManageAccounts' },
     ];
+    const centerWorkerNavItems = [
+        { label: 'Pets', path: '/PetManager' },
+        { label: 'Events', path: '/EventManager' },
+    ];
 
     return (
         <AppBar
@@ -105,8 +109,20 @@ const TitleBar = () => {
                         </Button>
                     ))}
 
-                    {(authority === 'CenterOwner' || authority === 'CenterWorker') &&
+                    {(authority === 'CenterOwner') &&
                         centerNavItems.map((item) => (
+                            <Button
+                                key={item.path}
+                                color="inherit"
+                                component={Link}
+                                to={item.path}
+                            >
+                                {item.label}
+                            </Button>
+                    ))}
+
+                    {(authority === 'CenterWorker') &&
+                        centerWorkerNavItems.map((item) => (
                             <Button
                                 key={item.path}
                                 color="inherit"
@@ -131,6 +147,7 @@ const TitleBar = () => {
                             ))}
                         {location.pathname === '/Messages' && <span>Messages</span>}
                     </Button>
+                    <Button color="inherit" component={Link} to="/credits">Credits</Button>
                     <Button color="inherit" component={Link} to="/Settings">Settings</Button>
                     <Button color="inherit" onClick={handleLogout}>Log Out</Button>
                 </div>

@@ -48,6 +48,10 @@ const RegisterCenterWorker = () => {
         <Box
             sx={{
                 background: 'linear-gradient(135deg, #FFFFFF 30%, #E7E9EC 90%)',
+                minHeight: '100vh',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
             }}
         >
             <Box

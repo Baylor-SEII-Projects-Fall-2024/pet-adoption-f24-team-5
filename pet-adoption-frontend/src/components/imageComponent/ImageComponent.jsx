@@ -1,40 +1,59 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from 'react';
+import { fetchImage } from '@/utils/image/fetchImage';
+import { Skeleton } from '@mui/material';
 import { useSelector } from "react-redux";
-import { fetchImage } from "@/utils/image/fetchImage";
 
-const ImageComponent = (props) => {
+const ImageComponent = ({ imageName, width, height, style = {} }) => {
     const [imageType, setImageType] = useState("");
     const [imageData, setImageData] = useState("");
+    const [isLoading, setIsLoading] = useState(true);
     const token = useSelector((state) => state.user.token);
 
     useEffect(() => {
+        setIsLoading(true);
+        setImageData("");
+        setImageType("");
+
         const loadImage = async () => {
             try {
                 const { imageType: fetchedImageType, imageData: fetchedImageData } =
-                    await fetchImage(props.imageName, token);
+                    await fetchImage(imageName, token);
                 setImageType(fetchedImageType);
                 setImageData(fetchedImageData);
-            } catch (err) {
-                console.error("Image fetch failed:", err);
+            } catch (error) {
+                console.error('Error loading image:', error);
+            } finally {
+                setIsLoading(false);
             }
         };
 
-        if (props.imageName) loadImage();
-    }, [props.imageName, token]);
+        if (imageName) {
+            loadImage();
+        }
+    }, [imageName, token]);
+
+    if (isLoading) {
+        return (
+            <Skeleton
+                variant="rectangular"
+                width={width}
+                height={height}
+                animation="wave"
+            />
+        );
+    }
 
     return (
         <img
             src={`data:${imageType};base64,${imageData}`}
-            alt="Pet"
+            alt=""
             style={{
-                float: props.float,
-                margin: props.margin,
-                width: props.width,
-                maxWidth: props.maxWidth,
-                height: props.height,
-                align: props.align,
+                ...style,
+                width,
+                height,
+                display: 'block'
             }}
-            onLoad={props.onLoad}
+            onLoad={() => setIsLoading(false)}
         />
     );
 };

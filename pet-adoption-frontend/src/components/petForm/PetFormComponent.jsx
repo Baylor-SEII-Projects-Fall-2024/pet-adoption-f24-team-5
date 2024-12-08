@@ -1,10 +1,11 @@
-import { Box, Button, FormControl, InputLabel, MenuItem, Select, Stack, TextField } from "@mui/material";
+import { Box, Button, FormControl, InputLabel, MenuItem, Select, Stack, TextField, Typography, Grid, Paper, InputAdornment } from "@mui/material";
 import ImageUploadComponent from "@/components/imageComponent/ImageUploadComponent";
 import React, { useEffect, useState } from "react";
 import { saveUpdatePet } from "@/utils/pet/SaveUpdatePet";
 import { useSelector } from 'react-redux';
 import { deletePet } from "@/utils/pet/DeletePet";
 import SearchableDropdown from "@/components/petForm/SearchableDropdown";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const PetFormComponent = (props) => {
     const [petId, setPetId] = useState(null);
@@ -179,103 +180,254 @@ const PetFormComponent = (props) => {
 
 
     return (
-        <Box component="form" onSubmit={handleSubmit}>
-            <Button onClick={props.handlePostNewPet} variant='contaiend'>Back to Pets</Button>
-
-            <Stack spacing={2}>
-                <TextField
-                    label="Pet Name"
-                    value={petName}
-                    onChange={(e) => setPetName(e.target.value)}
-                    required
-                    fullWidth
-                />
-                <SearchableDropdown
-                    label="Species"
-                    options={speciesOptions}
-                    value={species}
-                    inputValue={speciesInput}
-                    onChange={(newValue) => setSpecies(newValue)}
-                    onInputChange={(newInput) => setSpeciesInput(newInput)}
-                    sx={{ width: '100%' }}
-                />
-
-                <SearchableDropdown
-                    label="Breed"
-                    options={getBreedOptions()}
-                    value={breed}
-                    inputValue={breedInput}
-                    onChange={(newValue) => setBreed(newValue)}
-                    onInputChange={(newInput) => setBreedInput(newInput)}
-                    sx={{ width: '100%' }}
-                />
-
-                <SearchableDropdown
-                    label="Pet Color"
-                    options={colorOptions}
-                    value={color}
-                    inputValue={colorInput}
-                    onChange={(newValue) => setPetColor(newValue)}
-                    onInputChange={(newInput) => setPetColorInput(newInput)}
-                    sx={{ width: '100%' }}
-                />
-
-                <SearchableDropdown
-                    label="Sex"
-                    options={sexOptions}
-                    value={sex}
-                    inputValue={sexInput}
-                    onChange={(newValue) => setSex(newValue)}
-                    onInputChange={(newInput) => setSexInput(newInput)}
-                    sx={{ width: '100%' }}
-                />
-
-                <TextField
-                    label="Age"
-                    type="number"
-                    value={age}
-                    onChange={(e) => {
-                        const value = e.target.value;
-                        if (value === '' || (/^\d+$/.test(value) && parseInt(value, 10) >= 1 && parseInt(value, 10) <= 99)) {
-                            setAge(value);
-                        }
-                    }}
-                    onKeyDown={(e) => {
-                        // Prevent non-numeric key presses
-                        if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete') {
-                            e.preventDefault();
-                        }
-                    }}
-                    required
-                    fullWidth
-                />
-                <TextField
-                    label="Description"
-                    type="paragraph"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    fullWidth
-                />
-                <Select
-                    defaultValue="Up For Adoption"
-                    label="Adoption Status"
-                    value={adoptionStatus}
-                    onChange={handleChangeSelection}
+        <Box
+            component="form"
+            onSubmit={handleSubmit}
+            sx={{
+                height: '92vh',
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden',
+            }}
+        >
+            <Box sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 2,
+                py: 1.5,
+                px: 2,
+                borderBottom: 1,
+                borderColor: 'divider',
+                backgroundColor: 'background.paper',
+                minHeight: '56px',
+                flexShrink: 0,
+            }}>
+                <Button
+                    onClick={props.handlePostNewPet}
+                    variant='outlined'
+                    startIcon={<ArrowBackIcon />}
+                    size="small"
                 >
-                    <MenuItem value={'false'}>Up For Adoption</MenuItem>
-                    <MenuItem value={'true'}>Owned</MenuItem>
-                </Select>
-                <ImageUploadComponent onImageUpload={handleImageUpload} />
-                <Button type="submit" variant="contained">{buttonText}</Button>
-                {(props.type === "update") &&
-                    <Button type="delete" variant="contained" onClick={handleDelete}>Delete Pet</Button>
-                }
-            </Stack>
+                    Back to Pets
+                </Button>
+                <Typography variant="h5" component="h1" sx={{ fontWeight: 600 }}>
+                    {formType === "update" ? "Edit Pet Details" : "Add New Pet"}
+                </Typography>
+            </Box>
 
+            <Box sx={{
+                flex: 1,
+                overflow: 'auto',
+                p: 2,
+            }}>
+                <Box sx={{
+                    maxWidth: '800px',
+                    margin: '0 auto'
+                }}>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                label="Pet Name"
+                                value={petName}
+                                onChange={(e) => setPetName(e.target.value)}
+                                required
+                                fullWidth
+                                size="small"
+                                sx={{
+                                    backgroundColor: 'background.paper',
+                                    '& .MuiOutlinedInput-root': {
+                                        height: '40px'
+                                    }
+                                }}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <FormControl fullWidth size="small">
+                                <InputLabel>Species</InputLabel>
+                                <Select
+                                    value={species}
+                                    onChange={(e) => setSpecies(e.target.value)}
+                                    label="Species"
+                                    sx={{
+                                        height: '40px',
+                                        backgroundColor: 'background.paper'
+                                    }}
+                                >
+                                    {speciesOptions.map((option) => (
+                                        <MenuItem key={option} value={option}>
+                                            {option}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <FormControl fullWidth size="small">
+                                <InputLabel>Breed</InputLabel>
+                                <Select
+                                    value={breed}
+                                    onChange={(e) => setBreed(e.target.value)}
+                                    label="Breed"
+                                    sx={{
+                                        height: '40px',
+                                        backgroundColor: 'background.paper'
+                                    }}
+                                >
+                                    {getBreedOptions().map((option) => (
+                                        <MenuItem key={option} value={option}>
+                                            {option}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <FormControl fullWidth size="small">
+                                <InputLabel>Pet Color</InputLabel>
+                                <Select
+                                    value={color}
+                                    onChange={(e) => setPetColor(e.target.value)}
+                                    label="Pet Color"
+                                    sx={{
+                                        height: '40px',
+                                        backgroundColor: 'background.paper'
+                                    }}
+                                >
+                                    {colorOptions.map((option) => (
+                                        <MenuItem key={option} value={option}>
+                                            {option}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <FormControl fullWidth size="small">
+                                <InputLabel>Sex</InputLabel>
+                                <Select
+                                    value={sex}
+                                    onChange={(e) => setSex(e.target.value)}
+                                    label="Sex"
+                                    sx={{
+                                        height: '40px',
+                                        backgroundColor: 'background.paper'
+                                    }}
+                                >
+                                    {sexOptions.map((option) => (
+                                        <MenuItem key={option} value={option}>
+                                            {option}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                label="Age"
+                                type="number"
+                                value={age}
+                                onChange={(e) => {
+                                    const value = e.target.value;
+                                    if (value === '' || (/^\d+$/.test(value) && parseInt(value, 10) >= 0 && parseInt(value, 10) <= 99)) {
+                                        setAge(value);
+                                    }
+                                }}
+                                required
+                                fullWidth
+                                size="small"
+                                InputProps={{
+                                    endAdornment: <InputAdornment position="end">years</InputAdornment>,
+                                }}
+                                sx={{
+                                    backgroundColor: 'background.paper',
+                                    '& .MuiOutlinedInput-root': {
+                                        height: '40px'
+                                    }
+                                }}
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField
+                                label="Description"
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                                fullWidth
+                                multiline
+                                rows={3}
+                                size="small"
+                                sx={{
+                                    backgroundColor: 'background.paper'
+                                }}
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <FormControl fullWidth size="small">
+                                <InputLabel>Adoption Status</InputLabel>
+                                <Select
+                                    value={adoptionStatus}
+                                    onChange={handleChangeSelection}
+                                    label="Adoption Status"
+                                    sx={{
+                                        height: '40px',
+                                        backgroundColor: 'background.paper'
+                                    }}
+                                >
+                                    <MenuItem value={'false'}>Up For Adoption</MenuItem>
+                                    <MenuItem value={'true'}>Owned</MenuItem>
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Paper
+                                variant="outlined"
+                                sx={{
+                                    p: 2,
+                                    backgroundColor: 'background.default'
+                                }}
+                            >
+                                <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                                    Pet Image
+                                </Typography>
+                                <ImageUploadComponent onImageUpload={handleImageUpload} />
+                            </Paper>
+                        </Grid>
+                    </Grid>
+                </Box>
+            </Box>
+
+            <Box sx={{
+                display: 'flex',
+                gap: 2,
+                py: 1.5,
+                px: 2,
+                borderTop: 1,
+                borderColor: 'divider',
+                backgroundColor: 'background.paper',
+                minHeight: '56px',
+                flexShrink: 0,
+            }}>
+                <Button
+                    type="submit"
+                    variant="contained"
+                    fullWidth
+                    size="large"
+                >
+                    {buttonText}
+                </Button>
+                {formType === "update" && (
+                    <Button
+                        onClick={handleDelete}
+                        variant="outlined"
+                        color="error"
+                        fullWidth
+                        size="large"
+                    >
+                        Delete Pet
+                    </Button>
+                )}
+            </Box>
         </Box>
-    )
-
-
+    );
 }
 
 export default PetFormComponent;

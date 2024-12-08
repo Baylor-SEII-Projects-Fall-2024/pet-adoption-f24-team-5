@@ -1,5 +1,6 @@
 package petadoption.api.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jakarta.persistence.*;
@@ -26,6 +27,7 @@ import java.util.List;
         @JsonSubTypes.Type(value = CenterWorker.class, name = "CenterWorker"),
         @JsonSubTypes.Type(value = Owner.class, name = "Owner")
 })
+@JsonIgnoreProperties("password")
 public class User implements UserDetails {
     public static final String TABLE_NAME = "USERS";
 

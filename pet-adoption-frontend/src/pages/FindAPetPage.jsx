@@ -1,266 +1,318 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Grid, Typography, Button, IconButton, Stack } from "@mui/material";
-import { ExpandMore, ExpandLess } from '@mui/icons-material';
+import { Box, Grid, Typography, Button, Container } from "@mui/material";
 import { getSubjectFromToken, getAuthorityFromToken } from "@/utils/redux/tokenUtils";
 import { useSelector } from "react-redux";
 import PetCard from "@/components/petCard/PetCard";
 import { generateNewOptions } from "@/utils/recommendationEngine/generateNewOptions";
-import { getEvents } from "@/utils/event/getEvents";
-import { getCenterName } from "@/utils/user/center/getCenterName";
-import EventCard from "@/components/eventCard/EventCard";
-import HamburgerMenu from "@/components/HamburgerMenu";
 import SavedPetsModal from "@/components/SavedPetsModal";
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import CloseIcon from '@mui/icons-material/Close';
+import CircularProgress from '@mui/material/CircularProgress';
+import HamburgerMenu from '@/components/HamburgerMenu';
+import TuneIcon from '@mui/icons-material/Tune';
 
 const FindAPetPage = () => {
     const [currentPets, setCurrentPets] = useState([]);
     const [preloadedPets, setPreloadedPets] = useState([]);
-    const [events, setEvents] = useState([]);
-    const [isEventsCollapsed, setIsEventsCollapsed] = useState(false);
     const token = useSelector((state) => state.user.token);
     const [email, setEmail] = useState(getSubjectFromToken(token));
     const userType = getAuthorityFromToken(token);
-    const [loading, setLoading] = useState(false);
-    const [showWelcomeModal, setShowWelcomeModal] = useState(false);
-    const [hamburgerAnchorEl, setHamburgerAnchorEl] = useState(null);
+    const [loading, setLoading] = useState(true);
     const [savedPetsModalOpen, setSavedPetsModalOpen] = useState(false);
+    const [menuAnchorEl, setMenuAnchorEl] = useState(null);
 
     useEffect(() => {
-        const fetchEvents = async () => {
+        const initialLoad = async () => {
             try {
-                const eventsResponse = await getEvents(token) || [];
+                // Load current set
+                const initialPets = await generateNewOptions(token);
+                setCurrentPets(initialPets);
 
-                const eventsWithCenterNames = await Promise.all(
-                    eventsResponse.map(async (event) => {
-                        const centerName = await getCenterName(token, event.center_id);
-                        return { ...event, center_name: centerName };
-                    })
-                );
+                // Immediately preload next set
+                const nextPets = await generateNewOptions(token);
+                setPreloadedPets(nextPets);
 
-                setEvents(eventsWithCenterNames);
+                setLoading(false);
             } catch (error) {
-                console.error('Error fetching events:', error);
+                console.error('Error loading initial pets:', error);
+                setLoading(false);
             }
         };
 
-        fetchEvents();
-    }, [token, userType, email]);
-
-    useEffect(() => {
-        handleSearch();
-        setShowWelcomeModal(true);
+        initialLoad();
     }, [token]);
 
     const handleSearch = async () => {
+        // Use preloaded pets if available
         if (preloadedPets.length > 0) {
+            // Immediately show preloaded pets without loading state
             setCurrentPets(preloadedPets);
+
+            // Start preloading the next set in the background
+            try {
+                const nextPets = await generateNewOptions(token);
+                setPreloadedPets(nextPets);
+            } catch (error) {
+                console.error('Error preloading next set:', error);
+            }
+        } else {
+            // Only show loading state if we need to fetch new pets
+            setLoading(true);
+            try {
+                const newPets = await generateNewOptions(token);
+                setCurrentPets(newPets);
+
+                // Preload next set
+                const nextPets = await generateNewOptions(token);
+                setPreloadedPets(nextPets);
+            } catch (error) {
+                console.error('Error loading pets:', error);
+            } finally {
+                setLoading(false);
+            }
         }
-        else {
-            const response = await generateNewOptions(token);
-            setCurrentPets(response);
+    };
+
+    const handleLikePet = async (pet) => {
+        // Show some visual feedback
+        // Then load next set of pets
+        handleSearch();
+    };
+
+    const handleOpenMenu = (event) => {
+        setMenuAnchorEl(event.currentTarget);
+    };
+
+    const handleCloseMenu = () => {
+        setMenuAnchorEl(null);
+    };
+
+    const handleSelectSpecies = async (species) => {
+        setLoading(true);
+        try {
+            // You'll need to modify generateNewOptions to accept species parameter
+            const newPets = await generateNewOptions(token, species.toLowerCase());
+            setCurrentPets(newPets);
+
+            // Preload next set
+            const nextPets = await generateNewOptions(token, species.toLowerCase());
+            setPreloadedPets(nextPets);
+        } catch (error) {
+            console.error('Error loading pets:', error);
+        } finally {
+            setLoading(false);
         }
+    };
 
-        // Swap current pets with preloaded pets
-        const preloadNextOptions = async () => {
-            const response = await generateNewOptions(token);
-            setPreloadedPets(response);
-        };
+    const handleResetPreferences = async () => {
+        setLoading(true);
+        try {
+            // You'll need to implement this endpoint
+            await fetch('/api/users/reset-preferences', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
 
-        // Preload the next set of options in the background
-        preloadNextOptions();
-    }
+            // Load new pets with reset preferences
+            const newPets = await generateNewOptions(token);
+            setCurrentPets(newPets);
 
-    const handleOpenHamburgerMenu = (event) => {
-        setHamburgerAnchorEl(event.currentTarget);
-    }
-
-    const handleCloseHamburgerMenu = () => {
-        setHamburgerAnchorEl(null);
-    }
-
-    const handleSelectSpecies = (species) => {
-        console.log(`Selected species: ${species}`);
-        // Implement logic to filter or search pets by the selected species
-        handleCloseHamburgerMenu();
-    }
+            // Preload next set
+            const nextPets = await generateNewOptions(token);
+            setPreloadedPets(nextPets);
+        } catch (error) {
+            console.error('Error resetting preferences:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
-        <Box sx={{ height: '92vh', display: 'flex' }}>
-            {/* Events Sidebar */}
-            <Box
-                sx={{
-                    width: isEventsCollapsed ? '60px' : '400px',
-                    borderRight: '1px solid #e0e0e0',
-                    bgcolor: 'white',
-                    transition: 'width 0.3s ease',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: '92vh',
-                    overflowY: 'auto',
-                }}
-            >
-                {/* Sidebar Header */}
-                <Box
-                    sx={{
-                        p: 2,
-                        borderBottom: '1px solid #e0e0e0',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: isEventsCollapsed ? 'center' : 'space-between',
-                        position: 'sticky',
-                        top: 0,
-                        bgcolor: 'white',
-                        zIndex: 1,
-                    }}
-                >
-                    {!isEventsCollapsed && (
-                        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                            Upcoming Events
-                        </Typography>
-                    )}
-                    <IconButton
-                        onClick={() => setIsEventsCollapsed(!isEventsCollapsed)}
-                        sx={{
-                            transform: isEventsCollapsed ? 'rotate(180deg)' : 'none',
-                            transition: 'transform 0.3s ease',
-                        }}
-                    >
-                        {isEventsCollapsed ? <ExpandMore /> : <ExpandLess />}
-                    </IconButton>
-                </Box>
-
-                {/* Events List */}
-                {!isEventsCollapsed && (
-                    <Box sx={{ p: 2, overflowY: 'auto' }}>
-                        {events.length > 0 ? (
-                            <Stack spacing={2}>
-                                {events.map((event) => (
-                                    <EventCard
-                                        key={event.id}
-                                        event={event}
-                                        sx={{
-                                            width: '100%',
-                                            height: 'auto',
-                                        }}
-                                    />
-                                ))}
-                            </Stack>
-                        ) : (
-                            <Typography
-                                variant="body1"
-                                textAlign="center"
-                                sx={{ color: 'text.secondary', mt: 2 }}
-                            >
-                                No upcoming events at this time
-                            </Typography>
-                        )}
-                    </Box>
-                )}
+        <Container
+            maxWidth="xl"
+            sx={{
+                height: '92vh',
+                py: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden',
+                maxWidth: '1800px'
+            }}
+        >
+            {/* Header */}
+            <Box sx={{ mb: 2, textAlign: 'center' }}>
+                <Typography variant="h5" sx={{ fontWeight: 600, color: 'primary.main' }}>
+                    Find Your Match
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                    Like pets to improve your recommendations
+                </Typography>
             </Box>
 
-            {/* Main Content Area */}
+            {/* Content Area */}
             <Box sx={{
                 flex: 1,
                 display: 'flex',
                 flexDirection: 'column',
-                height: '92vh',
-                overflowY: 'auto'
+                overflow: 'hidden',
+                minHeight: 0,
+                justifyContent: 'center'
             }}>
-                {/* Pet Grid Section */}
-                <Box sx={{ flex: 1, p: 3, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                    <Grid container spacing={3} justifyContent="center">
-                        {loading ? (
-                            <Typography variant="h6" textAlign="center" sx={{ width: '100%', mt: 4 }}>
-                                Finding perfect matches for you...
-                            </Typography>
-                        ) : (
-                            Array.isArray(currentPets) && currentPets.map((pet) => (
-                                <Grid
-                                    item
-                                    xs={12}
-                                    sm={isEventsCollapsed ? 6 : 6}
-                                    md={isEventsCollapsed ? 4 : 4}
-                                    key={pet.id}
-                                >
-                                    <PetCard pet={pet} onLike={handleSearch} />
-                                </Grid>
-                            ))
-                        )}
-                    </Grid>
-                </Box>
-
-                {/* Footer Actions */}
-                <Box
-                    sx={{
-                        p: 3,
+                {loading ? (
+                    <Box sx={{
                         display: 'flex',
-                        justifyContent: 'space-between',
+                        justifyContent: 'center',
                         alignItems: 'center',
-                        gap: 2,
-                        borderTop: '1px solid #e0e0e0',
-                        bgcolor: 'white',
-                        position: 'sticky',
-                        bottom: 0,
-                    }}
-                >
-                    <Button
-                        onClick={handleSearch}
-                        variant="contained"
-                        size="large"
-                        sx={{
-                            bgcolor: '#4b6cb7',
-                            color: 'white',
-                            fontWeight: 'bold',
-                            '&:hover': {
-                                bgcolor: '#3b5998',
-                            },
-                            boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)',
-                            borderRadius: '8px',
-                            padding: '12px 24px',
-                        }}
-                    >
-                        Discover New Pets
-                    </Button>
+                        flex: 1
+                    }}>
+                        <CircularProgress size={40} />
+                    </Box>
+                ) : (
+                    <>
+                        {/* Pet Grid - Single Row of Three */}
+                        <Box sx={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            px: 1,
+                            mb: 2
+                        }}>
+                            <Box
+                                sx={{
+                                    display: 'grid',
+                                    gridTemplateColumns: {
+                                        xs: '1fr',
+                                        sm: 'repeat(2, 1fr)',
+                                        md: 'repeat(3, 1fr)', // Always show 3 columns on medium and up
+                                    },
+                                    gap: 3,
+                                    maxWidth: '1400px', // Increased to accommodate 3 cards
+                                    width: '100%'
+                                }}
+                            >
+                                {currentPets.slice(0, 3).map((pet) => ( // Show 3 pets
+                                    <Box
+                                        key={pet.id}
+                                        sx={{ height: 'fit-content' }}
+                                    >
+                                        <PetCard
+                                            pet={pet}
+                                            saveable={true}
+                                            likeable={true}
+                                            expandable={true}
+                                            contactable={true}
+                                            onLike={handleLikePet}
+                                            size="large"
+                                        />
+                                    </Box>
+                                ))}
+                            </Box>
+                        </Box>
 
-                    <Button
-                        variant="contained"
-                        size="large"
-                        onClick={() => setSavedPetsModalOpen(true)}
-                    >
-                        View Saved Pets
-                    </Button>
+                        {/* Action Buttons */}
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                width: '100%',
+                                marginLeft: 'auto',
+                                marginRight: 'auto',
+                                border: '1px solid',
+                                borderColor: 'divider',
+                                borderRadius: '16px',
+                                bgcolor: 'background.paper',
+                                boxShadow: '0px 0px 10px rgba(0,0,0,0.1)',
+                                mt: 'auto',
+                                mb: 2,
+                                position: 'relative',
+                                zIndex: 1,
+                                overflow: 'hidden'
+                            }}
+                        >
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    gap: 2,
+                                    py: 1.5,
+                                    maxWidth: '1400px',
+                                    margin: '0 auto',
+                                    width: '100%',
+                                }}
+                            >
+                                <Button
+                                    variant="outlined"
+                                    size="medium"
+                                    onClick={handleSearch}
+                                    startIcon={<CloseIcon />}
+                                    sx={{
+                                        minWidth: 150,
+                                        height: 40,
+                                        borderColor: 'error.main',
+                                        color: 'error.main',
+                                        '&:hover': {
+                                            borderColor: 'error.dark',
+                                            bgcolor: 'error.50'
+                                        }
+                                    }}
+                                >
+                                    Skip These
+                                </Button>
 
-                    <Button
-                        sx={{
-                            bgcolor: '#4b6cb7',
-                            color: 'white',
-                            fontWeight: 'bold',
-                            '&:hover': {
-                                bgcolor: '#3b5998',
-                            },
-                            marginLeft: 'auto',
-                        }}
-                        onClick={handleOpenHamburgerMenu}
-                        variant="contained"
-                        size="large"
-                    >
-                        Not Seeing What You Want?
-                    </Button>
-                </Box>
+                                <Button
+                                    variant="contained"
+                                    size="medium"
+                                    onClick={() => setSavedPetsModalOpen(true)}
+                                    sx={{
+                                        minWidth: 150,
+                                        height: 40,
+                                        bgcolor: 'primary.main',
+                                        '&:hover': {
+                                            bgcolor: 'primary.dark'
+                                        }
+                                    }}
+                                >
+                                    View Saved
+                                </Button>
+
+                                <Button
+                                    variant="contained"
+                                    size="medium"
+                                    onClick={handleOpenMenu}
+                                    startIcon={<TuneIcon />}
+                                    sx={{
+                                        minWidth: 150,
+                                        height: 40,
+                                        bgcolor: 'secondary.main',
+                                        '&:hover': {
+                                            bgcolor: 'secondary.dark'
+                                        }
+                                    }}
+                                >
+                                    Change Preferences
+                                </Button>
+                            </Box>
+                        </Box>
+                    </>
+                )}
             </Box>
 
-            <HamburgerMenu
-                anchorEl={hamburgerAnchorEl}
-                open={Boolean(hamburgerAnchorEl)}
-                onClose={handleCloseHamburgerMenu}
-                onSelectSpecies={handleSelectSpecies}
-            />
-
+            {/* Modals */}
             <SavedPetsModal
                 open={savedPetsModalOpen}
                 onClose={() => setSavedPetsModalOpen(false)}
             />
-        </Box>
-    )
-}
+
+            <HamburgerMenu
+                anchorEl={menuAnchorEl}
+                open={Boolean(menuAnchorEl)}
+                onClose={handleCloseMenu}
+                onSelectSpecies={handleSelectSpecies}
+                onResetPreferences={handleResetPreferences}
+            />
+        </Container>
+    );
+};
 
 export default FindAPetPage;
