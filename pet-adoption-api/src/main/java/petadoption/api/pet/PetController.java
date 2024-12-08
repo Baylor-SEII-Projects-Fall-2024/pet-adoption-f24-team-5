@@ -31,6 +31,11 @@ public class PetController {
         return petService.getAllPets();
     }
 
+    @GetMapping("/adoptable")
+    public List<Pet> getAdoptablePets() {
+        return petService.getAdoptablePets();
+    }
+
     @GetMapping("/available-species")
     public ResponseEntity<?> getAvailableSpecies() {
         try {
@@ -63,11 +68,18 @@ public class PetController {
         }
 
         try{
+
+            //save pet attached to adoption center
             AdoptionCenter adoptionCenter = userService.findCenterByWorkerEmail(email);
             Pet savedPet = petService.savePet(pet, adoptionCenter);
 
+            //save pet in vector database
+            double[] petVector = recommendationService.generatePreferenceVector(pet);
+            milvusServiceAdapter.upsertData(savedPet.petId, petVector,petVector.length, RecommendationService.PET_PARTITION);
+
+            //update adoption center pet count
             adoptionCenterService.updatePetCount(adoptionCenter.getId(),
-                    petService.getAvailablePetsByAdoptionCenter(adoptionCenter).size());
+                    petService.getNumAvailablePetsByAdoptionCenter(adoptionCenter));
             return ResponseEntity.status(HttpStatus.CREATED).body(savedPet);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -77,21 +89,27 @@ public class PetController {
 
     @PostMapping("/adopt")
     public ResponseEntity<?> adoptPet(@RequestBody Pet pet, @RequestParam String email) {
+
+        if(pet.getPetId() == null) {
+            return ResponseEntity.badRequest().body("Pet id is required");
+        }
+
+        if(email.isEmpty()) {
+            return ResponseEntity.badRequest().body("Email is required");
+        }
+
         try {
-            //TODO: change this to use milvus
+
             AdoptionCenter adoptionCenter = userService.findCenterByWorkerEmail(email);
-            double[] petVector = recommendationService.generatePreferenceVector(pet);
-            Pet savedPet = petService.savePet(pet, adoptionCenter);
+            Pet adoptedPet = petService.adoptPet(pet, adoptionCenter);
 
-            Optional<AdoptionCenter> tempCenter = adoptionCenterService.findById(pet.getAdoptionCenter().getId());
-            if(tempCenter.isPresent()) {
-                int petCount = petService.getAvailablePetsByAdoptionCenter(pet.getAdoptionCenter()).size();
-                adoptionCenterService.updatePetCount(pet.getAdoptionCenter().getId(), petCount);
-            }
+            //decrement pet count
+            adoptionCenterService.updatePetCount(pet.getAdoptionCenter().getId(), (adoptionCenter.getNumberOfPets() - 1));
 
-            milvusServiceAdapter.upsertData(savedPet.petId, petVector,petVector.length, recommendationService.PET_PARTITION);
+            milvusServiceAdapter.deleteData(pet.getPetId(), RecommendationService.PET_PARTITION);
+
             return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(savedPet);
+                    .body(adoptedPet);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
@@ -109,7 +127,7 @@ public class PetController {
 
         try {
             double [] petVector = recommendationService.generatePreferenceVector(pet);
-            milvusServiceAdapter.upsertData(pet.petId, petVector,petVector.length, recommendationService.PET_PARTITION);
+            milvusServiceAdapter.upsertData(pet.petId, petVector,petVector.length, RecommendationService.PET_PARTITION);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(petService.savePet(pet, userService.findCenterByWorkerEmail(email)));
         } catch (Exception e) {
@@ -118,14 +136,18 @@ public class PetController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<?> deletePet(@RequestBody Pet pet) {
+    public ResponseEntity<?> deletePet(@RequestBody Pet pet, @RequestParam String email) {
 
         if (pet.getPetId() == null) {
             return ResponseEntity.badRequest().body("Pet id is required");
         }
 
+        if(email.isEmpty()) {
+            return ResponseEntity.badRequest().body("Email is required");
+        }
+
         try {
-            if (!pet.getImageName().isEmpty() || pet.getAdoptionStatus() != null) {
+            if (pet.getImageName() != null && !pet.getImageName().isEmpty()) {
                 imageService.deleteImage(pet.getImageName());
             }
         } catch (Exception e) {
@@ -133,15 +155,14 @@ public class PetController {
         }
 
         try {
+            AdoptionCenter tempCenter = userService.findCenterByWorkerEmail(email);
+
             petService.deletePet(pet);
 
-            Optional<AdoptionCenter> tempCenter = adoptionCenterService.findById(pet.getAdoptionCenter().getId());
-            if(tempCenter.isPresent()) {
-                int petCount = petService.getAvailablePetsByAdoptionCenter(pet.getAdoptionCenter()).size();
-                adoptionCenterService.updatePetCount(pet.getAdoptionCenter().getId(), petCount);
-            }
+            int petCount = petService.getNumAvailablePetsByAdoptionCenter(tempCenter);
+            adoptionCenterService.updatePetCount(tempCenter.getId(), petCount);
 
-            milvusServiceAdapter.deleteData(pet.petId, recommendationService.PET_PARTITION);
+            milvusServiceAdapter.deleteData(pet.petId, RecommendationService.PET_PARTITION);
             return ResponseEntity.status(HttpStatus.OK).body("Pet deleted successfully");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());

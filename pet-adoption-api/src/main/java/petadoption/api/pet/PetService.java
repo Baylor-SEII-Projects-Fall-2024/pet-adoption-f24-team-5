@@ -14,6 +14,9 @@ public class PetService {
 
     private final PetRepository petRepository;
 
+    public List<Pet> getAdoptablePets() {
+        return petRepository.findByAdoptionStatusFalse().orElse(null);
+    }
 
     public List<Pet> getAllPets() { return petRepository.findAll(); }
 
@@ -26,13 +29,10 @@ public class PetService {
 
     }
 
-    public void adoptPet(Pet pet, Owner owner) {
-        petRepository.findByPetId(pet.getPetId()).map(tempPet -> {
-            tempPet.setAdoptionStatus(true);
-            tempPet.setPetOwner(owner);
-            Pet savedPet = petRepository.save(tempPet);
-            return ResponseEntity.ok(savedPet);
-        }).orElseGet(() -> ResponseEntity.notFound().build());
+    public Pet adoptPet(Pet pet, AdoptionCenter adoptionCenter) {
+        pet.setAdoptionCenter(adoptionCenter);
+        pet.setAdoptionStatus(true);
+        return petRepository.save(pet);
     }
 
     public List<Pet> getPetByAdoptionCenter(AdoptionCenter adoptionCenter) {
@@ -40,8 +40,8 @@ public class PetService {
                 .orElse(null);
     }
 
-    public List<Pet> getAvailablePetsByAdoptionCenter(AdoptionCenter adoptionCenter) {
-        return petRepository.findAvailablePetsByAdoptionCenter(adoptionCenter.getId())
+    public Integer getNumAvailablePetsByAdoptionCenter(AdoptionCenter adoptionCenter) {
+        return petRepository.findNumAvailablePetsByAdoptionCenter(adoptionCenter.getId())
                 .orElse(null);
     }
 
