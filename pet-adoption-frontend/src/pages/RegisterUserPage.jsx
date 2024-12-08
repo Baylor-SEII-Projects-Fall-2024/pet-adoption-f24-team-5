@@ -19,6 +19,7 @@ const Register = () => {
         lastName: '',
         age: '',
         centerZip: '',
+        numberOfPets: 0
     });
     const [errorMessage, setErrorMessage] = useState('');
     const { isLoaded } = useGoogleMaps();
