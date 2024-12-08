@@ -4,6 +4,8 @@ import { savePetToOwner } from "@/utils/user/owner/savePetToOwner";
 import { engineUpdatePreference } from "@/utils/recommendationEngine/engineUpdatePreference";
 import { getUser } from "@/utils/user/getUser";
 import { startConversation } from "@/utils/message/startConversation";
+import {API_URL} from "@/constants";
+import axios from "axios";
 
 export const usePetCardHandlers = (pet, token, email, onLike) => {
     const [loading, setLoading] = useState(true);
@@ -49,20 +51,88 @@ export const usePetCardHandlers = (pet, token, email, onLike) => {
         }
     };
 
-    const handleContactCenter = async () => {
+    const fetchUser = async () => {
         try {
-            const userData = await getUser(token, email);
+            const url = `${API_URL}/api/users/getUser?emailAddress=${email}`;
+            const response = await axios.get(url, {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Failed to fetch user", error);
+            throw error;
+        }
+    };
+
+    const handleContactCenter = async () => {
+        console.log("Pet data:", pet);
+        try {
+            // Fetch user data to get userId
+            const userData = await fetchUser();
+            const userId = userData.id;
+
+            // Retrieve centerID from the adoptionCenter field
             const centerID = pet.adoptionCenter?.id;
 
             if (!centerID) {
+                console.error("Center ID not found in pet data");
                 alert("Unable to contact the adoption center. Please try again later.");
                 return;
             }
 
-            await startConversation(token, userData.id, centerID);
+            const startConversationUrl = `${API_URL}/api/conversation/startConversation`;
+
+            // Start the conversation
+            const conversationResponse = await axios.post(
+                startConversationUrl,
+                null,
+                {
+                    params: {
+                        petOwnerID: userId,
+                        centerID: centerID,
+                    },
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            const conversation = conversationResponse.data;
+            console.log("Conversation started:", conversation);
+
+            // Send a message with the current PetCard's data
+            const sendMessageUrl = `${API_URL}/api/message/sendMessage`;
+            const petDataMessage = `PETCARD_JSON:${JSON.stringify(pet)}`;
+            console.log(petDataMessage);
+
+            const messageResponse = await axios.post(
+                sendMessageUrl,
+                {
+                    conversationId: conversation.conversationId,
+                    senderId: userId,
+                    receiverId: centerID,
+                    //message: petDataMessage,
+                    message: "Hello World",
+                    isRead: false,
+                },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            console.log("Message sent:", messageResponse.data);
+
+            // Navigate to the Messages page
             navigate("/Messages");
         } catch (error) {
-            console.error("Failed to start conversation", error);
+            console.error("Failed to contact adoption center", error);
         }
     };
 
