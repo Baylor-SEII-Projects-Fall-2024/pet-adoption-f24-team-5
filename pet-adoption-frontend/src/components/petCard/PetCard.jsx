@@ -8,6 +8,9 @@ import { useSelector } from "react-redux";
 import { getSubjectFromToken, getAuthorityFromToken } from "@/utils/redux/tokenUtils";
 import ExpandedPetCard from './ExpandedPetCard';
 import EditIcon from '@mui/icons-material/Edit';
+import MessageIcon from '@mui/icons-material/Message';
+import BookmarkAdd from '@mui/icons-material/BookmarkAdd';
+import Favorite from '@mui/icons-material/Favorite';
 
 const PetCard = ({
     pet,
@@ -63,9 +66,8 @@ const PetCard = ({
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
                 size={size}
-                sx={{ cursor: 'default' }}
             >
-                <ImageWrapper size={size}>
+                <ImageWrapper size={size} onClick={expandable ? handleCardClick : null} sx={{ cursor: expandable ? 'pointer' : 'default' }}>
                     <ImageComponent
                         key={imageKey}
                         imageName={pet.imageName}
@@ -86,7 +88,8 @@ const PetCard = ({
                             sx={{
                                 fontWeight: 600,
                                 mb: 0.5,
-                                fontSize: size === 'large' ? '1.25rem' : '1rem'
+                                fontSize: size === 'large' ? '1.25rem' : '1rem',
+                                color: 'text.primary'
                             }}
                         >
                             {pet.petName}
@@ -118,12 +121,14 @@ const PetCard = ({
                                 <Box
                                     key={index}
                                     sx={{
-                                        bgcolor: 'action.hover',
-                                        px: 1,
-                                        py: 0.25,
-                                        borderRadius: '8px',
+                                        bgcolor: 'secondary.light',
+                                        px: 1.5,
+                                        py: 0.5,
+                                        borderRadius: '12px',
                                         fontSize: '0.75rem',
-                                        color: 'text.primary'
+                                        color: 'text.primary',
+                                        border: '1px solid',
+                                        borderColor: 'secondary.main'
                                     }}
                                 >
                                     {item.label}
@@ -150,7 +155,9 @@ const PetCard = ({
                         )}
                     </Box>
 
+                    {/* Actions Section */}
                     <Box sx={{ mt: 'auto' }}>
+                        {/* Main Actions */}
                         {isManagerView ? (
                             <Button
                                 variant="contained"
@@ -159,10 +166,14 @@ const PetCard = ({
                                 startIcon={<EditIcon />}
                                 onClick={onClick}
                                 sx={{
-                                    mt: 1,
-                                    py: 1,
+                                    borderRadius: '24px',
+                                    py: 1.5,
                                     textTransform: 'none',
-                                    fontWeight: 600
+                                    fontWeight: 600,
+                                    bgcolor: 'primary.main',
+                                    '&:hover': {
+                                        bgcolor: 'primary.dark'
+                                    }
                                 }}
                             >
                                 Edit Pet Details
@@ -170,6 +181,7 @@ const PetCard = ({
                         ) : (
                             <PetCardActions
                                 saveable={saveable}
+                                contactable={contactable}
                                 likeable={likeable}
                                 authority={authority}
                                 onSave={handleSavePetToOwner}
@@ -180,7 +192,7 @@ const PetCard = ({
                         )}
                     </Box>
                 </PetInfo>
-            </StyledCard>
+            </StyledCard >
 
             {expandable && isExpanded && (
                 <ExpandedPetCard
@@ -191,7 +203,8 @@ const PetCard = ({
                     contactable={contactable}
                     onLike={onLike}
                 />
-            )}
+            )
+            }
         </>
     );
 };

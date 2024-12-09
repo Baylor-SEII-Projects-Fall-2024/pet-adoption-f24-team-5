@@ -71,12 +71,12 @@ const Messages = () => {
         setPetSelectionOpen(true);
     };
 
-// Function to close the pet selection dialog
+    // Function to close the pet selection dialog
     const handleClosePetSelection = () => {
         setPetSelectionOpen(false);
     };
 
-// Example pet data for testing
+    // Example pet data for testing
     /*const examplePetData = {
         petId: 101,
         petName: 'Buddy',
@@ -135,6 +135,11 @@ const Messages = () => {
 
             setMessages((prevMessages) => [...prevMessages, newMessage]);
             setMessageInput('');
+
+            // Force scroll to bottom after sending
+            setTimeout(() => {
+                scrollToBottom();
+            }, 100);
         } catch (error) {
             console.error('Failed to send message', error);
         }
@@ -150,7 +155,6 @@ const Messages = () => {
                 ? currentConversation.centerId
                 : currentConversation.ownerId;
 
-        // Convert pet data to JSON string and prepend the prefix
         const petDataJson = JSON.stringify(petData);
         const messageContent = `PETCARD_JSON:${petDataJson}`;
 
@@ -174,7 +178,11 @@ const Messages = () => {
 
             setMessages((prevMessages) => [...prevMessages, newMessage]);
             setMessageInput('');
-            scrollToBottom();
+
+            // Force scroll to bottom after sending
+            setTimeout(() => {
+                scrollToBottom();
+            }, 100);
         } catch (error) {
             console.error('Failed to send PetCard message', error);
         }
@@ -194,6 +202,11 @@ const Messages = () => {
 
     // Modified loadMessages to accept an optional parameter to control unread message reset
     const loadMessages = async (conversationId, userId, resetUnread = true) => {
+        if (!userData) {
+            console.log('userData not available yet');
+            return;
+        }
+
         try {
             const url = `${API_URL}/api/message/getMessages`;
 
@@ -311,6 +324,11 @@ const Messages = () => {
     };
 
     const fillDrawer = async (userId, userType) => {
+        if (!userId || !userType) {
+            console.log('Missing userId or userType in fillDrawer');
+            return;
+        }
+
         try {
             const url = `${API_URL}/api/conversation/getAllConversations`;
 
@@ -341,12 +359,12 @@ const Messages = () => {
 
             setConversations(updatedConversations);
 
-            // Only set currentConversationId if it hasn't been set yet
-            setCurrentConversationId((prevId) => prevId || updatedConversations[0]?.conversationId || null);
-
-            // Load messages for the first conversation if none selected
-            if (!currentConversationId && updatedConversations.length > 0) {
-                await loadMessages(updatedConversations[0].conversationId, userId);
+            // Only load messages if we have conversations and userData is available
+            if (updatedConversations.length > 0 && !currentConversationId) {
+                setCurrentConversationId(updatedConversations[0].conversationId);
+                if (userData) {
+                    await loadMessages(updatedConversations[0].conversationId, userId);
+                }
             }
         } catch (error) {
             console.error('Failed to get conversations', error);
@@ -360,19 +378,19 @@ const Messages = () => {
             // Fetch user information
             const response = await fetchUser(token);
             console.log('User data:', response.data);
-            const userData = response.data; // Store the fetched user data in a local variable
+            const userDataResponse = response.data;
 
-            setUserData(userData); // Set the userData state
-            setUserEmail(userData.emailAddress);
+            setUserData(userDataResponse); // Set the userData state
+            setUserEmail(userDataResponse.emailAddress);
 
-            const userId = userData.id; // Get the userId from the response
-            const userType = userData.userType;
+            // Wait for setState to complete using a Promise
+            await new Promise(resolve => setTimeout(resolve, 0));
 
-            // Ensure `userData` is fully set before proceeding
-            setTimeout(async () => {
-                // Fetch conversations and load the first conversation's messages
-                await fillDrawer(userId, userType);
-            }, 0);
+            const userId = userDataResponse.id;
+            const userType = userDataResponse.userType;
+
+            // Now that we have userData, fetch conversations
+            await fillDrawer(userId, userType);
         } catch (error) {
             console.error('Error during startup:', error);
         }
@@ -413,103 +431,156 @@ const Messages = () => {
 
 
     return (
-        <Box sx={{ display: 'flex', height: 'calc(100vh - 64px)', backgroundColor: '#f0f0f0' }}>
+        <Box
+            sx={{
+                height: '92vh', // Full viewport height minus header
+                display: 'flex',
+                bgcolor: 'background.default',
+                overflow: 'hidden', // Prevent scrolling of the entire container
+            }}
+        >
             {/* Drawer */}
             <Box
                 component="nav"
-                sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
-                aria-label="conversations"
+                sx={{
+                    width: { sm: drawerWidth },
+                    flexShrink: { sm: 0 },
+                }}
             >
                 <Drawer
                     variant={isMobile ? 'temporary' : 'permanent'}
                     open={isMobile ? mobileOpen : true}
                     onClose={handleDrawerToggle}
                     ModalProps={{
-                        keepMounted: true, // Better open performance on mobile.
+                        keepMounted: true,
                     }}
                     sx={{
                         '& .MuiDrawer-paper': {
                             width: drawerWidth,
                             boxSizing: 'border-box',
-                            top: '64px', // Offset to prevent overlapping the AppBar
-                            height: 'calc(100% - 64px)',
+                            position: 'relative', // Change from fixed to relative
+                            height: '100%',
+                            borderRight: '1px solid',
+                            borderColor: 'divider',
                         },
                     }}
                 >
-                    <Box sx={{ overflow: 'auto' }}>
-                        <List>
-                            {conversations.map((conversation) => (
-                                <ListItem
-                                    button
-                                    key={conversation.conversationId}
-                                    selected={conversation.conversationId === currentConversationId}
-                                    onClick={() => {
-                                        setCurrentConversationId(conversation.conversationId);
-                                        setIsNewConversation(true); // Mark this as a new conversation
-                                        loadMessages(conversation.conversationId, userData.id);
-                                        if (isMobile) {
-                                            setMobileOpen(false);
-                                        }
-                                    }}
-
-                                >
-                                    <ListItemText
-                                        primary={
-                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                <Typography>
-                                                    {conversation.otherUserName || `Conversation ${conversation.conversationId}`}
-                                                </Typography>
-                                                {conversation.unreadMessagesOwner > 0 || conversation.unreadMessagesCenter > 0 ? (
+                    <List sx={{ p: 0 }}>
+                        {conversations.map((conversation) => (
+                            <ListItem
+                                button
+                                key={conversation.conversationId}
+                                selected={conversation.conversationId === currentConversationId}
+                                onClick={() => handleConversationClick(conversation.conversationId)}
+                                sx={{
+                                    py: 2,
+                                    borderBottom: '1px solid',
+                                    borderColor: 'divider',
+                                    '&.Mui-selected': {
+                                        bgcolor: 'secondary.light', // Light beige background for selected conversation
+                                        '&:hover': {
+                                            bgcolor: 'secondary.light',
+                                        },
+                                    },
+                                    '&:hover': {
+                                        bgcolor: 'secondary.lighter', // Even lighter beige for hover
+                                    },
+                                }}
+                            >
+                                <ListItemText
+                                    primary={
+                                        <Box sx={{
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'center'
+                                        }}>
+                                            <Typography sx={{
+                                                fontWeight: 500,
+                                                color: 'text.primary',
+                                            }}>
+                                                {conversation.otherUserName}
+                                            </Typography>
+                                            {(conversation.unreadMessagesOwner > 0 ||
+                                                conversation.unreadMessagesCenter > 0) && (
                                                     <Badge
                                                         badgeContent={
-                                                            userData.userType === 'Owner'
+                                                            userData?.userType === 'Owner'
                                                                 ? conversation.unreadMessagesOwner
                                                                 : conversation.unreadMessagesCenter
                                                         }
                                                         color="error"
+                                                        sx={{ ml: 1 }}
                                                     />
-                                                ) : null}
-                                            </Box>
-                                        }
-                                    />
-                                </ListItem>
-                            ))}
-                        </List>
-                    </Box>
+                                                )}
+                                        </Box>
+                                    }
+                                />
+                            </ListItem>
+                        ))}
+                    </List>
                 </Drawer>
             </Box>
+
             {/* Main content area */}
             <Box
                 component="main"
                 sx={{
                     flexGrow: 1,
-                    p: 3,
-                    width: { sm: `calc(100% - ${drawerWidth}px)` },
+                    height: '100%',
                     display: 'flex',
                     flexDirection: 'column',
-                    height: 'calc(100vh - 64px)', // Adjusted height
+                    overflow: 'hidden',
+                    borderLeft: '1px solid',
+                    borderColor: 'divider',
                 }}
             >
-                {/* Header */}
-                <Box sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
+                {/* Chat header */}
+                <Box
+                    sx={{
+                        p: 2,
+                        bgcolor: 'background.paper',
+                        borderBottom: 1,
+                        borderColor: 'divider',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 2,
+                    }}
+                >
                     {isMobile && (
                         <IconButton
-                            color="inherit"
-                            aria-label="open drawer"
+                            color="primary"
                             edge="start"
                             onClick={handleDrawerToggle}
-                            sx={{ mr: 2 }}
+                            sx={{
+                                borderRadius: '12px',
+                                '&:hover': {
+                                    bgcolor: 'primary.lighter',
+                                }
+                            }}
                         >
                             <Menu />
                         </IconButton>
                     )}
-                    <Typography variant="h5" gutterBottom>
+                    <Typography
+                        variant="h6"
+                        sx={{
+                            color: 'text.primary',
+                            fontWeight: 600
+                        }}
+                    >
                         {currentConversation?.otherUserName || 'Select a conversation'}
                     </Typography>
                 </Box>
-                <Divider />
-                {/* Messages */}
-                <Box sx={{ flexGrow: 1, overflowY: 'auto', mb: 2, mt: 2, height: 'auto',}}>
+
+                {/* Messages container */}
+                <Box
+                    sx={{
+                        flexGrow: 1,
+                        overflow: 'auto',
+                        p: 2,
+                        bgcolor: 'background.default',
+                    }}
+                >
                     <Stack spacing={2}>
                         {messages.map((message) => {
                             const isCurrentUserSender = message.senderId === userData.id;
@@ -528,9 +599,21 @@ const Messages = () => {
                                             sx={{
                                                 display: 'flex',
                                                 justifyContent: isCurrentUserSender ? 'flex-end' : 'flex-start',
+                                                maxWidth: '400px',
+                                                alignSelf: isCurrentUserSender ? 'flex-end' : 'flex-start',
                                             }}
                                         >
-                                            <Typography color="error">Invalid pet data received.</Typography>
+                                            <Box sx={{
+                                                width: '100%',
+                                                bgcolor: 'background.paper',  // White background for PetCards
+                                                borderRadius: 2,
+                                                p: 1,
+                                                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                                                border: '1px solid',
+                                                borderColor: 'divider',
+                                            }}>
+                                                <Typography color="error">Invalid pet data received.</Typography>
+                                            </Box>
                                         </Box>
                                     );
                                 }
@@ -541,28 +624,40 @@ const Messages = () => {
                                         sx={{
                                             display: 'flex',
                                             justifyContent: isCurrentUserSender ? 'flex-end' : 'flex-start',
-                                            height: 'fit-content',
-                                            overflow: 'visible',
+                                            width: '100%',
+                                            maxWidth: '400px',
+                                            alignSelf: isCurrentUserSender ? 'flex-end' : 'flex-start',
+                                            px: 0.5,
                                         }}
                                     >
-                                        {/* Render the PetCard component */}
-                                        <Box
-                                            sx={{
-                                                width: '100%',
-                                                maxWidth: '400px',
-                                                overflow: 'visible',
-                                                height: 'fit-content',
-                                            }}
-                                        >
+                                        <Box sx={{
+                                            bgcolor: 'background.paper', // White background for better contrast
+                                            borderRadius: '16px',
+                                            p: 1,
+                                            boxShadow: '0 2px 4px rgba(139,115,85,0.1)', // Brown-tinted shadow
+                                            border: '1px solid',
+                                            borderColor: isCurrentUserSender
+                                                ? 'primary.light'  // Lighter border for better aesthetics
+                                                : 'secondary.light',
+                                        }}>
                                             <PetCard
                                                 pet={petData}
-                                                expandable={true} // Set as needed
-                                                saveable={true} // Set as needed
-                                                likeable={true} // Set as needed
+                                                expandable={true}
+                                                saveable={false}
+                                                likeable={false}
                                                 contactable={false}
-                                                size="Large"
+                                                size="default"
                                             />
-                                            <Typography variant="caption" display="block" align="right">
+                                            <Typography
+                                                variant="caption"
+                                                sx={{
+                                                    display: 'block',
+                                                    textAlign: 'right',
+                                                    mt: 0.5,
+                                                    color: 'text.secondary',
+                                                    px: 1, // Add some padding to align with the card
+                                                }}
+                                            >
                                                 {new Date(message.date).toLocaleTimeString([], {
                                                     hour: '2-digit',
                                                     minute: '2-digit',
@@ -584,14 +679,36 @@ const Messages = () => {
                                         <Box
                                             sx={{
                                                 maxWidth: '100%',
-                                                p: 1,
-                                                borderRadius: 2,
-                                                backgroundColor: isCurrentUserSender ? '#DCF8C6' : '#FFFFFF',
-                                                boxShadow: 1,
+                                                p: 1.5,
+                                                borderRadius: '16px',
+                                                backgroundColor: isCurrentUserSender
+                                                    ? 'primary.light' // Light brown for sent messages
+                                                    : 'secondary.light', // Light beige for received messages
+                                                border: '1px solid',
+                                                borderColor: isCurrentUserSender
+                                                    ? 'primary.main'
+                                                    : 'secondary.main',
+                                                boxShadow: '0 2px 4px rgba(139,115,85,0.1)', // Brown-tinted shadow
                                             }}
                                         >
-                                            <Typography variant="body1">{message.message}</Typography>
-                                            <Typography variant="caption" display="block" align="right">
+                                            <Typography
+                                                variant="body1"
+                                                sx={{
+                                                    color: 'text.primary',
+                                                    fontWeight: 400
+                                                }}
+                                            >
+                                                {message.message}
+                                            </Typography>
+                                            <Typography
+                                                variant="caption"
+                                                display="block"
+                                                align="right"
+                                                sx={{
+                                                    color: 'text.secondary',
+                                                    mt: 0.5
+                                                }}
+                                            >
                                                 {new Date(message.date).toLocaleTimeString([], {
                                                     hour: '2-digit',
                                                     minute: '2-digit',
@@ -602,26 +719,21 @@ const Messages = () => {
                                 );
                             }
                         })}
-                        {/* Dummy div to scroll into view */}
                         <div ref={messagesEndRef} />
                     </Stack>
                 </Box>
-                {/* Message Input */}
 
-                {/* Add this button within your JSX, perhaps near the message input
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={() => handleSendPetCardMessage(examplePetData)}
-                        disabled={!currentConversation}
-                    >
-                        Send PetCard
-                    </Button>*/}
-
-
-                <Box sx={{ mt: 'auto' }}>
+                {/* Message input */}
+                <Box
+                    sx={{
+                        p: 2,
+                        bgcolor: 'background.paper',
+                        borderTop: 1,
+                        borderColor: 'divider',
+                    }}
+                >
                     <form onSubmit={handleSendMessage}>
-                        <Stack direction="row" spacing={1}>
+                        <Stack direction="row" spacing={2}>
                             <TextField
                                 variant="outlined"
                                 placeholder="Type a message"
@@ -629,15 +741,27 @@ const Messages = () => {
                                 value={messageInput}
                                 onChange={(e) => setMessageInput(e.target.value)}
                                 disabled={!currentConversation}
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        borderRadius: '24px', // Pill-shaped input
+                                        '&.Mui-focused': {
+                                            '& .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: 'primary.main',
+                                                borderWidth: 2,
+                                            },
+                                        },
+                                    },
+                                }}
                             />
                             <Button
                                 type="submit"
                                 variant="contained"
                                 sx={{
-                                    background: 'linear-gradient(90deg, #43cea2, #185a9d)',
-                                    color: 'white',
+                                    bgcolor: 'primary.main',
+                                    borderRadius: '24px',
+                                    px: 3,
                                     '&:hover': {
-                                        background: 'linear-gradient(90deg, #185a9d, #43cea2)',
+                                        bgcolor: 'primary.dark',
                                     },
                                 }}
                                 disabled={!currentConversation}

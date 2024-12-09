@@ -6,6 +6,7 @@ import axios from '../utils/redux/axiosConfig';
 import { useDispatch } from 'react-redux';
 import { setToken } from '../utils/redux/userSlice';
 import { handleLogIn } from '../utils/login/logIn';
+import Image from 'next/image';
 
 const Login = () => {
     const [emailAddress, setEmailAddress] = useState('');
@@ -22,30 +23,63 @@ const Login = () => {
     return (
         <Box
             sx={{
-                height: '100vh',
+                minHeight: '92vh',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                background: 'linear-gradient(135deg, #4b6cb7 30%, #182848 90%)',
+                bgcolor: 'background.default',
+                py: 4
             }}
         >
             <Box
                 sx={{
-                    width: '400px',
-                    backgroundColor: 'white',
-                    borderRadius: '12px',
-                    boxShadow: '0px 0px 15px rgba(0, 0, 0, 0.1)',
-                    padding: 4,
-                    textAlign: 'center',
+                    width: '100%',
+                    maxWidth: '500px',
+                    mx: 'auto',
+                    bgcolor: 'background.paper',
+                    borderRadius: '24px',
+                    boxShadow: '0 4px 12px rgba(139,115,85,0.1)',
+                    p: 4
                 }}
             >
-                <Typography variant="h4" gutterBottom>
+                <Box sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    mb: 4
+                }}>
+                    <Image
+                        src="/favicon.ico"
+                        alt="DogPile Logo"
+                        width={64}
+                        height={64}
+                    />
+                    <Typography
+                        variant="h4"
+                        sx={{
+                            color: 'primary.main',
+                            fontWeight: 700,
+                            mt: 2
+                        }}
+                    >
+                        DogPile Solutions
+                    </Typography>
+                </Box>
+
+                <Typography
+                    variant="h4"
+                    sx={{
+                        mb: 4,
+                        color: 'text.primary',
+                        fontWeight: 600,
+                        textAlign: 'center'
+                    }}
+                >
                     Login
                 </Typography>
 
                 <form onSubmit={handleSubmit}>
-                    <Stack spacing={2} marginTop={2}>
-                        {/* Email Input */}
+                    <Stack spacing={3}>
                         <TextField
                             label="Email"
                             type="email"
@@ -60,9 +94,17 @@ const Login = () => {
                                     </InputAdornment>
                                 ),
                             }}
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    borderRadius: '12px',
+                                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                        borderColor: 'primary.main',
+                                        borderWidth: 2
+                                    }
+                                }
+                            }}
                         />
 
-                        {/* Password Input */}
                         <TextField
                             label="Password"
                             type="password"
@@ -77,28 +119,38 @@ const Login = () => {
                                     </InputAdornment>
                                 ),
                             }}
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    borderRadius: '12px',
+                                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                        borderColor: 'primary.main',
+                                        borderWidth: 2
+                                    }
+                                }
+                            }}
                         />
 
-                        {/* Error Message */}
                         {errorMessage && (
-                            <Typography variant="body2" color="error">
+                            <Typography
+                                variant="body2"
+                                color="error"
+                                textAlign="center"
+                            >
                                 {errorMessage}
                             </Typography>
                         )}
 
-                        {/* Login Button */}
                         <Button
                             type="submit"
                             variant="contained"
                             fullWidth
                             sx={{
-                                background: 'linear-gradient(90deg, #43cea2, #185a9d)',
+                                bgcolor: 'primary.main',
                                 color: 'white',
-                                padding: '10px 0',
-                                borderRadius: '50px',
-                                marginTop: 2,
+                                borderRadius: '24px',
+                                py: 1.5,
                                 '&:hover': {
-                                    background: 'linear-gradient(90deg, #185a9d, #43cea2)',
+                                    bgcolor: 'primary.dark',
                                 },
                             }}
                         >
@@ -107,13 +159,24 @@ const Login = () => {
                     </Stack>
                 </form>
 
-                {/* Sign Up Link */}
-                <Typography variant="body2" marginTop={2}>
-                    Don't have an account?{' '}
-                    <Link to="/register" style={{ color: '#43cea2', textDecoration: 'none' }}>
-                        Sign Up
-                    </Link>
-                </Typography>
+                <Box sx={{ mt: 3, textAlign: 'center' }}>
+                    <Typography
+                        variant="body2"
+                        sx={{ color: 'text.secondary' }}
+                    >
+                        Don't have an account?{' '}
+                        <Link
+                            to="/register"
+                            style={{
+                                color: 'inherit',
+                                textDecoration: 'none',
+                                fontWeight: 600
+                            }}
+                        >
+                            Sign Up
+                        </Link>
+                    </Typography>
+                </Box>
             </Box>
         </Box>
     );

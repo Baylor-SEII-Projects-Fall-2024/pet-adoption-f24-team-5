@@ -47,157 +47,229 @@ const RegisterCenterWorker = () => {
     return (
         <Box
             sx={{
-                background: 'linear-gradient(135deg, #FFFFFF 30%, #E7E9EC 90%)',
-                minHeight: '100vh',
+                minHeight: '92vh',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                bgcolor: 'background.default',
+                py: 4
             }}
         >
             <Box
                 sx={{
-                    display: 'flex',
-                    flexGrow: 1,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    overflow: 'auto',
+                    width: '100%',
+                    maxWidth: '500px',
+                    mx: 'auto',
+                    bgcolor: 'background.paper',
+                    borderRadius: '24px',
+                    boxShadow: '0 4px 12px rgba(139,115,85,0.1)',
+                    p: 4
                 }}
             >
-                <Box
+                <Typography
+                    variant="h4"
                     sx={{
-                        width: '400px',
-                        maxHeight: '90vh',
-                        overflowY: 'auto',
-                        backgroundColor: 'white',
-                        borderRadius: '12px',
-                        boxShadow: '0px 0px 15px rgba(0, 0, 0, 0.1)',
-                        padding: 4,
-                        textAlign: 'center',
+                        mb: 4,
+                        color: 'text.primary',
+                        fontWeight: 600,
+                        textAlign: 'center'
                     }}
                 >
-                    <Typography variant="h4" gutterBottom>
-                        Register Center Worker
-                    </Typography>
+                    Register Center Worker
+                </Typography>
 
-                    {!isRegistered ? (
-                        <form onSubmit={handleSubmit}>
-                            <Stack spacing={2}>
-                                <TextField
-                                    label="First Name"
-                                    type="text"
-                                    value={registrationData.firstName}
-                                    onChange={(e) => setRegistrationData({ ...registrationData, firstName: e.target.value })}
-                                    required
-                                    fullWidth
-                                />
-                                <TextField
-                                    label="Last Name"
-                                    type="text"
-                                    value={registrationData.lastName}
-                                    onChange={(e) => setRegistrationData({ ...registrationData, lastName: e.target.value })}
-                                    required
-                                    fullWidth
-                                />
-                                <TextField
-                                    label="Email"
-                                    type="email"
-                                    value={registrationData.emailAddress}
-                                    onChange={(e) => setRegistrationData({ ...registrationData, emailAddress: e.target.value })}
-                                    required
-                                    fullWidth
-                                    InputProps={{
-                                        startAdornment: (
-                                            <InputAdornment position="start">
-                                                <Email />
-                                            </InputAdornment>
-                                        ),
-                                    }}
-                                />
-                                <TextField
-                                    label="Password"
-                                    type="password"
-                                    value={registrationData.password}
-                                    onChange={(e) => setRegistrationData({ ...registrationData, password: e.target.value })}
-                                    required
-                                    fullWidth
-                                    InputProps={{
-                                        startAdornment: (
-                                            <InputAdornment position="start">
-                                                <Lock />
-                                            </InputAdornment>
-                                        ),
-                                    }}
-                                />
-                                <TextField
-                                    label="Age"
-                                    type="number"
-                                    value={registrationData.age}
-                                    onChange={(e) => {
-                                        const value = e.target.value;
-                                        if (value === '' || (/^\d+$/.test(value) && parseInt(value, 10) >= 1 && parseInt(value, 10) <= 99)) {
-                                            setRegistrationData({ ...registrationData, age: value });
+                {!isRegistered ? (
+                    <form onSubmit={handleSubmit}>
+                        <Stack spacing={3}>
+                            <TextField
+                                label="First Name"
+                                type="text"
+                                value={registrationData.firstName}
+                                onChange={(e) => setRegistrationData({ ...registrationData, firstName: e.target.value })}
+                                required
+                                fullWidth
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        borderRadius: '12px',
+                                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                            borderColor: 'primary.main',
+                                            borderWidth: 2
                                         }
+                                    }
+                                }}
+                            />
+                            <TextField
+                                label="Last Name"
+                                type="text"
+                                value={registrationData.lastName}
+                                onChange={(e) => setRegistrationData({ ...registrationData, lastName: e.target.value })}
+                                required
+                                fullWidth
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        borderRadius: '12px',
+                                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                            borderColor: 'primary.main',
+                                            borderWidth: 2
+                                        }
+                                    }
+                                }}
+                            />
+                            <TextField
+                                label="Email"
+                                type="email"
+                                value={registrationData.emailAddress}
+                                onChange={(e) => setRegistrationData({ ...registrationData, emailAddress: e.target.value })}
+                                required
+                                fullWidth
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <Email />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        borderRadius: '12px',
+                                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                            borderColor: 'primary.main',
+                                            borderWidth: 2
+                                        }
+                                    }
+                                }}
+                            />
+                            <TextField
+                                label="Password"
+                                type="password"
+                                value={registrationData.password}
+                                onChange={(e) => setRegistrationData({ ...registrationData, password: e.target.value })}
+                                required
+                                fullWidth
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <Lock />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        borderRadius: '12px',
+                                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                            borderColor: 'primary.main',
+                                            borderWidth: 2
+                                        }
+                                    }
+                                }}
+                            />
+                            <TextField
+                                label="Age"
+                                type="number"
+                                value={registrationData.age}
+                                onChange={(e) => {
+                                    const value = e.target.value;
+                                    if (value === '' || (/^\d+$/.test(value) && parseInt(value, 10) >= 1 && parseInt(value, 10) <= 99)) {
+                                        setRegistrationData({ ...registrationData, age: value });
+                                    }
 
-                                    }}
-                                    onKeyDown={(e) => {
-                                        // Prevent non-numeric key presses
-                                        if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete') {
-                                            e.preventDefault();
+                                }}
+                                onKeyDown={(e) => {
+                                    // Prevent non-numeric key presses
+                                    if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete') {
+                                        e.preventDefault();
+                                    }
+                                }}
+                                required
+                                fullWidth
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        borderRadius: '12px',
+                                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                            borderColor: 'primary.main',
+                                            borderWidth: 2
                                         }
-                                    }}
-                                    required
-                                    fullWidth
-                                />
-                                <TextField
-                                    label="Phone Number"
-                                    type="tel"
-                                    value={registrationData.phoneNumber}
-                                    onChange={(e) => handlePhoneNumberChange(e)}
-                                    required
-                                    fullWidth
-                                    InputProps={{
-                                        startAdornment: (
-                                            <InputAdornment position="start">
-                                                <Phone />
-                                            </InputAdornment>
-                                        ),
-                                    }}
-                                />
-                                <Button
-                                    type="submit"
-                                    variant="contained"
-                                    fullWidth
-                                    disabled={isSubmitting}
-                                    sx={{
-                                        background: 'linear-gradient(90deg, #43cea2, #185a9d)',
-                                        color: 'white',
-                                        borderRadius: '50px',
-                                        padding: '10px 0',
-                                        '&:hover': {
-                                            background: 'linear-gradient(90deg, #43cea2, #43cea2)',
-                                        },
-                                    }}
-                                >
-                                    {isSubmitting ? (
-                                        <CircularProgress size={24} sx={{ color: 'white' }} />
-                                    ) : (
-                                        'Register'
-                                    )}
-                                </Button>
-                            </Stack>
-                        </form>
-                    ) : (
-                        <Stack spacing={2} alignItems="center">
-                            <CheckCircle sx={{ fontSize: 60, color: '#43cea2' }} />
-                            <Typography variant="h5" color="textSecondary">
-                                Account Created!
-                            </Typography>
-                            <Link to="/ManageAccounts" style={{ color: '#43cea2', textDecoration: 'none' }}>
-                                Back to Account Manager
-                            </Link>
+                                    }
+                                }}
+                            />
+                            <TextField
+                                label="Phone Number"
+                                type="tel"
+                                value={registrationData.phoneNumber}
+                                onChange={(e) => handlePhoneNumberChange(e)}
+                                required
+                                fullWidth
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <Phone />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        borderRadius: '12px',
+                                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                            borderColor: 'primary.main',
+                                            borderWidth: 2
+                                        }
+                                    }
+                                }}
+                            />
+                            <Button
+                                type="submit"
+                                variant="contained"
+                                fullWidth
+                                disabled={isSubmitting}
+                                sx={{
+                                    bgcolor: 'primary.main',
+                                    color: 'white',
+                                    borderRadius: '24px',
+                                    py: 1.5,
+                                    '&:hover': {
+                                        bgcolor: 'primary.dark',
+                                    },
+                                    '&.Mui-disabled': {
+                                        bgcolor: 'action.disabledBackground',
+                                    }
+                                }}
+                            >
+                                {isSubmitting ? (
+                                    <CircularProgress size={24} sx={{ color: 'white' }} />
+                                ) : (
+                                    'Register'
+                                )}
+                            </Button>
                         </Stack>
-                    )}
-                </Box>
+                    </form>
+                ) : (
+                    <Stack spacing={3} alignItems="center">
+                        <CheckCircle sx={{
+                            fontSize: 60,
+                            color: 'primary.main'
+                        }} />
+                        <Typography
+                            variant="h5"
+                            sx={{ color: 'text.primary' }}
+                        >
+                            Account Created!
+                        </Typography>
+                        <Button
+                            component={Link}
+                            to="/ManageAccounts"
+                            variant="contained"
+                            sx={{
+                                bgcolor: 'primary.main',
+                                borderRadius: '24px',
+                                '&:hover': {
+                                    bgcolor: 'primary.dark'
+                                }
+                            }}
+                        >
+                            Back to Account Manager
+                        </Button>
+                    </Stack>
+                )}
             </Box>
         </Box>
     );
