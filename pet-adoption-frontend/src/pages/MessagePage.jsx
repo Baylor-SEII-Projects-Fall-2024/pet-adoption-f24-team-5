@@ -37,6 +37,12 @@ const Messages = () => {
 
 
     useEffect(() => {
+        if (userData) {
+            fillDrawer(userData.id, userData.userType);
+        }
+    }, [userData]);
+
+    useEffect(() => {
         if (isNewConversation && messages.length > 0) {
             scrollToBottom();
             setIsNewConversation(false); // Reset after scrolling
@@ -354,18 +360,24 @@ const Messages = () => {
             // Fetch user information
             const response = await fetchUser(token);
             console.log('User data:', response.data);
-            setUserData(response.data);
-            setUserEmail(response.data.emailAddress);
+            const userData = response.data; // Store the fetched user data in a local variable
 
-            const userId = response.data.id; // Get the userId from the response
-            const userType = response.data.userType;
+            setUserData(userData); // Set the userData state
+            setUserEmail(userData.emailAddress);
 
-            // Fetch conversations and load the first conversation's messages
-            await fillDrawer(userId, userType);
+            const userId = userData.id; // Get the userId from the response
+            const userType = userData.userType;
+
+            // Ensure `userData` is fully set before proceeding
+            setTimeout(async () => {
+                // Fetch conversations and load the first conversation's messages
+                await fillDrawer(userId, userType);
+            }, 0);
         } catch (error) {
             console.error('Error during startup:', error);
         }
     };
+
 
     // Use useEffect to call startup when the component mounts
     useEffect(() => {
@@ -497,7 +509,7 @@ const Messages = () => {
                 </Box>
                 <Divider />
                 {/* Messages */}
-                <Box sx={{ flexGrow: 1, overflowY: 'auto', mb: 2, mt: 2 }}>
+                <Box sx={{ flexGrow: 1, overflowY: 'auto', mb: 2, mt: 2, height: 'auto',}}>
                     <Stack spacing={2}>
                         {messages.map((message) => {
                             const isCurrentUserSender = message.senderId === userData.id;
@@ -529,12 +541,17 @@ const Messages = () => {
                                         sx={{
                                             display: 'flex',
                                             justifyContent: isCurrentUserSender ? 'flex-end' : 'flex-start',
+                                            height: 'fit-content',
+                                            overflow: 'visible',
                                         }}
                                     >
                                         {/* Render the PetCard component */}
                                         <Box
                                             sx={{
-                                                maxWidth: '70%',
+                                                width: '100%',
+                                                maxWidth: '400px',
+                                                overflow: 'visible',
+                                                height: 'fit-content',
                                             }}
                                         >
                                             <PetCard
@@ -542,6 +559,8 @@ const Messages = () => {
                                                 expandable={true} // Set as needed
                                                 saveable={true} // Set as needed
                                                 likeable={true} // Set as needed
+                                                contactable={false}
+                                                size="Large"
                                             />
                                             <Typography variant="caption" display="block" align="right">
                                                 {new Date(message.date).toLocaleTimeString([], {
@@ -564,7 +583,7 @@ const Messages = () => {
                                     >
                                         <Box
                                             sx={{
-                                                maxWidth: '70%',
+                                                maxWidth: '100%',
                                                 p: 1,
                                                 borderRadius: 2,
                                                 backgroundColor: isCurrentUserSender ? '#DCF8C6' : '#FFFFFF',
