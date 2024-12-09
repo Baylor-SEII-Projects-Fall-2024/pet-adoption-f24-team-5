@@ -194,7 +194,6 @@ const ExpandedPetCard = ({ pet, onClose, saveable = true, likeable = true, conta
                             style={{
                                 transform: imageZoom ? 'scale(1.5)' : 'scale(1)',
                                 transition: 'all 0.3s ease',
-                                cursor: 'pointer'
                             }}
                             onClick={() => setImageZoom(!imageZoom)}
                         />
@@ -221,14 +220,24 @@ const ExpandedPetCard = ({ pet, onClose, saveable = true, likeable = true, conta
                     <ContentWrapper>
                         <ContentSection>
                             <PetDetails>
-                                <Typography variant="h3" fontWeight={700}>
+                                <Typography
+                                    variant="h3"
+                                    sx={{
+                                        fontWeight: 700,
+                                        color: 'text.primary',
+                                        mb: 1
+                                    }}
+                                >
                                     {pet.petName}
                                 </Typography>
 
                                 <Typography
                                     variant="h6"
-                                    color="text.secondary"
-                                    sx={{ fontWeight: 500 }}
+                                    sx={{
+                                        fontWeight: 500,
+                                        color: 'text.secondary',
+                                        mb: 2
+                                    }}
                                 >
                                     {pet.adoptionCenter?.centerName || "Adoption Center"}
                                 </Typography>
@@ -242,22 +251,36 @@ const ExpandedPetCard = ({ pet, onClose, saveable = true, likeable = true, conta
                                     ].map((item, index) => (
                                         <DetailItem key={index}>
                                             {item.icon}
-                                            <Typography variant="body1" fontWeight={500}>
+                                            <Typography
+                                                variant="body1"
+                                                sx={{
+                                                    fontWeight: 500,
+                                                    color: 'text.primary'
+                                                }}
+                                            >
                                                 {item.value}
                                             </Typography>
                                         </DetailItem>
                                     ))}
                                 </Box>
 
-                                <Typography variant="h6" fontWeight={600} sx={{ mt: 3 }}>
+                                <Typography
+                                    variant="h6"
+                                    sx={{
+                                        fontWeight: 600,
+                                        mt: 3,
+                                        mb: 1,
+                                        color: 'text.primary'
+                                    }}
+                                >
                                     About {pet.petName}
                                 </Typography>
                                 <Typography
                                     variant="body1"
-                                    color="text.secondary"
                                     sx={{
                                         lineHeight: 1.8,
                                         letterSpacing: 0.3,
+                                        color: 'text.secondary',
                                     }}
                                 >
                                     {pet.description}
@@ -272,9 +295,10 @@ const ExpandedPetCard = ({ pet, onClose, saveable = true, likeable = true, conta
                                             size="large"
                                             startIcon={<MessageIcon />}
                                             sx={{
-                                                bgcolor: 'success.main',
+                                                bgcolor: 'primary.main',
+                                                borderRadius: '24px',
                                                 '&:hover': {
-                                                    bgcolor: 'success.dark',
+                                                    bgcolor: 'primary.dark',
                                                 },
                                             }}
                                         >
@@ -290,6 +314,7 @@ const ExpandedPetCard = ({ pet, onClose, saveable = true, likeable = true, conta
                                             size="large"
                                             startIcon={<BookmarkAdd />}
                                             sx={{
+                                                borderRadius: '24px',
                                                 borderColor: 'primary.main',
                                                 color: 'primary.main',
                                                 '&:hover': {
@@ -308,6 +333,7 @@ const ExpandedPetCard = ({ pet, onClose, saveable = true, likeable = true, conta
                                             size="large"
                                             startIcon={<Favorite />}
                                             sx={{
+                                                borderRadius: '24px',
                                                 borderColor: 'secondary.main',
                                                 color: 'secondary.main',
                                                 '&:hover': {

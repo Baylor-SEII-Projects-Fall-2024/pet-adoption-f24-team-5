@@ -3,7 +3,7 @@ import { API_URL } from "@/constants";
 
 export const getAllPets = async (token) => {
     try {
-        const response = await axios.get(`${API_URL}/api/pets`, {
+        const response = await axios.get(`${API_URL}/api/pets/adoptable`, {
             headers: {
                 Authorization: `Bearer ${token}`,
                 'Content-Type': 'application/json'

@@ -8,6 +8,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { handleRegisterUser } from '../utils/register/registerUser';
 import { useGoogleMaps } from '../components/GoogleMapsProvider';
+import Image from 'next/image';
 
 const Register = () => {
     const [registrationData, setRegistrationData] = useState({
@@ -213,263 +214,444 @@ const Register = () => {
     return (
         <Box
             sx={{
-                height: '100vh',
+                minHeight: '92vh',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                background: 'linear-gradient(135deg, #4b6cb7 30%, #182848 90%)',
-                overflow: 'auto',
+                bgcolor: 'background.default',
+                py: 2
             }}
         >
             <Box
                 sx={{
-                    width: '400px',
-                    maxHeight: '90vh',
-                    overflowY: 'auto',
-                    backgroundColor: 'white',
-                    borderRadius: '12px',
-                    boxShadow: '0px 0px 15px rgba(0, 0, 0, 0.1)',
-                    padding: 4,
-                    textAlign: 'center',
+                    width: '100%',
+                    maxWidth: '800px',
+                    mx: 'auto',
+                    bgcolor: 'background.paper',
+                    borderRadius: '24px',
+                    boxShadow: '0 4px 12px rgba(139,115,85,0.1)',
+                    p: 3
                 }}
             >
-                <Typography variant="h4" gutterBottom>
+                <Box sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    mb: 2
+                }}>
+                    <Image
+                        src="/favicon.ico"
+                        alt="DogPile Logo"
+                        width={48}
+                        height={48}
+                    />
+                    <Typography
+                        variant="h4"
+                        sx={{
+                            color: 'primary.main',
+                            fontWeight: 700,
+                            ml: 2
+                        }}
+                    >
+                        DogPile Solutions
+                    </Typography>
+                </Box>
+
+                <Typography
+                    variant="h5"
+                    sx={{
+                        mb: 2,
+                        color: 'text.primary',
+                        fontWeight: 600,
+                        textAlign: 'center'
+                    }}
+                >
                     Register
                 </Typography>
 
                 <form onSubmit={handleSubmit}>
-                    <Stack spacing={2}>
+                    <Box sx={{
+                        width: '100%',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        mb: 3
+                    }}>
                         <TextField
                             select
                             label="User Type"
                             value={registrationData.userType}
                             onChange={(e) => setRegistrationData({ ...registrationData, userType: e.target.value })}
                             required
-                            fullWidth
+                            sx={{
+                                width: '300px',
+                                '& .MuiOutlinedInput-root': {
+                                    borderRadius: '12px',
+                                }
+                            }}
+                            size="small"
                         >
                             <MenuItem value="CenterOwner">Adoption Center</MenuItem>
                             <MenuItem value="Owner">Pet Owner</MenuItem>
                         </TextField>
+                    </Box>
 
-                        <TextField
-                            label="Email"
-                            type="email"
-                            value={registrationData.emailAddress}
-                            onChange={(e) => setRegistrationData({ ...registrationData, emailAddress: e.target.value })}
-                            required
-                            fullWidth
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <Email />
-                                    </InputAdornment>
-                                ),
-                            }}
-                        />
-
-                        <TextField
-                            label="Password"
-                            type="password"
-                            value={registrationData.password}
-                            onChange={(e) => setRegistrationData({ ...registrationData, password: e.target.value })}
-                            required
-                            fullWidth
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <Lock />
-                                    </InputAdornment>
-                                ),
-                            }}
-                        />
-
-                        <TextField
-                            label="Phone Number"
-                            type="tel"
-                            value={registrationData.phoneNumber}
-                            onChange={handlePhoneNumberChange}
-                            required
-                            fullWidth
-                            inputProps={{ maxLength: 12 }}
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <Phone />
-                                    </InputAdornment>
-                                ),
-                            }}
-                        />
-
-                        {registrationData.userType === 'CenterOwner' && (
-                            <>
-                                <TextField
-                                    label="Adoption Center Name"
-                                    value={registrationData.centerName}
-                                    onChange={(e) => setRegistrationData({ ...registrationData, centerName: e.target.value })}
-                                    required
-                                    fullWidth
-                                />
-                                <Autocomplete
-                                    freeSolo
-                                    options={addressPredictions}
-                                    getOptionLabel={(option) =>
-                                        typeof option === 'string' ? option : option.description
+                    <Box sx={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 1fr',
+                        gap: 2,
+                        '& .MuiTextField-root': { m: 0 },
+                        minHeight: '300px',
+                    }}>
+                        <Box sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: 2,
+                        }}>
+                            <TextField
+                                label="Email"
+                                type="email"
+                                value={registrationData.emailAddress}
+                                onChange={(e) => setRegistrationData({ ...registrationData, emailAddress: e.target.value })}
+                                required
+                                fullWidth
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <Email />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        borderRadius: '12px',
+                                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                            borderColor: 'primary.main',
+                                            borderWidth: 2
+                                        }
                                     }
-                                    onInputChange={(_, newValue) => {
-                                        handleAddressSearch(newValue);
-                                        if (!newValue) {
-                                            setIsAddressValid(false);
-                                            setAddressError('');
+                                }}
+                                size="small"
+                            />
+
+                            <TextField
+                                label="Password"
+                                type="password"
+                                value={registrationData.password}
+                                onChange={(e) => setRegistrationData({ ...registrationData, password: e.target.value })}
+                                required
+                                fullWidth
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <Lock />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        borderRadius: '12px',
+                                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                            borderColor: 'primary.main',
+                                            borderWidth: 2
                                         }
-                                    }}
-                                    onChange={(_, newValue) => {
-                                        if (newValue && typeof newValue !== 'string') {
-                                            handleAddressSelect(newValue);
-                                        } else {
-                                            setIsAddressValid(false);
-                                            setAddressError('Please select an address from the suggestions');
+                                    }
+                                }}
+                                size="small"
+                            />
+
+                            <TextField
+                                label="Phone Number"
+                                type="tel"
+                                value={registrationData.phoneNumber}
+                                onChange={handlePhoneNumberChange}
+                                required
+                                fullWidth
+                                inputProps={{ maxLength: 12 }}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <Phone />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        borderRadius: '12px',
+                                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                            borderColor: 'primary.main',
+                                            borderWidth: 2
                                         }
-                                    }}
-                                    renderInput={(params) => (
-                                        <TextField
-                                            {...params}
-                                            label="Address"
-                                            required
-                                            fullWidth
-                                            error={!!addressError}
-                                            helperText={addressError || 'Please select an address from the suggestions'}
-                                            value={registrationData.centerAddress}
-                                            onChange={(e) => {
-                                                setRegistrationData({
-                                                    ...registrationData,
-                                                    centerAddress: e.target.value
-                                                });
+                                    }
+                                }}
+                                size="small"
+                            />
+                            <Box sx={{ flex: 1 }} />
+                        </Box>
+
+                        <Box sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: 2,
+                        }}>
+                            {registrationData.userType === 'CenterOwner' ? (
+                                <>
+                                    <TextField
+                                        label="Adoption Center Name"
+                                        value={registrationData.centerName}
+                                        onChange={(e) => setRegistrationData({ ...registrationData, centerName: e.target.value })}
+                                        required
+                                        fullWidth
+                                        sx={{
+                                            '& .MuiOutlinedInput-root': {
+                                                borderRadius: '12px',
+                                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                    borderColor: 'primary.main',
+                                                    borderWidth: 2
+                                                }
+                                            }
+                                        }}
+                                        size="small"
+                                    />
+                                    <Autocomplete
+                                        freeSolo
+                                        options={addressPredictions}
+                                        getOptionLabel={(option) =>
+                                            typeof option === 'string' ? option : option.description
+                                        }
+                                        onInputChange={(_, newValue) => {
+                                            handleAddressSearch(newValue);
+                                            if (!newValue) {
+                                                setIsAddressValid(false);
+                                                setAddressError('');
+                                            }
+                                        }}
+                                        onChange={(_, newValue) => {
+                                            if (newValue && typeof newValue !== 'string') {
+                                                handleAddressSelect(newValue);
+                                            } else {
                                                 setIsAddressValid(false);
                                                 setAddressError('Please select an address from the suggestions');
-                                            }}
-                                        />
-                                    )}
-                                />
-                                <TextField
-                                    label="City"
-                                    value={registrationData.centerCity}
-                                    required
-                                    fullWidth
-                                    InputProps={{
-                                        readOnly: true,
-                                    }}
-                                    InputLabelProps={{
-                                        shrink: true,
-                                    }}
-                                    sx={{
-                                        '& .MuiInputBase-input.Mui-readOnly': {
-                                            backgroundColor: 'rgba(0, 0, 0, 0.04)',
-                                            cursor: 'default',
-                                        }
-                                    }}
-                                />
-                                <TextField
-                                    label="State"
-                                    value={registrationData.centerState}
-                                    required
-                                    fullWidth
-                                    InputProps={{
-                                        readOnly: true,
-                                    }}
-                                    InputLabelProps={{
-                                        shrink: true,
-                                    }}
-                                    sx={{
-                                        '& .MuiInputBase-input.Mui-readOnly': {
-                                            backgroundColor: 'rgba(0, 0, 0, 0.04)',
-                                            cursor: 'default',
-                                        }
-                                    }}
-                                />
-                                <TextField
-                                    label="Zip Code"
-                                    value={registrationData.centerZip}
-                                    required
-                                    fullWidth
-                                    InputProps={{
-                                        readOnly: true,
-                                    }}
-                                    InputLabelProps={{
-                                        shrink: true,
-                                    }}
-                                    sx={{
-                                        '& .MuiInputBase-input.Mui-readOnly': {
-                                            backgroundColor: 'rgba(0, 0, 0, 0.04)',
-                                            cursor: 'default',
-                                        }
-                                    }}
-                                />
-                            </>
-                        )}
+                                            }
+                                        }}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                label="Address"
+                                                required
+                                                fullWidth
+                                                error={!!addressError}
+                                                helperText={addressError || 'Please select an address from the suggestions'}
+                                                value={registrationData.centerAddress}
+                                                onChange={(e) => {
+                                                    setRegistrationData({
+                                                        ...registrationData,
+                                                        centerAddress: e.target.value
+                                                    });
+                                                    setIsAddressValid(false);
+                                                    setAddressError('Please select an address from the suggestions');
+                                                }}
+                                                sx={{
+                                                    '& .MuiOutlinedInput-root': {
+                                                        borderRadius: '12px',
+                                                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                            borderColor: 'primary.main',
+                                                            borderWidth: 2
+                                                        }
+                                                    }
+                                                }}
+                                                size="small"
+                                            />
+                                        )}
+                                    />
+                                    <TextField
+                                        label="City"
+                                        value={registrationData.centerCity}
+                                        required
+                                        fullWidth
+                                        InputProps={{
+                                            readOnly: true,
+                                        }}
+                                        InputLabelProps={{
+                                            shrink: true,
+                                        }}
+                                        sx={{
+                                            '& .MuiInputBase-input.Mui-readOnly': {
+                                                backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                                                cursor: 'default',
+                                            },
+                                            '& .MuiOutlinedInput-root': {
+                                                borderRadius: '12px',
+                                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                    borderColor: 'primary.main',
+                                                    borderWidth: 2
+                                                }
+                                            }
+                                        }}
+                                        size="small"
+                                    />
+                                    <TextField
+                                        label="State"
+                                        value={registrationData.centerState}
+                                        required
+                                        fullWidth
+                                        InputProps={{
+                                            readOnly: true,
+                                        }}
+                                        InputLabelProps={{
+                                            shrink: true,
+                                        }}
+                                        sx={{
+                                            '& .MuiInputBase-input.Mui-readOnly': {
+                                                backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                                                cursor: 'default',
+                                            },
+                                            '& .MuiOutlinedInput-root': {
+                                                borderRadius: '12px',
+                                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                    borderColor: 'primary.main',
+                                                    borderWidth: 2
+                                                }
+                                            }
+                                        }}
+                                        size="small"
+                                    />
+                                    <TextField
+                                        label="Zip Code"
+                                        value={registrationData.centerZip}
+                                        required
+                                        fullWidth
+                                        InputProps={{
+                                            readOnly: true,
+                                        }}
+                                        InputLabelProps={{
+                                            shrink: true,
+                                        }}
+                                        sx={{
+                                            '& .MuiInputBase-input.Mui-readOnly': {
+                                                backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                                                cursor: 'default',
+                                            },
+                                            '& .MuiOutlinedInput-root': {
+                                                borderRadius: '12px',
+                                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                    borderColor: 'primary.main',
+                                                    borderWidth: 2
+                                                }
+                                            }
+                                        }}
+                                        size="small"
+                                    />
+                                </>
+                            ) : (
+                                <>
+                                    <TextField
+                                        label="First Name"
+                                        type="text"
+                                        value={registrationData.firstName}
+                                        onChange={(e) => setRegistrationData({ ...registrationData, firstName: e.target.value })}
+                                        required
+                                        fullWidth
+                                        sx={{
+                                            '& .MuiOutlinedInput-root': {
+                                                borderRadius: '12px',
+                                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                    borderColor: 'primary.main',
+                                                    borderWidth: 2
+                                                }
+                                            }
+                                        }}
+                                        size="small"
+                                    />
+                                    <TextField
+                                        label="Last Name"
+                                        type="text"
+                                        value={registrationData.lastName}
+                                        onChange={(e) => setRegistrationData({ ...registrationData, lastName: e.target.value })}
+                                        required
+                                        fullWidth
+                                        sx={{
+                                            '& .MuiOutlinedInput-root': {
+                                                borderRadius: '12px',
+                                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                    borderColor: 'primary.main',
+                                                    borderWidth: 2
+                                                }
+                                            }
+                                        }}
+                                        size="small"
+                                    />
+                                    <TextField
+                                        label="Zip Code"
+                                        type="text"
+                                        value={registrationData.centerZip}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            if (value === '' || (/^\d+$/.test(value))) {
+                                                setRegistrationData({ ...registrationData, centerZip: value });
+                                            }
+                                        }}
+                                        onKeyDown={(e) => {
+                                            // Prevent non-numeric key presses
+                                            if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete') {
+                                                e.preventDefault();
+                                            }
+                                        }}
+                                        inputProps={{ inputMode: 'numeric', pattern: '[0-9]*', maxLength: 5 }}
+                                        required
+                                        fullWidth
+                                        sx={{
+                                            '& .MuiOutlinedInput-root': {
+                                                borderRadius: '12px',
+                                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                    borderColor: 'primary.main',
+                                                    borderWidth: 2
+                                                }
+                                            }
+                                        }}
+                                        size="small"
+                                    />
+                                    <TextField
+                                        label="Age"
+                                        type="text" // Use text for more control over input
+                                        value={registrationData.age}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            if (value === '' || (/^\d+$/.test(value) && parseInt(value, 10) > 0 && parseInt(value, 10) <= 100)) {
+                                                setRegistrationData({ ...registrationData, age: value });
+                                            }
+                                        }}
+                                        onKeyDown={(e) => {
+                                            // Prevent non-numeric key presses
+                                            if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete') {
+                                                e.preventDefault();
+                                            }
+                                        }}
+                                        required
+                                        fullWidth
+                                        inputProps={{ inputMode: 'numeric', pattern: '[0-9]*', min: 1, max: 100 }}
+                                        sx={{
+                                            '& .MuiOutlinedInput-root': {
+                                                borderRadius: '12px',
+                                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                    borderColor: 'primary.main',
+                                                    borderWidth: 2
+                                                }
+                                            }
+                                        }}
+                                        size="small"
+                                    />
+                                </>
+                            )}
+                        </Box>
+                    </Box>
 
-                        {registrationData.userType === 'Owner' && (
-                            <>
-                                <TextField
-                                    label="First Name"
-                                    type="text"
-                                    value={registrationData.firstName}
-                                    onChange={(e) => setRegistrationData({ ...registrationData, firstName: e.target.value })}
-                                    required
-                                    fullWidth
-                                />
-                                <TextField
-                                    label="Last Name"
-                                    type="text"
-                                    value={registrationData.lastName}
-                                    onChange={(e) => setRegistrationData({ ...registrationData, lastName: e.target.value })}
-                                    required
-                                    fullWidth
-                                />
-                                <TextField
-                                    label="Zip Code"
-                                    type="text"
-                                    value={registrationData.centerZip}
-                                    onChange={(e) => {
-                                        const value = e.target.value;
-                                        if (value === '' || (/^\d+$/.test(value))) {
-                                            setRegistrationData({ ...registrationData, centerZip: value });
-                                        }
-                                    }}
-                                    onKeyDown={(e) => {
-                                        // Prevent non-numeric key presses
-                                        if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete') {
-                                            e.preventDefault();
-                                        }
-                                    }}
-                                    inputProps={{ inputMode: 'numeric', pattern: '[0-9]*', maxLength: 5 }}
-                                    required
-                                    fullWidth
-                                />
-                                <TextField
-                                    label="Age"
-                                    type="text" // Use text for more control over input
-                                    value={registrationData.age}
-                                    onChange={(e) => {
-                                        const value = e.target.value;
-                                        if (value === '' || (/^\d+$/.test(value) && parseInt(value, 10) > 0 && parseInt(value, 10) <= 100)) {
-                                            setRegistrationData({ ...registrationData, age: value });
-                                        }
-                                    }}
-                                    onKeyDown={(e) => {
-                                        // Prevent non-numeric key presses
-                                        if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete') {
-                                            e.preventDefault();
-                                        }
-                                    }}
-                                    required
-                                    fullWidth
-                                    inputProps={{ inputMode: 'numeric', pattern: '[0-9]*', min: 1, max: 100 }}
-                                />
-                            </>
-                        )}
-
+                    <Box sx={{ mt: 2, textAlign: 'center' }}>
                         {errorMessage && (
-                            <Typography variant="body2" color="error">
+                            <Typography
+                                variant="body2"
+                                color="error"
+                                sx={{ mb: 1 }}
+                            >
                                 {errorMessage}
                             </Typography>
                         )}
@@ -477,28 +659,41 @@ const Register = () => {
                         <Button
                             type="submit"
                             variant="contained"
-                            fullWidth
                             sx={{
-                                background: 'linear-gradient(90deg, #43cea2, #185a9d)',
+                                bgcolor: 'primary.main',
                                 color: 'white',
-                                borderRadius: '50px',
-                                padding: '10px 0',
+                                borderRadius: '24px',
+                                py: 1,
+                                px: 4,
                                 '&:hover': {
-                                    background: 'linear-gradient(90deg, #185a9d, #43cea2)',
+                                    bgcolor: 'primary.dark',
                                 },
                             }}
                         >
                             Register
                         </Button>
-                    </Stack>
-                </form>
 
-                <Typography variant="body2" marginTop={2}>
-                    Already have an account?{' '}
-                    <Link to="/login" style={{ color: '#43cea2', textDecoration: 'none' }}>
-                        Login
-                    </Link>
-                </Typography>
+                        <Typography
+                            variant="body2"
+                            sx={{
+                                color: 'text.secondary',
+                                mt: 1
+                            }}
+                        >
+                            Already have an account?{' '}
+                            <Link
+                                to="/login"
+                                style={{
+                                    color: 'inherit',
+                                    textDecoration: 'none',
+                                    fontWeight: 600
+                                }}
+                            >
+                                Login
+                            </Link>
+                        </Typography>
+                    </Box>
+                </form>
             </Box>
         </Box>
     );

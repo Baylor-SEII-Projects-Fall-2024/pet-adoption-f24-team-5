@@ -5,6 +5,28 @@ import { ThemeProvider, createTheme } from '@mui/material';
 // Material UI components throughout your website. Correspondingly, this is where you would set
 // up your color palette, standard spacings, etc.
 const themeOptions = {
+    palette: {
+        primary: {
+            main: '#8B7355', // warm brown from the logo outline
+            light: '#A68B73',
+            dark: '#6B563E',
+            contrastText: '#ffffff',
+        },
+        secondary: {
+            main: '#D4C4B7', // beige/cream color from the logo
+            light: '#E8DED6',
+            dark: '#BBA89A',
+            contrastText: '#000000',
+        },
+        background: {
+            default: '#FAF7F5', // very light cream
+            paper: '#ffffff',
+        },
+        text: {
+            primary: '#2C1810', // dark brown
+            secondary: '#5C4033', // medium brown
+        }
+    },
     typography: {
         fontFamily: 'Roboto, Noto Sans, sans-serif',
         fontSize: 14,
@@ -13,23 +35,28 @@ const themeOptions = {
         }
     },
     shape: {
-        borderRadius: 5,
+        borderRadius: 12, // increased for a softer look
     },
     components: {
         MuiButton: {
             styleOverrides: {
                 root: {
                     textTransform: 'none',
-                    marginLeft: 4,
-                    marginRight: 4,
-                    marginTop: 4,
-                    marginBottom: 4,
+                    margin: '8px',
+                    borderRadius: '24px', // pill-shaped buttons
+                    padding: '8px 24px',
                 },
                 outlinedPrimary: {
-                    border: '2px solid'
+                    border: '2px solid',
+                    '&:hover': {
+                        border: '2px solid',
+                    }
                 },
                 outlinedSecondary: {
-                    border: '2px solid'
+                    border: '2px solid',
+                    '&:hover': {
+                        border: '2px solid',
+                    }
                 },
             },
         },
@@ -39,7 +66,7 @@ const themeOptions = {
                     backgroundColor: '#ffffff',
                     transition: 'box-shadow 0.3s ease-in-out',
                     '&:hover': {
-                        boxShadow: '0 8px 24px rgba(0,0,0,0.12)'
+                        boxShadow: '0 8px 24px rgba(139,115,85,0.15)' // brown-tinted shadow
                     }
                 }
             }
@@ -48,7 +75,7 @@ const themeOptions = {
             styleOverrides: {
                 root: {
                     '& .MuiOutlinedInput-root': {
-                        borderRadius: '8px',
+                        borderRadius: '12px',
                     }
                 }
             }
@@ -59,6 +86,14 @@ const themeOptions = {
                     '&:focus': {
                         backgroundColor: 'transparent'
                     }
+                }
+            }
+        },
+        MuiCard: {
+            styleOverrides: {
+                root: {
+                    borderRadius: '16px',
+                    border: '1px solid #E8DED6', // light beige border
                 }
             }
         }
