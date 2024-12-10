@@ -1,8 +1,6 @@
 package petadoption.api.user;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
@@ -27,7 +25,7 @@ import java.util.List;
         @JsonSubTypes.Type(value = CenterWorker.class, name = "CenterWorker"),
         @JsonSubTypes.Type(value = Owner.class, name = "Owner")
 })
-@JsonIgnoreProperties("password")
+//@JsonIgnoreProperties("password")
 public class User implements UserDetails {
     public static final String TABLE_NAME = "USERS";
 
@@ -40,6 +38,7 @@ public class User implements UserDetails {
     protected String emailAddress;
 
     @Column(name = "PASSWORD")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     protected String password;
 
     @Column(name = "ACCOUNT_TYPE")

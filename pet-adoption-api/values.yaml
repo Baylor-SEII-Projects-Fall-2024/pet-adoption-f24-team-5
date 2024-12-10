@@ -38,6 +38,8 @@ minio:
 # Disable Pulsar
 pulsar:
   enabled: false
+pulsarv3:
+  enabled: false
 
 # Configure Milvus with persistence and resource limits
 milvus:
@@ -51,9 +53,9 @@ milvus:
       storageClass: ""
   resources:
     requests:
-      memory: "2Gi"
-      cpu: "1"
+      memory: "4Gi"
+      cpu: "2"
     limits:
-      memory: "2Gi"
-      cpu: "1"
+      memory: "4Gi"
+      cpu: "2"
 
