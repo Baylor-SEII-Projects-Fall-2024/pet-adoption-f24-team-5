@@ -7,6 +7,7 @@ import { deletePet } from "@/utils/pet/DeletePet";
 import SearchableDropdown from "@/components/petForm/SearchableDropdown";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { getAllPets } from "@/utils/user/center/getAllPets";
+import {getSubjectFromToken} from "@/utils/redux/tokenUtils";
 
 const PetFormComponent = (props) => {
     const [petId, setPetId] = useState(null);
@@ -160,6 +161,7 @@ const PetFormComponent = (props) => {
 
     const handleDelete = (event) => {
         event.preventDefault();
+        const email = getSubjectFromToken(token);
 
         const petData = {
             petId,
@@ -178,7 +180,8 @@ const PetFormComponent = (props) => {
             petData,
             token,
             resetFields,
-            handlePostNewPet: props.handlePostNewPet
+            handlePostNewPet: props.handlePostNewPet,
+            email
         });
 
     }
