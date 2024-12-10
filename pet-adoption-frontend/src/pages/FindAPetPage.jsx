@@ -10,6 +10,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import CircularProgress from '@mui/material/CircularProgress';
 import HamburgerMenu from '@/components/HamburgerMenu';
 import TuneIcon from '@mui/icons-material/Tune';
+import { resetRecommendation } from "@/utils/recommendationEngine/reset-recommendation";
+import { skewBySpecies } from "@/utils/recommendationEngine/skewBySpecies";
 
 const FindAPetPage = () => {
     const [currentPets, setCurrentPets] = useState([]);
@@ -89,13 +91,19 @@ const FindAPetPage = () => {
 
     const handleSelectSpecies = async (species) => {
         setLoading(true);
+        // Clear preloaded pets to avoid showing outdated recommendations
+        setPreloadedPets([]);
+
         try {
-            // You'll need to modify generateNewOptions to accept species parameter
-            const newPets = await generateNewOptions(token, species.toLowerCase());
+            // First skew the results towards the selected species
+            await skewBySpecies(token, species.toLowerCase());
+
+            // Then get new recommendations
+            const newPets = await generateNewOptions(token);
             setCurrentPets(newPets);
 
             // Preload next set
-            const nextPets = await generateNewOptions(token, species.toLowerCase());
+            const nextPets = await generateNewOptions(token);
             setPreloadedPets(nextPets);
         } catch (error) {
             console.error('Error loading pets:', error);
@@ -106,14 +114,12 @@ const FindAPetPage = () => {
 
     const handleResetPreferences = async () => {
         setLoading(true);
+        // Clear preloaded pets to avoid showing outdated recommendations
+        setPreloadedPets([]);
+
         try {
-            // You'll need to implement this endpoint
-            await fetch('/api/users/reset-preferences', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+            // Reset the recommendation engine
+            await resetRecommendation(token);
 
             // Load new pets with reset preferences
             const newPets = await generateNewOptions(token);
@@ -143,10 +149,17 @@ const FindAPetPage = () => {
         >
             {/* Header */}
             <Box sx={{ mb: 2, textAlign: 'center' }}>
-                <Typography variant="h5" sx={{ fontWeight: 600, color: 'primary.main' }}>
+                <Typography variant="h5" sx={{
+                    fontWeight: 600,
+                    color: 'text.primary',  // Using the new dark brown color
+                    mb: 1
+                }}>
                     Find Your Match
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" sx={{
+                    color: 'text.secondary',  // Using the new medium brown color
+                    mb: 3
+                }}>
                     Like pets to improve your recommendations
                 </Typography>
             </Box>
@@ -215,14 +228,13 @@ const FindAPetPage = () => {
                             sx={{
                                 display: 'flex',
                                 flexDirection: 'column',
-                                width: '100%',
                                 marginLeft: 'auto',
                                 marginRight: 'auto',
                                 border: '1px solid',
-                                borderColor: 'divider',
-                                borderRadius: '16px',
+                                borderColor: 'secondary.light', // Using the new beige color
+                                borderRadius: '24px', // Matching the new rounded theme
                                 bgcolor: 'background.paper',
-                                boxShadow: '0px 0px 10px rgba(0,0,0,0.1)',
+                                boxShadow: '0px 0px 10px rgba(139,115,85,0.1)', // Brown-tinted shadow
                                 mt: 'auto',
                                 mb: 2,
                                 position: 'relative',
@@ -235,7 +247,6 @@ const FindAPetPage = () => {
                                     display: 'flex',
                                     justifyContent: 'center',
                                     gap: 2,
-                                    py: 1.5,
                                     maxWidth: '1400px',
                                     margin: '0 auto',
                                     width: '100%',
@@ -248,7 +259,8 @@ const FindAPetPage = () => {
                                     startIcon={<CloseIcon />}
                                     sx={{
                                         minWidth: 150,
-                                        height: 40,
+                                        height: 48,
+                                        borderRadius: '24px', // Pill-shaped buttons
                                         borderColor: 'error.main',
                                         color: 'error.main',
                                         '&:hover': {
@@ -266,7 +278,8 @@ const FindAPetPage = () => {
                                     onClick={() => setSavedPetsModalOpen(true)}
                                     sx={{
                                         minWidth: 150,
-                                        height: 40,
+                                        height: 48,
+                                        borderRadius: '24px', // Pill-shaped buttons
                                         bgcolor: 'primary.main',
                                         '&:hover': {
                                             bgcolor: 'primary.dark'
@@ -283,8 +296,10 @@ const FindAPetPage = () => {
                                     startIcon={<TuneIcon />}
                                     sx={{
                                         minWidth: 150,
-                                        height: 40,
+                                        height: 48,
+                                        borderRadius: '24px', // Pill-shaped buttons
                                         bgcolor: 'secondary.main',
+                                        color: 'text.primary',
                                         '&:hover': {
                                             bgcolor: 'secondary.dark'
                                         }

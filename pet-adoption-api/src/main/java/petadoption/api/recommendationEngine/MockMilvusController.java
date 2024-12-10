@@ -28,7 +28,7 @@ public class MockMilvusController {
     private final MilvusServiceAdapter milvusServiceAdapter;
     private final MilvusService milvusService;
 
-    private final int DIMENSIONS = 50;
+    private final int DIMENSIONS = 100;
     private final int vectorCt = 1050;
     public final String PET_PARTITION = "PET_PARTITION";
 

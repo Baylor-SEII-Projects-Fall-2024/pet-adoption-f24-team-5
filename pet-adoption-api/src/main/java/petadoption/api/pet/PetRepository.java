@@ -13,6 +13,9 @@ import java.util.Optional;
 public interface PetRepository extends JpaRepository<Pet, Integer> {
     Optional<List<Pet>> findByAdoptionCenter(AdoptionCenter adoptionCenter);
 
+    @Query("SELECT COUNT(p) FROM Pet p WHERE p.adoptionCenter.id = :center_id AND p.adoptionStatus = false")
+    Optional<Integer> findNumAvailablePetsByAdoptionCenter(@Param("center_id") Long adoptionCenterId);
+
     Optional<Pet> findByPetId(long petId);
 
     Optional<List<Pet>> findByPetIdIn(Collection<Long> ids);
@@ -22,4 +25,6 @@ public interface PetRepository extends JpaRepository<Pet, Integer> {
 
     @Query("SELECT p FROM Pet p WHERE p.species = :species ORDER BY RAND() LIMIT 1")
     Pet findRandomPetBySpecies(@Param("species") String species);
+
+    Optional<List<Pet>> findByAdoptionStatusFalse();
 }

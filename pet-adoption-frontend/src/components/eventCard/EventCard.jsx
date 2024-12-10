@@ -123,7 +123,8 @@ const EventCard = ({
                                 sx={{
                                     borderBottom: 1,
                                     borderColor: 'divider',
-                                    pb: 1
+                                    pb: 1,
+                                    color: 'text.primary',
                                 }}
                             >
                                 {event.eventName || event.event_name || "Untitled Event"}
@@ -177,9 +178,14 @@ const EventCard = ({
                                 }}
                                 sx={{
                                     mt: 'auto',
-                                    py: 1,
+                                    py: 1.5,
                                     textTransform: 'none',
-                                    fontWeight: 600
+                                    fontWeight: 600,
+                                    borderRadius: '24px',
+                                    bgcolor: 'primary.main',
+                                    '&:hover': {
+                                        bgcolor: 'primary.dark'
+                                    }
                                 }}
                             >
                                 Edit Event Details
@@ -206,9 +212,7 @@ const EventCard = ({
                                         sx={{
                                             fontWeight: 700,
                                             mb: 2,
-                                            background: 'linear-gradient(45deg, #1976d2, #42a5f5)',
-                                            WebkitBackgroundClip: 'text',
-                                            WebkitTextFillColor: 'transparent',
+                                            color: 'text.primary',
                                         }}
                                     >
                                         {event.eventName || event.event_name || "Untitled Event"}

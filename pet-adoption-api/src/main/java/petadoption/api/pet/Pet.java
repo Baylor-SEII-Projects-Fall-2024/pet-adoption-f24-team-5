@@ -58,10 +58,6 @@ public class Pet {
     @Column(name = "IMAGE_NAME", length = 1000)
     private String imageName;
 
-    @ManyToOne
-    @JoinColumn(name = "OWNER_ID")
-    private Owner owner;
-
     public Pet(String species, String petName, String breed, String color, String sex, Integer age,
             Boolean adoptionStatus,
             String description) {

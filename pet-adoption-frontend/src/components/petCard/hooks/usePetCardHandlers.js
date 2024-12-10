@@ -115,8 +115,8 @@ export const usePetCardHandlers = (pet, token, email, onLike) => {
                     conversationId: conversation.conversationId,
                     senderId: userId,
                     receiverId: centerID,
-                    //message: petDataMessage,
-                    message: "Hello World",
+                    message: petDataMessage,
+                    //message: "Hello World",
                     isRead: false,
                 },
                 {

@@ -3,6 +3,7 @@ package petadoption.api.pet;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import petadoption.api.user.AdoptionCenter.AdoptionCenter;
+import petadoption.api.user.Owner.Owner;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,6 +14,9 @@ public class PetService {
 
     private final PetRepository petRepository;
 
+    public List<Pet> getAdoptablePets() {
+        return petRepository.findByAdoptionStatusFalse().orElse(null);
+    }
 
     public List<Pet> getAllPets() { return petRepository.findAll(); }
 
@@ -25,8 +29,19 @@ public class PetService {
 
     }
 
+    public Pet adoptPet(Pet pet, AdoptionCenter adoptionCenter) {
+        pet.setAdoptionCenter(adoptionCenter);
+        pet.setAdoptionStatus(true);
+        return petRepository.save(pet);
+    }
+
     public List<Pet> getPetByAdoptionCenter(AdoptionCenter adoptionCenter) {
         return petRepository.findByAdoptionCenter(adoptionCenter)
+                .orElse(null);
+    }
+
+    public Integer getNumAvailablePetsByAdoptionCenter(AdoptionCenter adoptionCenter) {
+        return petRepository.findNumAvailablePetsByAdoptionCenter(adoptionCenter.getId())
                 .orElse(null);
     }
 

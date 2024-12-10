@@ -55,7 +55,7 @@ const DetailItem = styled(Box)(({ theme }) => ({
     height: '100%',
     '&:hover': {
         transform: 'translateY(-2px)',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+        boxShadow: '0 4px 12px rgba(139,115,85,0.1)',
     },
     '& svg': {
         color: theme.palette.primary.main,
@@ -141,17 +141,17 @@ const ExpandedEventCard = ({ event, onClose }) => {
                                     fontWeight={800}
                                     sx={{
                                         mb: 1,
-                                        background: 'linear-gradient(45deg, #1976d2, #42a5f5)',
-                                        WebkitBackgroundClip: 'text',
-                                        WebkitTextFillColor: 'transparent',
+                                        color: 'text.primary',
                                     }}
                                 >
                                     {event.eventName || event.event_name || "Untitled Event"}
                                 </Typography>
                                 <Typography
                                     variant="h6"
-                                    color="text.secondary"
-                                    sx={{ fontWeight: 500 }}
+                                    sx={{
+                                        fontWeight: 500,
+                                        color: 'text.secondary'
+                                    }}
                                 >
                                     {event.centerName || event.center_name || "Unknown Center"}
                                 </Typography>
@@ -161,7 +161,8 @@ const ExpandedEventCard = ({ event, onClose }) => {
                                     onClick={onClose}
                                     sx={{
                                         bgcolor: 'background.paper',
-                                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                                        boxShadow: '0 2px 8px rgba(139,115,85,0.1)',
+                                        borderRadius: '12px',
                                         '&:hover': {
                                             bgcolor: 'background.paper',
                                             transform: 'scale(1.1)',
@@ -234,7 +235,7 @@ const ExpandedEventCard = ({ event, onClose }) => {
                                 fontWeight={700}
                                 sx={{
                                     mb: 3,
-                                    color: 'primary.main',
+                                    color: 'text.primary',
                                 }}
                             >
                                 About This Event
