@@ -87,31 +87,6 @@ public class PetController {
 
     }
 
-    @PostMapping("/adopt")
-    public ResponseEntity<?> adoptPet(@RequestBody Pet pet, @RequestParam String email) {
-
-        if(pet.getPetId() == null) {
-            return ResponseEntity.badRequest().body("Pet id is required");
-        }
-
-        if(email.isEmpty()) {
-            return ResponseEntity.badRequest().body("Email is required");
-        }
-
-        try {
-
-            AdoptionCenter adoptionCenter = userService.findCenterByWorkerEmail(email);
-            Pet adoptedPet = petService.adoptPet(pet, adoptionCenter);
-
-            //decrement pet count
-
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(adoptedPet);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
-    }
-
     @PostMapping("/update")
     public ResponseEntity<?> updatePet(@RequestBody Pet pet, @RequestParam String email) {
         if (pet.getPetId() == null) {
@@ -158,14 +133,11 @@ public class PetController {
         }
 
         try {
+
             if (pet.getImageName() != null && !pet.getImageName().isEmpty()) {
                 imageService.deleteImage(pet.getImageName());
             }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
 
-        try {
             AdoptionCenter tempCenter = userService.findCenterByWorkerEmail(email);
 
             petService.deletePet(pet);
