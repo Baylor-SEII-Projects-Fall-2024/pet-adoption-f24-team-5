@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import { deletePet } from "@/utils/pet/DeletePet";
 import SearchableDropdown from "@/components/petForm/SearchableDropdown";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { getAllPets } from "@/utils/user/center/getAllPets";
 
 const PetFormComponent = (props) => {
     const [petId, setPetId] = useState(null);
@@ -26,29 +27,10 @@ const PetFormComponent = (props) => {
     const [imageName, setImageName] = React.useState('');
     const [buttonText, setButtonText] = React.useState('');
     const token = useSelector((state) => state.user.token);
-
-    const speciesOptions = ["Dog", "Cat", "Snake"];
-    const dogBreeds = ["Golden Retriever", "Labrador Retriever", "German Shepherd", "French Bulldog", "Bulldog", "Poodle", "Beagle", "Rottweiler", "Yorkshire Terrier",
-        "Boxer", "Dachshund", "Siberian Husky", "Shih Tzu", "Australian Shepherd", "Cavalier King Charles Spaniel", "Doberman Pinscher", "Miniature Schnauzer",
-        "Great Dane", "Shiba Inu", "Cocker Spaniel", "Pug", "Border Collie", "Maltese", "Chihuahua", "Bernese Mountain Dog", "Basset Hound", "Havanese",
-        "Pembroke Welsh Corgi", "Vizsla", "Weimaraner", "Newfoundland", "Collie", "West Highland White Terrier", "Rhodesian Ridgeback", "Saint Bernard", "Boston Terrier",
-        "Akita", "Alaskan Malamute", "Bull Terrier", "American Staffordshire Terrier", "Australian Cattle Dog", "Bichon Frise", "Papillon", "Samoyed", "Whippet",
-        "English Springer Spaniel", "Irish Setter", "Scottish Terrier", "Chow Chow", "Pekingese"]
-    const catBreeds = ["Domestic Shorthair", "Domestic Longhair", "Maine Coon", "Siamese", "Persian", "Ragdoll", "Bengal", "Sphynx", "British Shorthair", "Scottish Fold", "Abyssinian",
-        "Russian Blue", "Birman", "American Shorthair", "Oriental Shorthair", "Devon Rex", "Cornish Rex", "Norwegian Forest Cat", "Himalayan", "Turkish Angora", "Savannah",
-        "Balinese", "Tonkinese", "Bombay", "Chartreux", "Singapura", "Manx", "Burmese", "Selkirk Rex", "Egyptian Mau", "Exotic Shorthair", "American Curl", "Turkish Van", "LaPerm",
-        "Ocicat", "Somali", "Munchkin", "Snowshoe", "Lykoi", "Japanese Bobtail", "Havana Brown", "Pixie-Bob", "Chantilly-Tiffany", "Cymric", "Peterbald", "Khao Manee",
-        "American Bobtail", "Siberian", "Toyger", "Korat", "Tabby"]
-
-    const defaultBreed = ["No Selected Species"];
-
-    const sexOptions = ["Male", "Female"];
-
-    const colorOptions = ["Black", "White", "Brown", "Gray", "Tan", "Cream", "Red", "Blue", "Chocolate", "Fawn", "Silver", "Gold", "Sable", "Brindle", "Merle", "Orange", "Lilac", "Tortoiseshell",
-        "Calico", "Seal", "Smoke", "Cinnamon", "Buff", "Chestnut", "Piebald", "Harlequin", "Tricolor", "Bicolor", "Black and Tan", "Black and White", "Blue Merle", "Chocolate and White",
-        "Cream and White", "Red and White", "Silver and White", "Golden", "Liver", "Isabella", "Wheaten", "Mahogany", "Apricot", "Slate", "Peach", "Lavender", "Champagne", "Mink"]
-
-    const adoptionOptions = ["Up For Adoption", "Owned"];
+    const [availableSpecies, setAvailableSpecies] = useState([]);
+    const [availableBreeds, setAvailableBreeds] = useState([]);
+    const [availableColors, setAvailableColors] = useState([]);
+    const [availableSexes, setAvailableSexes] = useState([]);
 
     useEffect(() => {
         setFormType(props.type);
@@ -65,7 +47,68 @@ const PetFormComponent = (props) => {
 
     }, [props.type, props.pet]);
 
+    useEffect(() => {
+        const fetchPetData = async () => {
+            try {
+                const petsData = await getAllPets(token);
+                const uniqueSpecies = [...new Set(petsData.map(pet => pet.species))];
+                setAvailableSpecies(uniqueSpecies);
+            } catch (error) {
+                console.error('Error fetching pet data:', error);
+            }
+        };
 
+        fetchPetData();
+    }, [token]);
+
+    useEffect(() => {
+        const updateBreeds = async () => {
+            if (!species) return;
+
+            try {
+                const petsData = await getAllPets(token);
+                const uniqueBreeds = [...new Set(
+                    petsData
+                        .filter(pet => pet.species === species)
+                        .map(pet => pet.breed)
+                )];
+                setAvailableBreeds(uniqueBreeds);
+                setBreed(''); // Reset breed when species changes
+            } catch (error) {
+                console.error('Error fetching breeds:', error);
+            }
+        };
+
+        updateBreeds();
+    }, [species, token]);
+
+    useEffect(() => {
+        const fetchColors = async () => {
+            try {
+                const petsData = await getAllPets(token);
+                const uniqueColors = [...new Set(petsData.map(pet => pet.color))];
+                setAvailableColors(uniqueColors);
+            } catch (error) {
+                console.error('Error fetching colors:', error);
+            }
+        };
+
+        fetchColors();
+    }, [token]);
+
+    useEffect(() => {
+        const fetchSexes = async () => {
+            try {
+                const petsData = await getAllPets(token);
+                const uniqueSexes = [...new Set(petsData.map(pet => pet.sex))];
+                setAvailableSexes(uniqueSexes);
+            } catch (error) {
+                console.error('Error fetching sexes:', error);
+            }
+        };
+
+        fetchSexes();
+    }, [token]);
 
     const setFields = (pet) => {
         setPetId(pet.petId);
@@ -109,16 +152,7 @@ const PetFormComponent = (props) => {
     }
 
     const getBreedOptions = () => {
-        switch (species) {
-            case "Dog":
-                return dogBreeds;
-            case "Cat":
-                return catBreeds;
-            case "Snake":
-                return "SNAKES!";
-            default:
-                return defaultBreed;
-        }
+        return availableBreeds;
     };
 
     const handleDelete = (event) => {
@@ -253,9 +287,9 @@ const PetFormComponent = (props) => {
                                         backgroundColor: 'background.paper'
                                     }}
                                 >
-                                    {speciesOptions.map((option) => (
-                                        <MenuItem key={option} value={option}>
-                                            {option}
+                                    {availableSpecies.map((speciesOption) => (
+                                        <MenuItem key={speciesOption} value={speciesOption}>
+                                            {speciesOption}
                                         </MenuItem>
                                     ))}
                                 </Select>
@@ -293,9 +327,9 @@ const PetFormComponent = (props) => {
                                         backgroundColor: 'background.paper'
                                     }}
                                 >
-                                    {colorOptions.map((option) => (
-                                        <MenuItem key={option} value={option}>
-                                            {option}
+                                    {availableColors.map((colorOption) => (
+                                        <MenuItem key={colorOption} value={colorOption}>
+                                            {colorOption}
                                         </MenuItem>
                                     ))}
                                 </Select>
@@ -313,9 +347,9 @@ const PetFormComponent = (props) => {
                                         backgroundColor: 'background.paper'
                                     }}
                                 >
-                                    {sexOptions.map((option) => (
-                                        <MenuItem key={option} value={option}>
-                                            {option}
+                                    {availableSexes.map((sexOption) => (
+                                        <MenuItem key={sexOption} value={sexOption}>
+                                            {sexOption}
                                         </MenuItem>
                                     ))}
                                 </Select>
