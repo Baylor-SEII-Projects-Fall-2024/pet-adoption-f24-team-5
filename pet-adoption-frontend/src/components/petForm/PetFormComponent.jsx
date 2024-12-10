@@ -73,14 +73,17 @@ const PetFormComponent = (props) => {
                         .map(pet => pet.breed)
                 )];
                 setAvailableBreeds(uniqueBreeds);
-                setBreed(''); // Reset breed when species changes
+
+                if (formType !== "update") {
+                    setBreed('');
+                }
             } catch (error) {
                 console.error('Error fetching breeds:', error);
             }
         };
 
         updateBreeds();
-    }, [species, token]);
+    }, [species, token, formType]);
 
     useEffect(() => {
         const fetchColors = async () => {
