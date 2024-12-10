@@ -6,7 +6,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { getUser } from "@/utils/user/getUser";
 import { getAllUnreadsForUser } from "@/utils/user/getAllUnreadsForUser";
-import { NotificationsOutlined, Settings, Logout } from '@mui/icons-material';
+import { NotificationsOutlined, Settings, Logout, Book } from '@mui/icons-material';
 import { IconButton, Tooltip } from '@mui/material';
 import Image from 'next/image';
 import { useTheme } from '@mui/material/styles';
@@ -115,7 +115,7 @@ const TitleBar = () => {
                     <Button
                         color="inherit"
                         component={Link}
-                        to="/credits"
+                        to="/"
                         sx={{
                             fontSize: '1.4rem',
                             textTransform: 'none',
@@ -200,6 +200,25 @@ const TitleBar = () => {
                     width: '250px',
                     justifyContent: 'flex-end'
                 }}>
+                    {/* Story Icon */}
+                    <Tooltip title="Our Story">
+                        <IconButton
+                            color="inherit"
+                            component={Link}
+                            to="/credits"
+                            size="small"
+                            sx={{
+                                padding: '8px',
+                                borderRadius: '12px',
+                                '&:hover': {
+                                    bgcolor: 'rgba(255,255,255,0.1)'
+                                }
+                            }}
+                        >
+                            <Book sx={{ fontSize: '1.2rem' }} />
+                        </IconButton>
+                    </Tooltip>
+
                     {/* Messages Icon */}
                     <Tooltip title="Messages">
                         <IconButton
