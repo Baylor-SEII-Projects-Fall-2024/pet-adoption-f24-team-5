@@ -104,9 +104,6 @@ public class PetController {
             Pet adoptedPet = petService.adoptPet(pet, adoptionCenter);
 
             //decrement pet count
-            adoptionCenterService.updatePetCount(pet.getAdoptionCenter().getId(), (adoptionCenter.getNumberOfPets() - 1));
-
-            milvusServiceAdapter.deleteData(pet.getPetId(), RecommendationService.PET_PARTITION);
 
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(adoptedPet);
@@ -126,10 +123,24 @@ public class PetController {
         }
 
         try {
-            double [] petVector = recommendationService.generatePreferenceVector(pet);
-            milvusServiceAdapter.upsertData(pet.petId, petVector,petVector.length, RecommendationService.PET_PARTITION);
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(petService.savePet(pet, userService.findCenterByWorkerEmail(email)));
+            AdoptionCenter adoptionCenter = userService.findCenterByWorkerEmail(email);
+            Pet updatedPet;
+
+            if (pet.adoptionStatus) {
+                updatedPet = petService.adoptPet(pet, adoptionCenter);
+
+                adoptionCenterService.updatePetCount(pet.getAdoptionCenter().getId(), (adoptionCenter.getNumberOfPets() - 1));
+
+                milvusServiceAdapter.deleteData(pet.getPetId(), RecommendationService.PET_PARTITION);
+
+            } else {
+                double[] petVector = recommendationService.generatePreferenceVector(pet);
+                milvusServiceAdapter.upsertData(pet.petId, petVector, petVector.length, RecommendationService.PET_PARTITION);
+
+                updatedPet = petService.savePet(pet, adoptionCenter);
+            }
+
+            return ResponseEntity.status(HttpStatus.OK).body(updatedPet);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
