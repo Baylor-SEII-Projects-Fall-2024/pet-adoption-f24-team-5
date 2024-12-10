@@ -34,9 +34,9 @@ public class AttributeEmbedding {
         // Configure and train Word2Vec
         Word2Vec vec = new Word2Vec.Builder()
                 .minWordFrequency(1)
-                .layerSize(50)
-                .windowSize(5)
-                .learningRate(0.025)
+                .layerSize(100)
+                .windowSize(10)
+                .learningRate(0.02)
                 .seed(42)
                 .iterate(sentenceIterator)
                 .tokenizerFactory(new DefaultTokenizerFactory())
@@ -58,7 +58,9 @@ public class AttributeEmbedding {
 
         // Retrain Word2Vec with the combined sentences
         SentenceIterator sentenceIterator = new CollectionSentenceIterator(combinedSentences);
-        word2Vec = trainAttributeEmbeddings(sentenceIterator);
+//        word2Vec = trainAttributeEmbeddings(sentenceIterator);
+        word2Vec.setSentenceIterator(sentenceIterator);
+        word2Vec.fit();
         additionalSentences.clear(); // Clear after retraining
     }
 }

@@ -64,8 +64,8 @@ public class RecommendationService {
         try{
             if(preferences != null){
 
-                double weightOfOld = 0.75;
-                double weightOfNew= 0.25;
+                double weightOfOld = 0.70;
+                double weightOfNew= 0.30;
 
                 embeddingVector = VectorUtils.combineVectors(preferences, weightOfOld, embeddingVector, weightOfNew);
             }

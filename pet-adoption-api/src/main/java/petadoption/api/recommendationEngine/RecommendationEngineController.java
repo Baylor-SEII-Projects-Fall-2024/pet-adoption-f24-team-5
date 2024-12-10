@@ -32,7 +32,7 @@ public class RecommendationEngineController {
     public ResponseEntity<?> skewResults(@RequestParam String species, @RequestParam String email) {
         String breed = "any";
         String color = "multicolor";
-        int age = 6;
+        int age = 4;
 
         try {
             List<String> cleanedPreferences = new ArrayList<>();
@@ -41,7 +41,7 @@ public class RecommendationEngineController {
             cleanedPreferences.add(color.toLowerCase().replaceAll("\\s+", ""));
             cleanedPreferences.add(String.valueOf(age).toLowerCase().replaceAll("\\s+", ""));
 
-            double[] userNewWeights = recommendationService.savePreferenceEmbedding(ownerService.findOwnerIdByEmail(email), cleanedPreferences, 2.75);
+            double[] userNewWeights = recommendationService.savePreferenceEmbedding(ownerService.findOwnerIdByEmail(email), cleanedPreferences, 3.0);
             return new ResponseEntity<>(userNewWeights, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
