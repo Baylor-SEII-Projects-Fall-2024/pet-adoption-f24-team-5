@@ -9,6 +9,8 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { getAllPets } from "@/utils/pet/getAllPets";
 import AddIcon from '@mui/icons-material/Add';
 
+
+
 const PetFormComponent = (props) => {
     const [petId, setPetId] = useState(null);
     const [formType, setFormType] = React.useState('');
@@ -164,6 +166,7 @@ const PetFormComponent = (props) => {
 
     const handleDelete = (event) => {
         event.preventDefault();
+        const email = getSubjectFromToken(token);
 
         const petData = {
             petId,
@@ -182,7 +185,8 @@ const PetFormComponent = (props) => {
             petData,
             token,
             resetFields,
-            handlePostNewPet: props.handlePostNewPet
+            handlePostNewPet: props.handlePostNewPet,
+            email
         });
 
     }
