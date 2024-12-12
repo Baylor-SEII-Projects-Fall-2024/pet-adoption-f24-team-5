@@ -1,4 +1,4 @@
-import { Box, Button, FormControl, InputLabel, MenuItem, Select, Stack, TextField, Typography, Grid, Paper, InputAdornment } from "@mui/material";
+import { Box, Button, FormControl, InputLabel, MenuItem, Select, Stack, TextField, Typography, Grid, Paper, InputAdornment, Divider } from "@mui/material";
 import ImageUploadComponent from "@/components/imageComponent/ImageUploadComponent";
 import React, { useEffect, useState } from "react";
 import { saveUpdatePet } from "@/utils/pet/SaveUpdatePet";
@@ -6,8 +6,10 @@ import { useSelector } from 'react-redux';
 import { deletePet } from "@/utils/pet/DeletePet";
 import SearchableDropdown from "@/components/petForm/SearchableDropdown";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { getAllPets } from "@/utils/user/center/getAllPets";
-import {getSubjectFromToken} from "@/utils/redux/tokenUtils";
+import { getAllPets } from "@/utils/pet/getAllPets";
+import AddIcon from '@mui/icons-material/Add';
+import { getSubjectFromToken } from "@/utils/redux/tokenUtils";
+
 
 const PetFormComponent = (props) => {
     const [petId, setPetId] = useState(null);
@@ -32,6 +34,9 @@ const PetFormComponent = (props) => {
     const [availableBreeds, setAvailableBreeds] = useState([]);
     const [availableColors, setAvailableColors] = useState([]);
     const [availableSexes, setAvailableSexes] = useState([]);
+    const [isCustomSpecies, setIsCustomSpecies] = useState(false);
+    const [isCustomBreed, setIsCustomBreed] = useState(false);
+    const [isCustomColor, setIsCustomColor] = useState(false);
 
     useEffect(() => {
         setFormType(props.type);
@@ -258,13 +263,13 @@ const PetFormComponent = (props) => {
             <Box sx={{
                 flex: 1,
                 overflow: 'auto',
-                p: 2,
+                p: 3,
             }}>
                 <Box sx={{
                     maxWidth: '800px',
                     margin: '0 auto'
                 }}>
-                    <Grid container spacing={2}>
+                    <Grid container spacing={2.5}>
                         <Grid item xs={12} sm={6}>
                             <TextField
                                 label="Pet Name"
@@ -274,72 +279,347 @@ const PetFormComponent = (props) => {
                                 fullWidth
                                 size="small"
                                 sx={{
-                                    backgroundColor: 'background.paper',
                                     '& .MuiOutlinedInput-root': {
-                                        height: '40px'
+                                        height: '40px',
+                                        backgroundColor: 'background.paper',
+                                        borderRadius: 1,
                                     }
                                 }}
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                            <FormControl fullWidth size="small">
-                                <InputLabel>Species</InputLabel>
-                                <Select
-                                    value={species}
-                                    onChange={(e) => setSpecies(e.target.value)}
-                                    label="Species"
-                                    sx={{
-                                        height: '40px',
-                                        backgroundColor: 'background.paper'
-                                    }}
-                                >
-                                    {availableSpecies.map((speciesOption) => (
-                                        <MenuItem key={speciesOption} value={speciesOption}>
-                                            {speciesOption}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
+                            <Box sx={{
+                                display: 'flex',
+                                gap: 1,
+                                '& .MuiFormControl-root': {
+                                    flex: 1,
+                                },
+                                '& .MuiOutlinedInput-root': {
+                                    height: '40px',
+                                    backgroundColor: 'background.paper',
+                                    borderRadius: 1,
+                                },
+                                width: '100%',
+                            }}>
+                                {!isCustomSpecies ? (
+                                    <>
+                                        <FormControl fullWidth size="small">
+                                            <InputLabel>Species</InputLabel>
+                                            <Select
+                                                value={species}
+                                                onChange={(e) => setSpecies(e.target.value)}
+                                                label="Species"
+                                                sx={{
+                                                    height: '40px',
+                                                    backgroundColor: 'background.paper',
+                                                    borderRadius: 1,
+                                                    '& .MuiOutlinedInput-notchedOutline': {
+                                                        borderColor: 'divider'
+                                                    }
+                                                }}
+                                            >
+                                                {availableSpecies.map((speciesOption) => (
+                                                    <MenuItem key={speciesOption} value={speciesOption}>
+                                                        {speciesOption}
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                        </FormControl>
+                                        <Button
+                                            onClick={() => setIsCustomSpecies(true)}
+                                            variant="outlined"
+                                            size="small"
+                                            sx={{
+                                                minWidth: '40px',
+                                                width: '40px',
+                                                height: '40px',
+                                                p: 0,
+                                                borderRadius: 1,
+                                                border: '1px solid',
+                                                borderColor: 'divider',
+                                                ml: 1,
+                                                m: 0,
+                                                '& .MuiButton-root': {
+                                                    margin: 0,
+                                                }
+                                            }}
+                                        >
+                                            <AddIcon />
+                                        </Button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <TextField
+                                            label="Enter New Species"
+                                            value={speciesInput}
+                                            onChange={(e) => {
+                                                setSpeciesInput(e.target.value);
+                                                setSpecies(e.target.value);
+                                            }}
+                                            size="small"
+                                            autoFocus
+                                            sx={{
+                                                flex: 1,
+                                                '& .MuiOutlinedInput-root': {
+                                                    height: '40px',
+                                                    backgroundColor: 'background.paper',
+                                                }
+                                            }}
+                                        />
+                                        <Button
+                                            onClick={() => {
+                                                setIsCustomSpecies(false);
+                                                setSpecies('');
+                                                setSpeciesInput('');
+                                            }}
+                                            variant="outlined"
+                                            color="error"
+                                            size="small"
+                                            sx={{
+                                                minWidth: '40px',
+                                                width: '40px',
+                                                height: '40px',
+                                                p: 0,
+                                                borderRadius: 1,
+                                                border: '1px solid',
+                                                borderColor: 'divider',
+                                                ml: 1,
+                                                m: 0,
+                                                '& .MuiButton-root': {
+                                                    margin: 0,
+                                                },
+                                                '&:hover': {
+                                                    backgroundColor: 'error.lighter',
+                                                }
+                                            }}
+                                        >
+                                            ×
+                                        </Button>
+                                    </>
+                                )}
+                            </Box>
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                            <FormControl fullWidth size="small">
-                                <InputLabel>Breed</InputLabel>
-                                <Select
-                                    value={breed}
-                                    onChange={(e) => setBreed(e.target.value)}
-                                    label="Breed"
-                                    sx={{
-                                        height: '40px',
-                                        backgroundColor: 'background.paper'
-                                    }}
-                                >
-                                    {getBreedOptions().map((option) => (
-                                        <MenuItem key={option} value={option}>
-                                            {option}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
+                            <Box sx={{
+                                display: 'flex',
+                                gap: 1,
+                                '& .MuiFormControl-root': {
+                                    flex: 1,
+                                },
+                                '& .MuiOutlinedInput-root': {
+                                    height: '40px',
+                                    backgroundColor: 'background.paper',
+                                    borderRadius: 1,
+                                },
+                                width: '100%',
+                            }}>
+                                {!isCustomBreed ? (
+                                    <>
+                                        <FormControl size="small" sx={{ flex: 1 }}>
+                                            <InputLabel>Breed</InputLabel>
+                                            <Select
+                                                value={breed}
+                                                onChange={(e) => setBreed(e.target.value)}
+                                                label="Breed"
+                                                sx={{
+                                                    height: '40px',
+                                                    backgroundColor: 'background.paper',
+                                                    borderRadius: 1,
+                                                    '& .MuiOutlinedInput-notchedOutline': {
+                                                        borderColor: 'divider'
+                                                    }
+                                                }}
+                                            >
+                                                {getBreedOptions().map((option) => (
+                                                    <MenuItem key={option} value={option}>
+                                                        {option}
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                        </FormControl>
+                                        <Button
+                                            onClick={() => setIsCustomBreed(true)}
+                                            variant="outlined"
+                                            size="small"
+                                            sx={{
+                                                minWidth: '40px',
+                                                width: '40px',
+                                                height: '40px',
+                                                p: 0,
+                                                borderRadius: 1,
+                                                border: '1px solid',
+                                                borderColor: 'divider',
+                                                ml: 1,
+                                                m: 0,
+                                                '& .MuiButton-root': {
+                                                    margin: 0,
+                                                }
+                                            }}
+                                        >
+                                            <AddIcon />
+                                        </Button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <TextField
+                                            label="Enter New Breed"
+                                            value={breedInput}
+                                            onChange={(e) => {
+                                                setBreedInput(e.target.value);
+                                                setBreed(e.target.value);
+                                            }}
+                                            size="small"
+                                            autoFocus
+                                            sx={{
+                                                flex: 1,
+                                                '& .MuiOutlinedInput-root': {
+                                                    height: '40px',
+                                                    backgroundColor: 'background.paper',
+                                                }
+                                            }}
+                                        />
+                                        <Button
+                                            onClick={() => {
+                                                setIsCustomBreed(false);
+                                                setBreed('');
+                                                setBreedInput('');
+                                            }}
+                                            variant="outlined"
+                                            color="error"
+                                            size="small"
+                                            sx={{
+                                                minWidth: '40px',
+                                                width: '40px',
+                                                height: '40px',
+                                                p: 0,
+                                                borderRadius: 1,
+                                                border: '1px solid',
+                                                borderColor: 'divider',
+                                                ml: 1,
+                                                m: 0,
+                                                '& .MuiButton-root': {
+                                                    margin: 0,
+                                                },
+                                                '&:hover': {
+                                                    backgroundColor: 'error.lighter',
+                                                }
+                                            }}
+                                        >
+                                            ×
+                                        </Button>
+                                    </>
+                                )}
+                            </Box>
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                            <FormControl fullWidth size="small">
-                                <InputLabel>Pet Color</InputLabel>
-                                <Select
-                                    value={color}
-                                    onChange={(e) => setPetColor(e.target.value)}
-                                    label="Pet Color"
-                                    sx={{
-                                        height: '40px',
-                                        backgroundColor: 'background.paper'
-                                    }}
-                                >
-                                    {availableColors.map((colorOption) => (
-                                        <MenuItem key={colorOption} value={colorOption}>
-                                            {colorOption}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
+                            <Box sx={{
+                                display: 'flex',
+                                gap: 1,
+                                '& .MuiFormControl-root': {
+                                    flex: 1,
+                                },
+                                '& .MuiOutlinedInput-root': {
+                                    height: '40px',
+                                    backgroundColor: 'background.paper',
+                                    borderRadius: 1,
+                                },
+                                width: '100%',
+                            }}>
+                                {!isCustomColor ? (
+                                    <>
+                                        <FormControl fullWidth size="small">
+                                            <InputLabel>Pet Color</InputLabel>
+                                            <Select
+                                                value={color}
+                                                onChange={(e) => setPetColor(e.target.value)}
+                                                label="Pet Color"
+                                                sx={{
+                                                    height: '40px',
+                                                    backgroundColor: 'background.paper',
+                                                    borderRadius: 1,
+                                                    '& .MuiOutlinedInput-notchedOutline': {
+                                                        borderColor: 'divider'
+                                                    }
+                                                }}
+                                            >
+                                                {availableColors.map((colorOption) => (
+                                                    <MenuItem key={colorOption} value={colorOption}>
+                                                        {colorOption}
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                        </FormControl>
+                                        <Button
+                                            onClick={() => setIsCustomColor(true)}
+                                            variant="outlined"
+                                            size="small"
+                                            sx={{
+                                                minWidth: '40px',
+                                                height: '40px',
+                                                p: 0,
+                                                borderRadius: 1,
+                                                border: '1px solid',
+                                                borderColor: 'divider',
+                                                ml: 1,
+                                                m: 0,
+                                                '& .MuiButton-root': {
+                                                    margin: 0,
+                                                }
+                                            }}
+                                        >
+                                            <AddIcon />
+                                        </Button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <TextField
+                                            label="Enter New Color"
+                                            value={colorInput}
+                                            onChange={(e) => {
+                                                setPetColorInput(e.target.value);
+                                                setPetColor(e.target.value);
+                                            }}
+                                            fullWidth
+                                            size="small"
+                                            autoFocus
+                                            sx={{
+                                                '& .MuiOutlinedInput-root': {
+                                                    height: '40px',
+                                                    backgroundColor: 'background.paper',
+                                                }
+                                            }}
+                                        />
+                                        <Button
+                                            onClick={() => {
+                                                setIsCustomColor(false);
+                                                setPetColor('');
+                                                setPetColorInput('');
+                                            }}
+                                            variant="outlined"
+                                            color="error"
+                                            size="small"
+                                            sx={{
+                                                minWidth: '40px',
+                                                height: '40px',
+                                                p: 0,
+                                                borderRadius: 1,
+                                                border: '1px solid',
+                                                borderColor: 'divider',
+                                                ml: 1,
+                                                m: 0,
+                                                '& .MuiButton-root': {
+                                                    margin: 0,
+                                                },
+                                                '&:hover': {
+                                                    backgroundColor: 'error.lighter',
+                                                }
+                                            }}
+                                        >
+                                            ×
+                                        </Button>
+                                    </>
+                                )}
+                            </Box>
                         </Grid>
                         <Grid item xs={12} sm={6}>
                             <FormControl fullWidth size="small">
@@ -350,14 +630,15 @@ const PetFormComponent = (props) => {
                                     label="Sex"
                                     sx={{
                                         height: '40px',
-                                        backgroundColor: 'background.paper'
+                                        backgroundColor: 'background.paper',
+                                        borderRadius: 1,
+                                        '& .MuiOutlinedInput-notchedOutline': {
+                                            borderColor: 'divider'
+                                        }
                                     }}
                                 >
-                                    {availableSexes.map((sexOption) => (
-                                        <MenuItem key={sexOption} value={sexOption}>
-                                            {sexOption}
-                                        </MenuItem>
-                                    ))}
+                                    <MenuItem value="Male">Male</MenuItem>
+                                    <MenuItem value="Female">Female</MenuItem>
                                 </Select>
                             </FormControl>
                         </Grid>
@@ -379,9 +660,10 @@ const PetFormComponent = (props) => {
                                     endAdornment: <InputAdornment position="end">years</InputAdornment>,
                                 }}
                                 sx={{
-                                    backgroundColor: 'background.paper',
                                     '& .MuiOutlinedInput-root': {
-                                        height: '40px'
+                                        height: '40px',
+                                        backgroundColor: 'background.paper',
+                                        borderRadius: 1,
                                     }
                                 }}
                             />
@@ -396,7 +678,10 @@ const PetFormComponent = (props) => {
                                 rows={3}
                                 size="small"
                                 sx={{
-                                    backgroundColor: 'background.paper'
+                                    '& .MuiOutlinedInput-root': {
+                                        backgroundColor: 'background.paper',
+                                        borderRadius: 1,
+                                    }
                                 }}
                             />
                         </Grid>
@@ -409,7 +694,11 @@ const PetFormComponent = (props) => {
                                     label="Adoption Status"
                                     sx={{
                                         height: '40px',
-                                        backgroundColor: 'background.paper'
+                                        backgroundColor: 'background.paper',
+                                        borderRadius: 1,
+                                        '& .MuiOutlinedInput-notchedOutline': {
+                                            borderColor: 'divider'
+                                        }
                                     }}
                                 >
                                     <MenuItem value={'false'}>Up For Adoption</MenuItem>
@@ -421,8 +710,9 @@ const PetFormComponent = (props) => {
                             <Paper
                                 variant="outlined"
                                 sx={{
-                                    p: 2,
-                                    backgroundColor: 'background.default'
+                                    p: 3,
+                                    backgroundColor: 'background.default',
+                                    mt: 1
                                 }}
                             >
                                 <Typography variant="subtitle2" sx={{ mb: 1 }}>
